@@ -1,6 +1,6 @@
 baseURL: "https://example.org/"
 title: "Continuum"
-languageCode: "en-us"
+locale: "en-us"
 
 # Building this directory standalone:  hugo server --themesDir ../..
 theme: "hugo-continuum"
