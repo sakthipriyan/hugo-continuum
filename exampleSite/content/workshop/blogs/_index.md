@@ -1,0 +1,4 @@
+---
+title: "Blogs"
+type: blogs
+---
