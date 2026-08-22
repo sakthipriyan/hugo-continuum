@@ -1,0 +1,28 @@
+name: "Continuum"
+license: "MIT"
+licenselink: "https://github.com/sakthipriyan/hugo-continuum/blob/main/LICENSE"
+description: "A Hugo theme for sites that publish blogs, books, slides, videos and interactive tools across multiple self-describing sections"
+homepage: "https://github.com/sakthipriyan/hugo-continuum"
+demosite: "https://sakthipriyan.com/"
+tags:
+  - "blog"
+  - "portfolio"
+  - "slides"
+  - "books"
+  - "tools"
+  - "responsive"
+  - "multi-section"
+features:
+  - "responsive"
+  - "blog"
+  - "slides"
+  - "videos"
+  - "tools"
+  - "books"
+  - "taxonomies"
+  - "syntax-highlighting"
+min_version: "0.164.0"
+
+author:
+  name: "Sakthi Priyan H"
+  homepage: "https://sakthipriyan.com/"
