@@ -22,7 +22,7 @@ Displays tags and Disqus comments
 
     {{- if $tags }}
     <div class="card-tags">
-        <span class="tags-icon">🏷️</span>
+        <span class="tags-icon" aria-hidden="true">🏷️</span>
         {{- range $tags }}
         {{ $tagUrl := printf "/%s/tags/%s/" $currentSection (. | urlize) }}
         <a href="{{ $tagUrl | absURL }}" class="tag-link">{{ . | title }}</a>

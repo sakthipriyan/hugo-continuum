@@ -35,14 +35,14 @@ Renders a content card with image, title, summary, meta, and tags
                 {{ else if in .RelPermalink "/slides/" }}{{ $contentIcon = "🎯" }}
                 {{ else if in .RelPermalink "/books/" }}{{ $contentIcon = "📚" }}
                 {{ end }}
-                <span class="content-icon">{{ $contentIcon }}</span>
-                <h2 class="card-title">
+                <span class="content-icon" aria-hidden="true">{{ $contentIcon }}</span>
+                <h3 class="card-title">
                     {{ if and (eq .Type "books") .Params.chapter }}
                         {{ .CurrentSection.Title }}
                     {{ else }}
                         {{ .Title }}
                     {{ end }}
-                </h2>
+                </h3>
             </div>
 
             {{ if and (eq .Type "books") .Params.chapter }}
@@ -72,7 +72,7 @@ Renders a content card with image, title, summary, meta, and tags
             <div class="card-meta">
                 {{ if .Date }}
                 <span class="meta-item">
-                    <span class="meta-icon">📅</span>
+                    <span class="meta-icon" aria-hidden="true">📅</span>
                     <time datetime="{{ .Date.Format " 2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
                 </span>
                 {{ end }}
@@ -80,7 +80,7 @@ Renders a content card with image, title, summary, meta, and tags
                 <!-- Video duration -->
                 {{ if .Params.duration }}
                 <span class="meta-item">
-                    <span class="meta-icon">⏱️</span>
+                    <span class="meta-icon" aria-hidden="true">⏱️</span>
                     <span class="duration">{{ .Params.duration }}</span>
                 </span>
                 {{ end }}
@@ -88,7 +88,7 @@ Renders a content card with image, title, summary, meta, and tags
                 <!-- Platform (for videos) -->
                 {{ if .Params.platform }}
                 <span class="meta-item">
-                    <span class="meta-icon">📺</span>
+                    <span class="meta-icon" aria-hidden="true">📺</span>
                     <span class="platform">{{ .Params.platform }}</span>
                 </span>
                 {{ end }}
@@ -96,7 +96,7 @@ Renders a content card with image, title, summary, meta, and tags
                 <!-- Tool type -->
                 {{ if .Params.tool_type }}
                 <span class="meta-item">
-                    <span class="meta-icon">🔧</span>
+                    <span class="meta-icon" aria-hidden="true">🔧</span>
                     <span class="tool-type">{{ .Params.tool_type | title }}</span>
                 </span>
                 {{ end }}
@@ -104,7 +104,7 @@ Renders a content card with image, title, summary, meta, and tags
                 <!-- Difficulty -->
                 {{ if .Params.difficulty }}
                 <span class="meta-item">
-                    <span class="meta-icon">📊</span>
+                    <span class="meta-icon" aria-hidden="true">📊</span>
                     <span class="difficulty">{{ .Params.difficulty | title }}</span>
                 </span>
                 {{ end }}
@@ -115,7 +115,7 @@ Renders a content card with image, title, summary, meta, and tags
                 {{ $readTime := math.Ceil (div $words 200.0) }}
                 {{ if gt $readTime 0 }}
                 <span class="meta-item">
-                    <span class="meta-icon">⏱️</span>
+                    <span class="meta-icon" aria-hidden="true">⏱️</span>
                     <span class="read-time">{{ $readTime }} min read</span>
                 </span>
                 {{ end }}
