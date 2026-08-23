@@ -32,9 +32,10 @@
     {{- block "book-layout" . }}{{- end }}
 {{- else }}
 <body class="{{ $bodyClass }}">
+    <a class="skip-link" href="#main-content">Skip to content</a>
     {{- partial "header.html" . }}
     {{- partial "breadcrumb.html" . }}
-    <main>
+    <main id="main-content" tabindex="-1">
         {{- block "main" . }}{{- end }}
     </main>
     {{- partial "footer.html" . }}

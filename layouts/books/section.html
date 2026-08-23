@@ -10,6 +10,7 @@
 </head>
 
 <body class="book-reader {{ .Section }}">
+    <a class="skip-link" href="#main-content">Skip to content</a>
     {{- /* Check if this is the books list page or a specific book page */ -}}
     {{- /* True for a section's /books/ index, false for an individual book. */ -}}
     {{- $isBooksListPage := eq (len (split (strings.TrimSuffix "/" (strings.TrimPrefix "/" .RelPermalink)) "/")) 2 -}}
@@ -58,7 +59,7 @@
     {{ partial "book-toc.html" . }}
 
     {{- /* Main Content */ -}}
-    <main class="book-main-content">
+    <main class="book-main-content" id="main-content" tabindex="-1">
         <div class="book-content-wrapper">
             <article class="book-chapter">
                 <header class="chapter-header">

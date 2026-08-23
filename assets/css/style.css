@@ -19,6 +19,7 @@
     --accent-ink: var(--secondary-color);
     --on-accent: #fff;
     --header-bg: var(--primary-color);
+    --focus-ring: var(--primary-color);
 }
 
 * {
@@ -38,6 +39,46 @@ body.book-layout {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+}
+
+/* Skip link: off-screen until focused, then pinned to the top-left so a
+   keyboard user can jump past the nav on every page. */
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 1100;
+    padding: 0.75rem 1.25rem;
+    background: var(--primary-color);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 0 0 var(--border-radius) 0;
+}
+
+.skip-link:focus {
+    left: 0;
+}
+
+/* main is focus-target only; never show a ring around the whole page. */
+main:focus {
+    outline: none;
+}
+
+/* Visible keyboard focus. :focus-visible keeps the ring off mouse clicks.
+   The ring colour is its own token rather than the section accent: a light
+   accent like gold is ~1.6:1 on white and would be nearly invisible. */
+:focus-visible {
+    outline-style: solid;
+    outline-width: 3px;
+    outline-color: var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* Inside the coloured header the ring must contrast with the accent, not with
+   the page. --on-accent is guaranteed to do that by construction, and setting
+   it on the header itself means every descendant inherits it. */
+.site-header {
+    --focus-ring: var(--on-accent);
 }
 
 /* Header */
@@ -2821,5 +2862,31 @@ main article table th {
 @media (prefers-reduced-motion: reduce) {
     .spinner {
         animation: none;
+    }
+}
+
+
+/* Respect a user's request for less motion: the theme uses hover lifts and
+   scale transforms throughout, which can trigger vestibular discomfort. */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .content-card:hover,
+    .section-card:hover,
+    .social-link:hover,
+    .stat-link:hover,
+    .profile-photo:hover,
+    .profile-photo-placeholder:hover,
+    .nav-links .section-link-pill:hover,
+    .tag-card:hover .tag-count-badge {
+        transform: none;
     }
 }
