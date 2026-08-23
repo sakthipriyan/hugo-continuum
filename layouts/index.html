@@ -34,6 +34,88 @@
         </div>
     </section>
 
+    {{- /* Everything below is driven by content, not by the theme:
+           - the intro is the body of content/_index.md
+           - "Start here" comes from its `startHere` front matter
+           - "Latest" is derived from dates, so it never goes stale
+           - section cards read each section's own _index.md */ -}}
+
+    {{- with .Content }}
+    <section class="home-intro">
+        {{ . }}
+    </section>
+    {{- end }}
+
+    {{- /* Curated entry points. Each item names a page; the blurb defaults to
+           that page's own description so nothing has to be written twice. */ -}}
+    {{- with .Params.startHere }}
+    <section class="home-start" aria-labelledby="start-here">
+        <h2 id="start-here">Start here</h2>
+        <ul class="start-grid">
+            {{- range . }}
+            {{- $ref := .page }}
+            {{- /* Accept either a content path or a published URL: sections that
+                   set `cascade: url:` publish at a path GetPage cannot resolve. */ -}}
+            {{- $target := $.Site.GetPage $ref }}
+            {{- if not $target }}
+            {{- range $.Site.Pages }}
+            {{- if eq .RelPermalink $ref }}{{ $target = . }}{{ end }}
+            {{- end }}
+            {{- end }}
+            {{- if not $target }}
+            {{- warnf "startHere: no page matches %q -- check content/_index.md" $ref }}
+            {{- end }}
+            {{- if $target }}
+            {{- $owner := partial "func/owning-section.html" $target }}
+            <li class="start-item"
+                {{- with $owner }}{{ with .Params.accentFrom }} style="--accent-from:{{ . }};--accent-ink:{{ $owner.Params.accentInk | default . }};"{{ end }}{{ end }}>
+                <a href="{{ $target.RelPermalink }}">
+                    {{- /* The kind is the subsection the page lives in. Derive it from the
+                           logical content path, which -- unlike .Type or .CurrentSection --
+                           is unaffected by `cascade: url:` and by whether a section
+                           declares a type of its own. */ -}}
+                    {{- $kind := $target.Type }}
+                    {{- $parts := split (strings.TrimPrefix "/" $target.Path) "/" }}
+                    {{- if ge (len $parts) 2 }}{{ $kind = index $parts 1 }}{{ end }}
+                    <span class="start-kind">{{ with $owner }}<span aria-hidden="true">{{ .Params.emoji }}</span> {{ end }}{{ $kind | humanize | singularize }}</span>
+                    <span class="start-title">{{ $target.Title }}</span>
+                </a>
+                <p class="start-note">{{ .note | default $target.Params.summary | default $target.Description | default $target.Summary }}</p>
+            </li>
+            {{- end }}
+            {{- end }}
+        </ul>
+    </section>
+    {{- end }}
+
+    {{- /* Most recent published items across every section. */ -}}
+    {{- /* Any published page carrying a real date. Filtering by Type is not
+           reliable here: Hugo resolves Type differently depending on whether a
+           section declares one, so a date is the honest signal. */ -}}
+    {{- $dated := slice }}
+    {{- range .Site.RegularPages }}
+    {{- if not .Date.IsZero }}{{ $dated = $dated | append . }}{{ end }}
+    {{- end }}
+    {{- $latest := first (.Params.latestCount | default 5) (sort $dated "Date" "desc") }}
+    {{- with $latest }}
+    <section class="home-latest" aria-labelledby="latest">
+        <h2 id="latest">Latest</h2>
+        <ul class="latest-list">
+            {{- range . }}
+            {{- $owner := partial "func/owning-section.html" . }}
+            <li class="latest-item"
+                {{- with $owner }}{{ with .Params.accentFrom }} style="--accent-from:{{ . }};--accent-ink:{{ $owner.Params.accentInk | default . }};"{{ end }}{{ end }}>
+                <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                {{- with $owner }}
+                <span class="latest-section">{{ .Title }}</span>
+                {{- end }}
+            </li>
+            {{- end }}
+        </ul>
+    </section>
+    {{- end }}
+
     <div class="main-sections">
         {{ range .Site.Sections }}
         {{ $section := . }}
@@ -47,32 +129,58 @@
             <h2>
                 {{ $emoji := "📊" }}
                 {{ if $section.Params.emoji }}{{ $emoji = $section.Params.emoji }}{{ end }}
-                {{ $emoji }} {{ $section.Title }}
+                <span aria-hidden="true">{{ $emoji }}</span> {{ $section.Title }}
             </h2>
             <p>{{ $section.Params.description | default $section.Summary | default "Explore this section" }}</p>
 
+            {{- /* Lead with the section's newest item: a reason to click, rather
+                   than an inventory count. */ -}}
+            {{- $sectionDated := slice }}
+            {{- range $section.RegularPagesRecursive }}
+            {{- if not .Date.IsZero }}{{ $sectionDated = $sectionDated | append . }}{{ end }}
+            {{- end }}
+            {{- $newest := first 1 (sort $sectionDated "Date" "desc") }}
+            {{- range $newest }}
+            <div class="section-newest">
+                <span class="section-newest-label">Latest</span>
+                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+            </div>
+            {{- end }}
+
             <div class="section-stats">
                 <div class="stats-grid">
-                    {{ $sectionPath := $section.RelPermalink }}
-
-                    {{ range (slice "books" "blogs" "slides" "tools" "videos") }}
-                    {{ $subPath := printf "%s%s/" $sectionPath . }}
-                    {{ $subSection := $.Site.GetPage $subPath }}
-                    {{ if and $subSection (gt (len $subSection.Pages) 0) }}
-                    {{ $icon := "📄" }}
-                    {{ if eq . "books" }}{{ $icon = "📚" }}
-                    {{ else if eq . "blogs" }}{{ $icon = "📝" }}
-                    {{ else if eq . "slides" }}{{ $icon = "🎯" }}
-                    {{ else if eq . "tools" }}{{ $icon = "🛠️" }}
-                    {{ else if eq . "videos" }}{{ $icon = "🎥" }}
-                    {{ end }}
+                    {{- $sectionPath := $section.RelPermalink }}
+                    {{- range (slice "books" "blogs" "slides" "tools" "videos") }}
+                    {{- $subSection := $.Site.GetPage (printf "%s%s/" $sectionPath .) }}
+                    {{- if and $subSection $subSection.Pages }}
+                    {{- $icon := "📄" }}
+                    {{- if eq . "books" }}{{ $icon = "📚" }}
+                    {{- else if eq . "blogs" }}{{ $icon = "📝" }}
+                    {{- else if eq . "slides" }}{{ $icon = "🎯" }}
+                    {{- else if eq . "tools" }}{{ $icon = "🛠️" }}
+                    {{- else if eq . "videos" }}{{ $icon = "🎥" }}
+                    {{- end }}
                     <a href="{{ $subSection.Permalink }}" class="stat-link">
-                        {{ $icon }} {{ len $subSection.Pages }} {{ if eq (len $subSection.Pages) 1 }}{{ . | singularize
-                        }}{{ else }}{{ . }}{{ end }}
+                        <span aria-hidden="true">{{ $icon }}</span> {{ len $subSection.Pages }} {{ if eq (len $subSection.Pages) 1 }}{{ . | singularize }}{{ else }}{{ . }}{{ end }}
                     </a>
-                    {{ end }}
-                    {{ end }}
+                    {{- end }}
+                    {{- end }}
 
+                    {{- /* Tag count, from the taxonomy the section declares. The
+                           previous version counted a field that was never set, so
+                           this link never appeared. */ -}}
+                    {{- with $section.Params.taxonomy }}
+                    {{- $terms := index $.Site.Taxonomies . }}
+                    {{- if $terms }}
+                    {{- $tagsPage := $.Site.GetPage (printf "%stags/" $sectionPath) }}
+                    {{- if $tagsPage }}
+                    <a href="{{ $tagsPage.Permalink }}" class="stat-link">
+                        <span aria-hidden="true">🏷️</span> {{ len $terms }} tags
+                    </a>
+                    {{- end }}
+                    {{- end }}
+                    {{- end }}
                 </div>
             </div>
 
