@@ -833,6 +833,22 @@ main {
     margin-top: 4rem;
 }
 
+/* Attribution links: underlined so they read as links on the dark footer
+   without relying on colour alone. */
+.site-footer a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.site-footer a:hover {
+    text-decoration-thickness: 2px;
+}
+
+.site-footer :focus-visible {
+    --focus-ring: #fff;
+}
+
 /* Section Overview */
 .section-overview {
     padding: 0rem 0;
