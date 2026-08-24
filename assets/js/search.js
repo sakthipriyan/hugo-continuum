@@ -110,9 +110,8 @@
         return frag;
     }
 
-    // Pills are built from the matches themselves, so a type that cannot match
-    // is never offered, and a type with no hits for this query is disabled
-    // rather than removed -- the row keeps its shape while you type.
+    // Pills are built from the matches themselves: only types that actually have
+    // a hit for this query are offered.
     function renderFilters(all) {
         if (!filters) return;
         const counts = new Map();
@@ -120,26 +119,27 @@
         const kinds = [...new Set(allKinds)].sort();
 
         filters.replaceChildren(filters.querySelector('legend'));
-        const mk = (value, label, n, disabled) => {
-            const id = 'filter-' + (value || 'all');
+        const mk = (value, label, n) => {
             const wrap = document.createElement('label');
-            wrap.className = 'search-filter' + (disabled ? ' is-empty' : '');
+            wrap.className = 'search-filter';
             const r = document.createElement('input');
-            r.type = 'radio'; r.name = 'search-type'; r.id = id; r.value = value;
+            r.type = 'radio'; r.name = 'search-type'; r.id = 'filter-' + (value || 'all');
+            r.value = value;
             r.checked = activeType === value;
-            r.disabled = !!disabled;
             r.addEventListener('change', () => { activeType = value; run(input.value); });
             const span = document.createElement('span');
             span.textContent = `${label} (${n})`;
             wrap.append(r, span);
             return wrap;
         };
-        filters.appendChild(mk('', 'All', all.length, false));
+        filters.appendChild(mk('', 'All', all.length));
         for (const k of kinds) {
             const n = counts.get(k) || 0;
-            filters.appendChild(mk(k, k + 's', n, n === 0));
+            if (n === 0) continue;
+            filters.appendChild(mk(k, k + 's', n));
         }
-        filters.hidden = all.length === 0;
+        // With one type left, All and that type mean the same thing.
+        filters.hidden = all.length === 0 || filters.querySelectorAll('.search-filter').length < 3;
     }
 
     function render(matches, terms) {
