@@ -44,12 +44,44 @@
 
 {{- $title := cond $isHome $site.Title (printf "%s | %s" .Title $site.Title) -}}
 
-{{- /* Social image: page image, then a site-wide default, then the profile. */ -}}
+{{- /* Social image: page image, then a site-wide default, then the profile.
+       $wide tracks whether the image is known to suit a wide card; a square
+       image in a summary_large_image card is cropped to 1.91:1, which on a
+       portrait means cutting the subject's head off. Default to the square
+       `summary` card and only claim the large one when the shape is known. */ -}}
 {{- $img := "" -}}
-{{- with .Params.image }}{{ $img = . }}{{ end -}}
-{{- if not $img }}{{ with .Params.youtube_id }}{{ $img = printf "https://img.youtube.com/vi/%s/maxresdefault.jpg" . }}{{ end }}{{ end -}}
-{{- if not $img }}{{ with $site.Params.ogImage }}{{ $img = . }}{{ end }}{{ end -}}
-{{- if not $img }}{{ with $site.Params.profileImage }}{{ $img = . }}{{ end }}{{ end -}}
+{{- $wide := false -}}
+{{- $res := false -}}
+{{- with .Params.image }}
+  {{- $img = . -}}
+  {{- $res = or ($.Resources.GetMatch .) (resources.Get .) -}}
+{{- end -}}
+{{- if not $img }}{{ with .Params.youtube_id }}
+  {{- /* YouTube thumbnails are 16:9. */ -}}
+  {{- $img = printf "https://img.youtube.com/vi/%s/maxresdefault.jpg" . -}}
+  {{- $wide = true -}}
+{{- end }}{{ end -}}
+{{- if not $img }}{{ with $site.Params.ogImage }}
+  {{- $img = . -}}
+  {{- $res = resources.Get . -}}
+{{- end }}{{ end -}}
+{{- if not $img }}{{ with $site.Params.profileImage }}
+  {{- $img = . -}}
+  {{- $res = resources.Get . -}}
+{{- end }}{{ end -}}
+
+{{- /* Measure it when Hugo can. Files under static/ are not resources, so this
+       simply stays unknown and the safe card type is used. */ -}}
+{{- $w := 0 }}{{ $h := 0 -}}
+{{- with $res }}
+  {{- if and .Width .Height }}
+    {{- $w = .Width }}{{ $h = .Height -}}
+    {{- if ge (div (float .Width) (float .Height)) 1.5 }}{{ $wide = true }}{{ end -}}
+  {{- end -}}
+{{- end -}}
+{{- with $site.Params.ogImageWidth }}{{ $w = . }}{{ end -}}
+{{- with $site.Params.ogImageHeight }}{{ $h = . }}{{ end -}}
+{{- if and $w $h (ne $h 0) }}{{ if ge (div (float $w) (float $h)) 1.5 }}{{ $wide = true }}{{ end }}{{ end -}}
 {{- with $img }}{{ if not (urls.Parse .).Scheme }}{{ $img = absURL . }}{{ end }}{{ end -}}
 
 <title>{{ $title }}</title>
@@ -81,10 +113,14 @@
 {{- end }}
 {{- with $img }}
 <meta property="og:image" content="{{ . }}">
+{{- if and $w $h (ne $w 0) (ne $h 0) }}
+<meta property="og:image:width" content="{{ $w }}">
+<meta property="og:image:height" content="{{ $h }}">
+{{- end }}
 {{- end }}
 
 {{- /* Twitter */}}
-<meta name="twitter:card" content="{{ cond (ne $img "") "summary_large_image" "summary" }}">
+<meta name="twitter:card" content="{{ $site.Params.twitterCard | default (cond $wide "summary_large_image" "summary") }}">
 {{- with $site.Params.twitterHandle }}
 <meta name="twitter:site" content="{{ . }}">
 <meta name="twitter:creator" content="{{ . }}">
