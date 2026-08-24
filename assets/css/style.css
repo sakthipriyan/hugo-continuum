@@ -112,15 +112,16 @@ main:focus {
 .nav-links {
     display: flex;
     list-style: none;
-    gap: 2rem;
+    gap: 0.35rem;
 }
 
 .nav-links a {
     color: var(--on-accent);
     text-decoration: none;
     transition: var(--transition);
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.6rem;
     border-radius: var(--border-radius);
+    white-space: nowrap;
 }
 
 .nav-links a:hover {
@@ -165,7 +166,7 @@ main:focus {
 }
 
 /* Mobile Navigation Styles */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .hamburger {
         display: flex;
         order: 2;
@@ -1053,7 +1054,7 @@ main {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .main-nav {
         padding: 0 1rem;
     }
@@ -1413,7 +1414,7 @@ main {
 }
 
 /* Responsive navigation for section headers */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .logo .separator {
         margin: 0 0.25rem;
     }

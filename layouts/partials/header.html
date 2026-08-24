@@ -17,26 +17,24 @@
 
             <ul class="nav-links">
                 {{- /* Subsections, in a fixed reading order, shown only when they
-                       have something in them. `about` and `tags` are always shown
-                       when present: about has body content rather than child pages,
-                       and tags is populated from the taxonomy, not from .Pages. */ -}}
+                       have something in them. `about`, `search` and `tags` are always
+                       shown when present: about has body content rather than child
+                       pages, search has neither, and tags is populated from the
+                       taxonomy rather than from .Pages. */ -}}
                 {{- $hasTags := and $section.Params.taxonomy (isset .Site.Taxonomies $section.Params.taxonomy) }}
-                {{- range (slice "about" "blogs" "books" "slides" "tags" "tools" "videos") }}
+                {{- range (slice "about" "blogs" "books" "search" "slides" "tags" "tools" "videos") }}
                     {{- $sub := $section.GetPage . }}
                     {{- if $sub }}
                         {{- if eq . "tags" }}
                             {{- if $hasTags }}
                             <li><a href="{{ $sub.RelPermalink }}">{{ title . }}</a></li>
                             {{- end }}
-                        {{- else if eq . "about" }}
+                        {{- else if or (eq . "about") (eq . "search") }}
                             <li><a href="{{ $sub.RelPermalink }}">{{ title . }}</a></li>
                         {{- else if $sub.Pages }}
                             <li><a href="{{ $sub.RelPermalink }}">{{ title . }}</a></li>
                         {{- end }}
                     {{- end }}
-                {{- end }}
-                {{- with .Site.GetPage "/search" }}
-                <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
                 {{- end }}
             </ul>
         {{- else }}
@@ -62,9 +60,6 @@
                 {{- end }}
                 <li><a href="{{ $s.RelPermalink }}" class="section-link-pill"
                     {{- with $style }} style="{{ . | safeCSS }}"{{ end }}>{{ $s.Title }}</a></li>
-                {{- end }}
-                {{- with .Site.GetPage "/search" }}
-                <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
                 {{- end }}
             </ul>
         {{- end }}

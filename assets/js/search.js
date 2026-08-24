@@ -6,6 +6,9 @@
     const status = document.getElementById('search-status');
     if (!input || !results || !status) return;
 
+    // A search page inside a section only searches that section.
+    const scope = document.querySelector('.search-form')?.dataset.scope || '';
+
     let docs = null;
     let loading = null;
 
@@ -17,7 +20,11 @@
                 if (!r.ok) throw new Error(r.status);
                 return r.json();
             })
-            .then(d => { docs = d; status.textContent = ''; return d; })
+            .then(d => {
+                docs = scope ? d.filter(x => x.n === scope) : d;
+                status.textContent = '';
+                return docs;
+            })
             .catch(() => { status.textContent = 'Could not load the search index.'; return []; });
         return loading;
     }

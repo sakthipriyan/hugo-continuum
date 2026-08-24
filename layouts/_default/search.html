@@ -1,4 +1,9 @@
 {{ define "main" }}
+{{- /* A search page inside a section searches that section; one at the site
+       root searches everything. The scope is read from the page's own
+       position, so no configuration is needed either way. */ -}}
+{{- $scope := "" }}
+{{- with partial "func/owning-section.html" . }}{{ $scope = .Title }}{{ end }}
 <div class="container section-container">
   <div class="content-list">
     <h1>{{ .Title }}</h1>
@@ -6,8 +11,9 @@
     <div class="section-content">{{ . }}</div>
     {{- end }}
 
-    <form class="search-form" role="search" onsubmit="return false;">
-      <label class="search-label" for="search-input">Search {{ .Site.Title }}</label>
+    <form class="search-form" role="search" onsubmit="return false;"
+          {{ with $scope }}data-scope="{{ . }}"{{ end }}>
+      <label class="search-label" for="search-input">Search {{ with $scope }}{{ . }}{{ else }}{{ $.Site.Title }}{{ end }}</label>
       <input type="search" id="search-input" class="search-input" autocomplete="off"
              placeholder="Title, tag, or anything in the text…" spellcheck="false">
       <p class="search-status" id="search-status" role="status" aria-live="polite"></p>
