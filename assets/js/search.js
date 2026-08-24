@@ -4,12 +4,16 @@
     const input = document.getElementById('search-input');
     const results = document.getElementById('search-results');
     const status = document.getElementById('search-status');
+    const filters = document.getElementById('search-filters');
     if (!input || !results || !status) return;
+
+    let activeType = new URLSearchParams(location.search).get('type') || '';
 
     // A search page inside a section only searches that section.
     const scope = document.querySelector('.search-form')?.dataset.scope || '';
 
     let docs = null;
+    let allKinds = [];
     let loading = null;
 
     function load() {
@@ -22,6 +26,7 @@
             })
             .then(d => {
                 docs = scope ? d.filter(x => x.n === scope) : d;
+                allKinds = docs.map(x => x.k).filter(Boolean);
                 status.textContent = '';
                 return docs;
             })
@@ -48,18 +53,38 @@
         return total;
     }
 
-    // Show where the match actually is, rather than always the opening line.
-    function excerpt(doc, terms) {
+    // Several snippets per document, each around a different match, so a long
+    // page shows where it is relevant rather than just its opening line.
+    const MAX_SNIPPETS = 3;
+
+    function excerpts(doc, terms) {
         const body = doc.b || doc.s || '';
         const low = norm(body);
-        let at = -1;
+
+        // Collect match positions for every term, earliest first.
+        const hits = [];
         for (const term of terms) {
-            const i = low.indexOf(term);
-            if (i !== -1 && (at === -1 || i < at)) at = i;
+            let from = 0, i;
+            while ((i = low.indexOf(term, from)) !== -1 && hits.length < 60) {
+                hits.push(i);
+                from = i + term.length;
+            }
         }
-        if (at === -1) return doc.s || '';
-        const start = Math.max(0, at - 70);
-        return (start > 0 ? '…' : '') + body.slice(start, start + 200).trim() + '…';
+        if (!hits.length) return doc.s ? [doc.s] : [];
+        hits.sort((a, b) => a - b);
+
+        // Merge positions that would produce overlapping windows.
+        const out = [];
+        let lastEnd = -1;
+        for (const at of hits) {
+            if (at < lastEnd) continue;
+            const start = Math.max(0, at - 70);
+            const end = Math.min(body.length, at + 150);
+            out.push((start > 0 ? '…' : '') + body.slice(start, end).trim() + (end < body.length ? '…' : ''));
+            lastEnd = end;
+            if (out.length === MAX_SNIPPETS) break;
+        }
+        return out;
     }
 
     function mark(text, terms) {
@@ -85,6 +110,38 @@
         return frag;
     }
 
+    // Pills are built from the matches themselves, so a type that cannot match
+    // is never offered, and a type with no hits for this query is disabled
+    // rather than removed -- the row keeps its shape while you type.
+    function renderFilters(all) {
+        if (!filters) return;
+        const counts = new Map();
+        for (const { doc } of all) counts.set(doc.k, (counts.get(doc.k) || 0) + 1);
+        const kinds = [...new Set(allKinds)].sort();
+
+        filters.replaceChildren(filters.querySelector('legend'));
+        const mk = (value, label, n, disabled) => {
+            const id = 'filter-' + (value || 'all');
+            const wrap = document.createElement('label');
+            wrap.className = 'search-filter' + (disabled ? ' is-empty' : '');
+            const r = document.createElement('input');
+            r.type = 'radio'; r.name = 'search-type'; r.id = id; r.value = value;
+            r.checked = activeType === value;
+            r.disabled = !!disabled;
+            r.addEventListener('change', () => { activeType = value; run(input.value); });
+            const span = document.createElement('span');
+            span.textContent = `${label} (${n})`;
+            wrap.append(r, span);
+            return wrap;
+        };
+        filters.appendChild(mk('', 'All', all.length, false));
+        for (const k of kinds) {
+            const n = counts.get(k) || 0;
+            filters.appendChild(mk(k, k + 's', n, n === 0));
+        }
+        filters.hidden = all.length === 0;
+    }
+
     function render(matches, terms) {
         results.replaceChildren();
         for (const { doc } of matches) {
@@ -98,14 +155,24 @@
 
             const meta = document.createElement('p');
             meta.className = 'search-meta';
-            const bits = [doc.n, doc.k, doc.d].filter(Boolean);
-            meta.textContent = bits.join(' · ');
+            if (doc.i) {
+                const ic = document.createElement('span');
+                ic.className = 'search-icon';
+                ic.setAttribute('aria-hidden', 'true');
+                ic.textContent = doc.i;
+                meta.appendChild(ic);
+            }
+            // The section is only worth saying when results can span sections.
+            const bits = [!scope ? doc.n : '', doc.k, doc.d].filter(Boolean);
+            meta.appendChild(document.createTextNode(bits.join(' · ')));
             li.appendChild(meta);
 
-            const p = document.createElement('p');
-            p.className = 'search-excerpt';
-            p.appendChild(mark(excerpt(doc, terms), terms));
-            li.appendChild(p);
+            for (const snippet of excerpts(doc, terms)) {
+                const p = document.createElement('p');
+                p.className = 'search-excerpt';
+                p.appendChild(mark(snippet, terms));
+                li.appendChild(p);
+            }
 
             results.appendChild(li);
         }
@@ -116,20 +183,39 @@
         if (!terms.length) {
             results.replaceChildren();
             status.textContent = '';
+            if (filters) filters.hidden = true;
+            syncUrl('');
             return;
         }
         load().then(() => {
             if (!docs) return;
-            const matches = docs
+            const all = docs
                 .map(doc => ({ doc, s: score(doc, terms) }))
                 .filter(m => m.s > 0)
-                .sort((a, b) => b.s - a.s || (b.doc.d || '').localeCompare(a.doc.d || ''))
-                .slice(0, 40);
+                .sort((a, b) => b.s - a.s || (b.doc.d || '').localeCompare(a.doc.d || ''));
+
+            // Resolve the fallback before drawing the pills, or the row shows a
+            // type as selected while All is actually in effect.
+            if (activeType && !all.some(m => m.doc.k === activeType)) activeType = '';
+
+            renderFilters(all);
+
+            const matches = (activeType ? all.filter(m => m.doc.k === activeType) : all).slice(0, 40);
+            const label = activeType ? `${activeType.toLowerCase()} result` : 'result';
             status.textContent = matches.length
-                ? `${matches.length}${matches.length === 40 ? '+' : ''} result${matches.length === 1 ? '' : 's'} for “${q.trim()}”`
+                ? `${matches.length}${matches.length === 40 ? '+' : ''} ${label}${matches.length === 1 ? '' : 's'} for “${q.trim()}”`
                 : `No results for “${q.trim()}”`;
+            syncUrl(q);
             render(matches, terms);
         });
+    }
+
+    function syncUrl(q) {
+        const p = new URLSearchParams();
+        if (q.trim()) p.set('q', q.trim());
+        if (activeType) p.set('type', activeType);
+        const url = location.pathname + (p.toString() ? '?' + p : '');
+        history.replaceState(null, '', url);
     }
 
     let timer;

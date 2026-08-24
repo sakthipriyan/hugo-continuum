@@ -19,6 +19,12 @@
       <p class="search-status" id="search-status" role="status" aria-live="polite"></p>
     </form>
 
+    {{- /* Filled in by search.js from the kinds actually present in the index,
+           so a section without videos never offers a Videos filter. */ -}}
+    <fieldset class="search-filters" id="search-filters" hidden>
+      <legend class="search-filters-legend">Filter by type</legend>
+    </fieldset>
+
     <noscript>
       <p class="no-content">Search needs JavaScript. You can browse by
         section or tag instead — every page is reachable without it.</p>

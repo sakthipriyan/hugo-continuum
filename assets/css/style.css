@@ -3113,6 +3113,70 @@ main article table th {
     min-height: 1.2em;
 }
 
+/* Type filters: radios so the group keeps native keyboard and screen-reader
+   behaviour, styled as pills. */
+.search-filters {
+    border: 0;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+/* An author `display` beats the browser's [hidden] rule, so the filter row
+   would stay on screen with nothing in it whenever the query was cleared. */
+.search-filters[hidden] {
+    display: none;
+}
+
+.search-filters-legend {
+    padding: 0;
+    margin-right: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--gray-medium);
+}
+
+.search-filter input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+}
+
+.search-filter span {
+    display: inline-block;
+    padding: 0.35rem 0.85rem;
+    border: 2px solid var(--gray-light);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.search-filter input:checked + span {
+    background: var(--accent-from);
+    border-color: var(--accent-from);
+    color: var(--on-accent);
+    font-weight: 600;
+}
+
+.search-filter input:focus-visible + span {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+.search-filter.is-empty span {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
 .search-results {
     list-style: none;
     margin: 0;
@@ -3147,10 +3211,25 @@ main article table th {
 }
 
 .search-excerpt {
-    margin: 0;
+    margin: 0 0 0.4rem;
     color: var(--text-color);
     font-size: 0.95rem;
     line-height: 1.55;
+}
+
+/* Second and later snippets are additional matches within the same page. */
+.search-excerpt + .search-excerpt {
+    padding-top: 0.4rem;
+    border-top: 1px dashed var(--gray-light);
+}
+
+.search-excerpt:last-child {
+    margin-bottom: 0;
+}
+
+.search-icon {
+    margin-right: 0.4rem;
+    font-size: 0.95rem;
 }
 
 .search-result mark {
