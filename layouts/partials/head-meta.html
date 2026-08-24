@@ -10,11 +10,37 @@
        summary, then to the site description. Trimmed to a length search
        engines and social cards will actually show. */ -}}
 {{- $desc := "" -}}
+{{- $authored := true -}}
 {{- with .Description }}{{ $desc = . }}{{ end -}}
 {{- if not $desc }}{{ with .Params.summary }}{{ $desc = . }}{{ end }}{{ end -}}
 {{- if not $desc }}{{ with .Summary }}{{ $desc = . }}{{ end }}{{ end -}}
-{{- if not $desc }}{{ with $site.Params.description }}{{ $desc = . }}{{ end }}{{ end -}}
-{{- $desc = $desc | plainify | htmlUnescape | chomp | truncate 160 -}}
+
+{{- /* Listing pages rarely have prose of their own. A synthesised line naming
+       what is on the page beats repeating the site tagline on all of them. */ -}}
+{{- if not $desc -}}
+  {{- $authored = false -}}
+  {{- $count := len .Pages -}}
+  {{- if and (eq .Kind "term") $count -}}
+    {{- $desc = printf "%d %s tagged “%s” on %s." $count (cond (eq $count 1) "item" "items") .Title $site.Title -}}
+  {{- else if and (eq .Kind "section") $count -}}
+    {{- $desc = printf "%d %s in %s on %s." $count (cond (eq $count 1) "item" "items") .Title $site.Title -}}
+  {{- else -}}
+    {{- with $site.Params.description }}{{ $desc = . }}{{ end -}}
+  {{- end -}}
+{{- end -}}
+{{- $desc = $desc | plainify | htmlUnescape | chomp -}}
+
+{{- /* Many summaries are written to sit beside the title on the page and read as
+       a continuation of it ("Couchbase setup on AWS" + "EC2 instances"). That
+       works in a card and fails in a search result, where the title is not
+       adjacent. Lead with the title when the summary is short enough to be one
+       of those -- but only for text the author actually wrote for this page. */ -}}
+{{- if and $authored (not $isHome) .Title (lt (len $desc) 60) -}}
+  {{- if not (hasPrefix (lower $desc) (lower .Title)) -}}
+    {{- $desc = printf "%s — %s" .Title $desc -}}
+  {{- end -}}
+{{- end -}}
+{{- $desc = $desc | truncate 160 -}}
 
 {{- $title := cond $isHome $site.Title (printf "%s | %s" .Title $site.Title) -}}
 
