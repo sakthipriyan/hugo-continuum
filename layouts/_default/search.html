@@ -17,13 +17,17 @@
       <div class="search-row">
         <input type="search" id="search-input" class="search-input" autocomplete="off"
                placeholder="Title, tag, or anything in the text…" spellcheck="false">
-        <div class="search-sort">
-          <label for="search-sort-select">Sort</label>
-          <select id="search-sort-select">
-            <option value="">Best match</option>
-            <option value="latest">Latest</option>
-          </select>
-        </div>
+        <fieldset class="search-sort">
+          <legend class="search-filters-legend">Sort by</legend>
+          <label class="search-filter">
+            <input type="radio" name="search-sort" value="" checked>
+            <span>Best match</span>
+          </label>
+          <label class="search-filter">
+            <input type="radio" name="search-sort" value="latest">
+            <span>Latest</span>
+          </label>
+        </fieldset>
       </div>
       <p class="search-status" id="search-status" role="status" aria-live="polite"></p>
     </form>

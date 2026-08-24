@@ -10,7 +10,7 @@
     const params = new URLSearchParams(location.search);
     let activeType = params.get('type') || '';
     let activeSort = params.get('sort') === 'latest' ? 'latest' : '';
-    const sortSelect = document.getElementById('search-sort-select');
+    const sortInputs = [...document.querySelectorAll('input[name="search-sort"]')];
 
     // A search page inside a section only searches that section.
     const scope = document.querySelector('.search-form')?.dataset.scope || '';
@@ -225,10 +225,10 @@
         history.replaceState(null, '', url);
     }
 
-    if (sortSelect) {
-        sortSelect.value = activeSort;
-        sortSelect.addEventListener('change', () => {
-            activeSort = sortSelect.value === 'latest' ? 'latest' : '';
+    for (const r of sortInputs) {
+        r.checked = r.value === activeSort;
+        r.addEventListener('change', () => {
+            activeSort = r.value === 'latest' ? 'latest' : '';
             run(input.value);
         });
     }

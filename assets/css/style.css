@@ -3094,33 +3094,16 @@ main article table th {
     max-width: 52rem;
 }
 
+/* Same pill pattern as the type filters, so the two read as one system. */
 .search-sort {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border: 0;
+    padding: 0;
+    margin: 0;
     margin-left: auto;
-}
-
-.search-sort label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--gray-medium);
-}
-
-.search-sort select {
-    padding: 0.5rem 0.6rem;
-    font-family: inherit;
-    font-size: 0.95rem;
-    color: var(--text-color);
-    background: #fff;
-    border: 2px solid var(--gray-light);
-    border-radius: var(--border-radius);
-}
-
-.search-sort select:focus-visible {
-    border-color: var(--accent-from);
 }
 
 .search-input {
