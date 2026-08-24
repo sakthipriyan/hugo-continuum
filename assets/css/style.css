@@ -3104,7 +3104,7 @@ main article table th {
     margin-left: auto;
 }
 
-.search-sort .search-filters-legend {
+.search-sort .filter-legend {
     margin-right: 0.1rem;
     white-space: nowrap;
 }
@@ -3142,7 +3142,7 @@ main article table th {
 
 /* Type filters: radios so the group keeps native keyboard and screen-reader
    behaviour, styled as pills. */
-.search-filters {
+.filter-row {
     border: 0;
     padding: 0;
     margin: 0 0 1.5rem;
@@ -3154,11 +3154,11 @@ main article table th {
 
 /* An author `display` beats the browser's [hidden] rule, so the filter row
    would stay on screen with nothing in it whenever the query was cleared. */
-.search-filters[hidden] {
+.filter-row[hidden] {
     display: none;
 }
 
-.search-filters-legend {
+.filter-legend {
     padding: 0;
     margin-right: 0.25rem;
     font-size: 0.8rem;
@@ -3168,14 +3168,14 @@ main article table th {
     color: var(--gray-medium);
 }
 
-.search-filter input {
+.filter-pill input {
     position: absolute;
     opacity: 0;
     width: 1px;
     height: 1px;
 }
 
-.search-filter span {
+.filter-pill span {
     display: inline-block;
     padding: 0.35rem 0.85rem;
     border: 2px solid var(--gray-light);
@@ -3187,14 +3187,14 @@ main article table th {
     transition: var(--transition);
 }
 
-.search-filter input:checked + span {
+.filter-pill input:checked + span {
     background: var(--accent-from);
     border-color: var(--accent-from);
     color: var(--on-accent);
     font-weight: 600;
 }
 
-.search-filter input:focus-visible + span {
+.filter-pill input:focus-visible + span {
     outline: 3px solid var(--focus-ring);
     outline-offset: 2px;
 }
@@ -3266,4 +3266,31 @@ main article table th {
     font-weight: 600;
     padding: 0 0.1em;
     border-radius: 2px;
+}
+
+/* ---------------------------------------------------------------------------
+   Filterable collections (term pages, search results)
+   --------------------------------------------------------------------------- */
+
+/* The slot exists only to carry data attributes for filtering; display:contents
+   keeps the card itself as the grid item, so the grid is unaffected. */
+.card-slot {
+    display: contents;
+}
+
+/* An author `display` beats the browser's [hidden] rule. */
+.card-slot[hidden] {
+    display: none;
+}
+
+.collection-count {
+    margin: 0 0 1rem;
+    color: var(--gray-medium);
+    font-size: 0.9rem;
+}
+
+/* The filter row sits directly above its grid, whose own margin-top would
+   otherwise double the gap. */
+.filter-row + .posts-grid {
+    margin-top: 0;
 }

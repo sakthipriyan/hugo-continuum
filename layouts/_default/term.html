@@ -19,6 +19,19 @@
     {{- with .CurrentSection }}{{ if .Draft }}{{ $parentIsDraft = true }}{{ end }}{{ end -}}
     {{- with .Parent }}{{ if .Draft }}{{ $parentIsDraft = true }}{{ end }}{{ end -}}
     {{- if not $parentIsDraft }}{{ $articles = $articles | append . }}{{ end -}}
+  {{- end -}}
+  {{- $articles = sort $articles "Date" "desc" -}}
+
+  {{- /* One flat, newest-first list with a type filter above it -- the same
+         shape the search page uses. Grouping by type was the old split, but
+         136 of the site's term pages hold a single type, where the group
+         header wrapped the whole list and said nothing. */ -}}
+  {{- $items := slice -}}
+  {{- range $group := (slice "blogs" "books" "slides" "tools" "videos") -}}
+    {{- $n := len (where $articles "Type" $group) -}}
+    {{- if $n }}
+      {{- $items = $items | append (dict "value" $group "label" ($group | title) "count" $n) -}}
+    {{- end -}}
   {{- end }}
 
   <div class="content-list">
@@ -30,24 +43,28 @@
     {{- end }}
 
     {{- if $articles }}
-    {{- range $group := (slice "blogs" "books" "slides" "tools" "videos") }}
-    {{- $inGroup := where $articles "Type" $group }}
-    {{- if $inGroup }}
-    <div class="category-section-full">
-      <div class="category-header-full">
-        <h2>{{ $group | title }}</h2>
-      </div>
-      <div class="posts-grid">
-        {{- range $inGroup }}
-        {{ partial "content-card.html" . }}
-        {{- end }}
-      </div>
+    <p class="collection-count" id="collection-count" role="status" aria-live="polite">{{ len $articles }} item{{ if ne (len $articles) 1 }}s{{ end }}</p>
+
+    {{ partial "filter-pills.html" (dict
+        "legend" "Filter by type"
+        "name"   "type"
+        "total"  (len $articles)
+        "items"  $items
+        "active" "") }}
+
+    <div class="posts-grid" id="collection">
+      {{- range $articles }}
+      <div class="card-slot" data-type="{{ .Type }}">{{ partial "content-card.html" . }}</div>
+      {{- end }}
     </div>
-    {{- end }}
-    {{- end }}
+    <p class="no-content" id="collection-empty" hidden>No items of that type.</p>
     {{- else }}
     <p class="no-content">No content found with the tag "{{ .Title | title }}"{{- if $currentSection }} in {{ $sectionName }}{{- end }}.</p>
     {{- end }}
   </div>
 </div>
+{{ end }}
+
+{{ define "scripts" }}
+{{ partial "js.html" (slice "collection") }}
 {{ end }}

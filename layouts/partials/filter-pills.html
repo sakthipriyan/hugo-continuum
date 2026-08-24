@@ -1,0 +1,29 @@
+{{- /*
+  A row of filter pills, rendered server-side. search.js builds the same markup
+  in the browser, so both surfaces share one component and one stylesheet.
+
+  Params:
+    legend  string  the row's label, e.g. "Filter by type"
+    name    string  radio group name; also the query parameter the pills drive
+    total   int     count behind the "All" pill
+    items   slice   dicts of value / label / count
+    active  string  value of the pill that starts selected ("" = All)
+
+  With only one item the row says nothing All does not, so it is not rendered.
+*/ -}}
+{{- $items := .items -}}
+{{- if gt (len $items) 1 -}}
+<div class="filter-row" role="radiogroup" aria-label="{{ .legend }}" data-filter="{{ .name }}">
+  <span class="filter-legend">{{ .legend }}</span>
+  <label class="filter-pill">
+    <input type="radio" name="{{ .name }}" value=""{{ if not .active }} checked{{ end }}>
+    <span>All ({{ .total }})</span>
+  </label>
+  {{- range $items }}
+  <label class="filter-pill">
+    <input type="radio" name="{{ $.name }}" value="{{ .value }}"{{ if eq $.active .value }} checked{{ end }}>
+    <span>{{ .label }} ({{ .count }})</span>
+  </label>
+  {{- end }}
+</div>
+{{- end -}}

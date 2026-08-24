@@ -4,7 +4,7 @@
     const input = document.getElementById('search-input');
     const results = document.getElementById('search-results');
     const status = document.getElementById('search-status');
-    const filters = document.getElementById('search-filters');
+    const filters = document.getElementById('filter-row');
     if (!input || !results || !status) return;
 
     const params = new URLSearchParams(location.search);
@@ -124,7 +124,7 @@
         filters.replaceChildren(filters.querySelector('legend'));
         const mk = (value, label, n) => {
             const wrap = document.createElement('label');
-            wrap.className = 'search-filter';
+            wrap.className = 'filter-pill';
             const r = document.createElement('input');
             r.type = 'radio'; r.name = 'search-type'; r.id = 'filter-' + (value || 'all');
             r.value = value;
@@ -142,7 +142,7 @@
             filters.appendChild(mk(k, k + 's', n));
         }
         // With one type left, All and that type mean the same thing.
-        filters.hidden = all.length === 0 || filters.querySelectorAll('.search-filter').length < 3;
+        filters.hidden = all.length === 0 || filters.querySelectorAll('.filter-pill').length < 3;
     }
 
     function render(matches, terms) {

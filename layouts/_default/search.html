@@ -21,12 +21,12 @@
                taken out of flex flow and lands above its controls, which is not
                what this row wants. The radios keep their own semantics. */ -}}
         <div class="search-sort" role="radiogroup" aria-labelledby="sort-by-label">
-          <span class="search-filters-legend" id="sort-by-label">Sort by</span>
-          <label class="search-filter">
+          <span class="filter-legend" id="sort-by-label">Sort by</span>
+          <label class="filter-pill">
             <input type="radio" name="search-sort" value="" checked>
             <span>Best match</span>
           </label>
-          <label class="search-filter">
+          <label class="filter-pill">
             <input type="radio" name="search-sort" value="latest">
             <span>Latest</span>
           </label>
@@ -37,8 +37,8 @@
 
     {{- /* Filled in by search.js from the kinds actually present in the index,
            so a section without videos never offers a Videos filter. */ -}}
-    <fieldset class="search-filters" id="search-filters" hidden>
-      <legend class="search-filters-legend">Filter by type</legend>
+    <fieldset class="filter-row" id="filter-row" hidden>
+      <legend class="filter-legend">Filter by type</legend>
     </fieldset>
 
     <noscript>
