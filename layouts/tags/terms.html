@@ -41,7 +41,9 @@
                 
                 <div class="tag-card">
                     <a href="{{ $tagUrl | absURL }}">
-                        <h3 class="tag-name">{{ replace .Name "-" " " | title }}</h3>
+                        {{- /* .Name is the lowercased taxonomy key, so `| title` turns AWS into Aws.
+                               The term's own page keeps the casing the author wrote. */ -}}
+                        <h3 class="tag-name">{{ with .Page }}{{ .Title }}{{ else }}{{ replace .Name "-" " " | title }}{{ end }}</h3>
                         <div class="tag-meta">
                             <span class="tag-count-badge">{{ .Count }}</span>
                         </div>
