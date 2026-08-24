@@ -7,7 +7,10 @@
     const filters = document.getElementById('search-filters');
     if (!input || !results || !status) return;
 
-    let activeType = new URLSearchParams(location.search).get('type') || '';
+    const params = new URLSearchParams(location.search);
+    let activeType = params.get('type') || '';
+    let activeSort = params.get('sort') === 'latest' ? 'latest' : '';
+    const sortSelect = document.getElementById('search-sort-select');
 
     // A search page inside a section only searches that section.
     const scope = document.querySelector('.search-form')?.dataset.scope || '';
@@ -192,7 +195,10 @@
             const all = docs
                 .map(doc => ({ doc, s: score(doc, terms) }))
                 .filter(m => m.s > 0)
-                .sort((a, b) => b.s - a.s || (b.doc.d || '').localeCompare(a.doc.d || ''));
+                .sort(activeSort === 'latest'
+                    // Newest first, with relevance only breaking exact date ties.
+                    ? (a, b) => (b.doc.d || '').localeCompare(a.doc.d || '') || b.s - a.s
+                    : (a, b) => b.s - a.s || (b.doc.d || '').localeCompare(a.doc.d || ''));
 
             // Resolve the fallback before drawing the pills, or the row shows a
             // type as selected while All is actually in effect.
@@ -214,8 +220,17 @@
         const p = new URLSearchParams();
         if (q.trim()) p.set('q', q.trim());
         if (activeType) p.set('type', activeType);
+        if (activeSort) p.set('sort', activeSort);
         const url = location.pathname + (p.toString() ? '?' + p : '');
         history.replaceState(null, '', url);
+    }
+
+    if (sortSelect) {
+        sortSelect.value = activeSort;
+        sortSelect.addEventListener('change', () => {
+            activeSort = sortSelect.value === 'latest' ? 'latest' : '';
+            run(input.value);
+        });
     }
 
     let timer;
