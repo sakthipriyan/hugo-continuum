@@ -17,8 +17,11 @@
       <div class="search-row">
         <input type="search" id="search-input" class="search-input" autocomplete="off"
                placeholder="Title, tag, or anything in the text…" spellcheck="false">
-        <fieldset class="search-sort">
-          <legend class="search-filters-legend">Sort by</legend>
+        {{- /* A div with role=radiogroup rather than a fieldset: a <legend> is
+               taken out of flex flow and lands above its controls, which is not
+               what this row wants. The radios keep their own semantics. */ -}}
+        <div class="search-sort" role="radiogroup" aria-labelledby="sort-by-label">
+          <span class="search-filters-legend" id="sort-by-label">Sort by</span>
           <label class="search-filter">
             <input type="radio" name="search-sort" value="" checked>
             <span>Best match</span>
@@ -27,7 +30,7 @@
             <input type="radio" name="search-sort" value="latest">
             <span>Latest</span>
           </label>
-        </fieldset>
+        </div>
       </div>
       <p class="search-status" id="search-status" role="status" aria-live="polite"></p>
     </form>

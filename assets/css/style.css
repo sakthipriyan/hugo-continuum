@@ -3098,16 +3098,22 @@ main article table th {
 .search-sort {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 0.5rem;
-    border: 0;
-    padding: 0;
-    margin: 0;
+    flex: 0 0 auto;
     margin-left: auto;
 }
 
+.search-sort .search-filters-legend {
+    margin-right: 0.1rem;
+    white-space: nowrap;
+}
+
 .search-input {
-    flex: 1 1 22rem;
+    /* Small basis and min-width so the input yields to the sort control rather
+       than pushing it onto its own line; it still grows to fill what is left. */
+    flex: 1 1 14rem;
+    min-width: 9rem;
     max-width: 40rem;
     padding: 0.75rem 1rem;
     font-size: 1.05rem;
