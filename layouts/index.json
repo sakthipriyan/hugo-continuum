@@ -1,0 +1,40 @@
+{{- /*
+  Search index. Built at publish time and fetched only by the search page, so
+  it costs nothing on any other page. Body text is truncated: enough for recall
+  across a few hundred documents without shipping the whole site as JSON.
+*/ -}}
+{{- $docs := slice -}}
+{{- range where .Site.RegularPages "Params.private" "!=" true -}}
+  {{- $p := . -}}
+  {{- $owner := partial "func/owning-section.html" $p -}}
+  {{- $tags := slice -}}
+  {{- $section := "" -}}
+  {{- with $owner -}}
+    {{- $section = .Title -}}
+    {{- with .Params.taxonomy }}{{ with (index $p.Params .) }}{{ $tags = . }}{{ end }}{{ end -}}
+  {{- end -}}
+  {{- $kind := .Type -}}
+  {{- $parts := split (strings.TrimPrefix "/" .Path) "/" -}}
+  {{- if ge (len $parts) 2 }}{{ $kind = index $parts 1 }}{{ end -}}
+  {{- /* Same icons the content cards use, so a result looks like the thing it
+         points at. */ -}}
+  {{- $icon := "📄" -}}
+  {{- if eq $kind "books" }}{{ $icon = "📚" }}
+  {{- else if eq $kind "blogs" }}{{ $icon = "📝" }}
+  {{- else if eq $kind "slides" }}{{ $icon = "🎯" }}
+  {{- else if eq $kind "tools" }}{{ $icon = "🛠️" }}
+  {{- else if eq $kind "videos" }}{{ $icon = "🎥" }}
+  {{- end -}}
+  {{- $docs = $docs | append (dict
+      "t" .Title
+      "u" .RelPermalink
+      "s" (or .Params.summary .Description .Summary | plainify | htmlUnescape | chomp | truncate 200)
+      "g" $tags
+      "k" ($kind | humanize | singularize)
+      "i" $icon
+      "n" $section
+      "d" (cond .Date.IsZero "" (.Date.Format "2006-01-02"))
+      "b" (.Plain | htmlUnescape | chomp | truncate 1200)
+  ) -}}
+{{- end -}}
+{{- $docs | jsonify -}}

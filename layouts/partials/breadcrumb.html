@@ -30,6 +30,7 @@
                     {{ if and $subsection (ne $subsection "tags") }}
                         {{ $subsectionPage := .Site.GetPage (printf "/%s/%s/" $actualSection $subsection) }}
                         {{ if $subsectionPage }}
+                        {{ if eq .RelPermalink $subsectionPage.RelPermalink }}{{ $.Scratch.Set "crumbIsSelf" true }}{{ end }}
                         <li class="breadcrumb-item{{ if eq .RelPermalink $subsectionPage.RelPermalink }} active{{ end }}"{{ if eq .RelPermalink $subsectionPage.RelPermalink }} aria-current="page"{{ end }}>
                             {{ if eq .RelPermalink $subsectionPage.RelPermalink }}
                                 <span>{{ $subsection | title }}</span>
@@ -68,8 +69,8 @@
                 {{ end }}
             {{ end }}
             
-            <!-- Current page -->
-            {{ if not .IsSection }}
+            <!-- Current page, unless the subsection crumb above already is it -->
+            {{ if and (not .IsSection) (not (.Scratch.Get "crumbIsSelf")) }}
             <li class="breadcrumb-item active" aria-current="page">
                 <span>{{ .Title }}</span>
             </li>

@@ -79,6 +79,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     window.addEventListener('resize', function () {
-        if (window.innerWidth > 768 && isOpen()) close({ restoreFocus: false });
+        if (window.innerWidth > 1024 && isOpen()) close({ restoreFocus: false });
     });
 });
