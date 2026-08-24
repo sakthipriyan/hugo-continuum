@@ -3176,12 +3176,18 @@ main article table th {
     list-style: none;
     margin: 0;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
+/* Each result is its own block. With real space between them the shared
+   bottom rule is redundant, and the accent edge does the separating. */
 .search-result {
-    padding: 1rem 0 1rem 1rem;
+    padding: 0.9rem 1rem;
     border-left: 3px solid var(--accent-from);
-    border-bottom: 1px solid var(--gray-light);
+    background: #fff;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
 }
 
 .search-result > a {
@@ -3197,7 +3203,7 @@ main article table th {
 }
 
 .search-meta {
-    margin: 0.25rem 0 0.4rem;
+    margin: 0.35rem 0 0.6rem;
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.03em;
@@ -3206,7 +3212,7 @@ main article table th {
 }
 
 .search-excerpt {
-    margin: 0 0 0.4rem;
+    margin: 0 0 0.55rem;
     color: var(--text-color);
     font-size: 0.95rem;
     line-height: 1.55;
@@ -3214,7 +3220,7 @@ main article table th {
 
 /* Second and later snippets are additional matches within the same page. */
 .search-excerpt + .search-excerpt {
-    padding-top: 0.4rem;
+    padding-top: 0.55rem;
     border-top: 1px dashed var(--gray-light);
 }
 
