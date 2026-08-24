@@ -1,0 +1,28 @@
+{{ define "main" }}
+<div class="container section-container">
+  <div class="content-list">
+    <h1>{{ .Title }}</h1>
+    {{- with .Content }}
+    <div class="section-content">{{ . }}</div>
+    {{- end }}
+
+    <form class="search-form" role="search" onsubmit="return false;">
+      <label class="search-label" for="search-input">Search {{ .Site.Title }}</label>
+      <input type="search" id="search-input" class="search-input" autocomplete="off"
+             placeholder="Title, tag, or anything in the text…" spellcheck="false">
+      <p class="search-status" id="search-status" role="status" aria-live="polite"></p>
+    </form>
+
+    <noscript>
+      <p class="no-content">Search needs JavaScript. You can browse by
+        section or tag instead — every page is reachable without it.</p>
+    </noscript>
+
+    <ol class="search-results" id="search-results"></ol>
+  </div>
+</div>
+{{ end }}
+
+{{ define "scripts" }}
+{{ partial "js.html" (slice "search") }}
+{{ end }}

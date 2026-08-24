@@ -35,6 +35,9 @@
                         {{- end }}
                     {{- end }}
                 {{- end }}
+                {{- with .Site.GetPage "/search" }}
+                <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+                {{- end }}
             </ul>
         {{- else }}
             {{- /* Site header: one pill per top-level section, each carrying its
@@ -59,6 +62,9 @@
                 {{- end }}
                 <li><a href="{{ $s.RelPermalink }}" class="section-link-pill"
                     {{- with $style }} style="{{ . | safeCSS }}"{{ end }}>{{ $s.Title }}</a></li>
+                {{- end }}
+                {{- with .Site.GetPage "/search" }}
+                <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
                 {{- end }}
             </ul>
         {{- end }}
