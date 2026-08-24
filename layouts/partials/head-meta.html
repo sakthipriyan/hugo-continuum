@@ -1,0 +1,138 @@
+{{- /*
+  Title, description, canonical, social cards, icons, feed discovery and
+  structured data. Everything is derived from the page or from site params, so
+  the theme carries no site-specific values.
+*/ -}}
+{{- $site := .Site -}}
+{{- $isHome := .IsHome -}}
+
+{{- /* Description: prefer what the author wrote, fall back to the generated
+       summary, then to the site description. Trimmed to a length search
+       engines and social cards will actually show. */ -}}
+{{- $desc := "" -}}
+{{- $authored := true -}}
+{{- with .Description }}{{ $desc = . }}{{ end -}}
+{{- if not $desc }}{{ with .Params.summary }}{{ $desc = . }}{{ end }}{{ end -}}
+{{- if not $desc }}{{ with .Summary }}{{ $desc = . }}{{ end }}{{ end -}}
+
+{{- /* Listing pages rarely have prose of their own. A synthesised line naming
+       what is on the page beats repeating the site tagline on all of them. */ -}}
+{{- if not $desc -}}
+  {{- $authored = false -}}
+  {{- $count := len .Pages -}}
+  {{- if and (eq .Kind "term") $count -}}
+    {{- $desc = printf "%d %s tagged “%s” on %s." $count (cond (eq $count 1) "item" "items") .Title $site.Title -}}
+  {{- else if and (eq .Kind "section") $count -}}
+    {{- $desc = printf "%d %s in %s on %s." $count (cond (eq $count 1) "item" "items") .Title $site.Title -}}
+  {{- else -}}
+    {{- with $site.Params.description }}{{ $desc = . }}{{ end -}}
+  {{- end -}}
+{{- end -}}
+{{- $desc = $desc | plainify | htmlUnescape | chomp -}}
+
+{{- /* Many summaries are written to sit beside the title on the page and read as
+       a continuation of it ("Couchbase setup on AWS" + "EC2 instances"). That
+       works in a card and fails in a search result, where the title is not
+       adjacent. Lead with the title when the summary is short enough to be one
+       of those -- but only for text the author actually wrote for this page. */ -}}
+{{- if and $authored (not $isHome) .Title (lt (len $desc) 60) -}}
+  {{- if not (hasPrefix (lower $desc) (lower .Title)) -}}
+    {{- $desc = printf "%s — %s" .Title $desc -}}
+  {{- end -}}
+{{- end -}}
+{{- $desc = $desc | truncate 160 -}}
+
+{{- $title := cond $isHome $site.Title (printf "%s | %s" .Title $site.Title) -}}
+
+{{- /* Social image: page image, then a site-wide default, then the profile. */ -}}
+{{- $img := "" -}}
+{{- with .Params.image }}{{ $img = . }}{{ end -}}
+{{- if not $img }}{{ with .Params.youtube_id }}{{ $img = printf "https://img.youtube.com/vi/%s/maxresdefault.jpg" . }}{{ end }}{{ end -}}
+{{- if not $img }}{{ with $site.Params.ogImage }}{{ $img = . }}{{ end }}{{ end -}}
+{{- if not $img }}{{ with $site.Params.profileImage }}{{ $img = . }}{{ end }}{{ end -}}
+{{- with $img }}{{ if not (urls.Parse .).Scheme }}{{ $img = absURL . }}{{ end }}{{ end -}}
+
+<title>{{ $title }}</title>
+{{- with $desc }}
+<meta name="description" content="{{ . }}">
+{{- end }}
+<link rel="canonical" href="{{ .Permalink }}">
+
+{{- /* Open Graph */}}
+<meta property="og:site_name" content="{{ $site.Title }}">
+<meta property="og:title" content="{{ cond $isHome $site.Title .Title }}">
+{{- with $desc }}
+<meta property="og:description" content="{{ . }}">
+{{- end }}
+<meta property="og:url" content="{{ .Permalink }}">
+{{- if and (eq .Kind "page") (not .Date.IsZero) }}
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+{{- if and .Lastmod (ne .Lastmod.Year 1) }}
+<meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">
+{{- end }}
+{{- with partial "func/owning-section.html" . }}{{ with .Params.taxonomy }}{{ with (index $.Params .) }}
+{{- range . }}
+<meta property="article:tag" content="{{ . }}">
+{{- end }}
+{{- end }}{{ end }}{{ end }}
+{{- else }}
+<meta property="og:type" content="website">
+{{- end }}
+{{- with $img }}
+<meta property="og:image" content="{{ . }}">
+{{- end }}
+
+{{- /* Twitter */}}
+<meta name="twitter:card" content="{{ cond (ne $img "") "summary_large_image" "summary" }}">
+{{- with $site.Params.twitterHandle }}
+<meta name="twitter:site" content="{{ . }}">
+<meta name="twitter:creator" content="{{ . }}">
+{{- end }}
+<meta name="twitter:title" content="{{ cond $isHome $site.Title .Title }}">
+{{- with $desc }}
+<meta name="twitter:description" content="{{ . }}">
+{{- end }}
+{{- with $img }}
+<meta name="twitter:image" content="{{ . }}">
+{{- end }}
+
+{{- /* Icons, declared by the site so the theme ships none of its own. */}}
+{{- range $site.Params.icons }}
+<link rel="icon" href="{{ .href | absURL }}"{{ with .type }} {{ printf "type=%q" . | safeHTMLAttr }}{{ end }}{{ with .sizes }} sizes="{{ . }}"{{ end }}>
+{{- end }}
+{{- with $site.Params.appleTouchIcon }}
+<link rel="apple-touch-icon" href="{{ . | absURL }}">
+{{- end }}
+
+{{- /* Feed discovery: the site generates one but nothing pointed at it. */}}
+{{- $feed := .OutputFormats.Get "rss" }}
+{{- if not $feed }}{{ $feed = $site.Home.OutputFormats.Get "rss" }}{{ end }}
+{{- with $feed }}
+<link rel="alternate" {{ printf "type=%q" .MediaType.Type | safeHTMLAttr }} href="{{ .Permalink }}" title="{{ $site.Title }}">
+{{- end }}
+
+{{- /* Structured data */}}
+{{- if $isHome }}
+{{- $sameAs := slice }}
+{{- range $site.Params.social }}{{ $sameAs = $sameAs | append .url }}{{ end }}
+<script type="application/ld+json">{{ dict
+  "@context" "https://schema.org"
+  "@type" "Person"
+  "name" ($site.Params.author | default $site.Title)
+  "url" $site.BaseURL
+  "description" $desc
+  "sameAs" $sameAs
+  | jsonify | safeJS }}</script>
+{{- else if and (eq .Kind "page") (not .Date.IsZero) }}
+<script type="application/ld+json">{{ dict
+  "@context" "https://schema.org"
+  "@type" "BlogPosting"
+  "headline" .Title
+  "description" $desc
+  "url" .Permalink
+  "datePublished" (.Date.Format "2006-01-02")
+  "dateModified" (cond (ne .Lastmod.Year 1) (.Lastmod.Format "2006-01-02") (.Date.Format "2006-01-02"))
+  "author" (dict "@type" "Person" "name" ($site.Params.author | default $site.Title) "url" $site.BaseURL)
+  | jsonify | safeJS }}</script>
+{{- end }}

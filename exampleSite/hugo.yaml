@@ -7,6 +7,16 @@ theme: "hugo-continuum"
 
 params:
   author: "Ada Example"
+  # Social/SEO metadata. All optional -- omit any and the theme skips it.
+  twitterHandle: "@example"
+  ogImage: "/images/social-card.png"
+  icons:
+    - href: "/favicon.svg"
+      type: "image/svg+xml"
+    - href: "/favicon-32.png"
+      type: "image/png"
+      sizes: "32x32"
+  appleTouchIcon: "/apple-touch-icon.png"
   initials: "AE"
   description: "A demo of the Continuum theme."
   social:

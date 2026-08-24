@@ -3,10 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ if .Title }}{{ .Title }} | {{ end }}{{ .Site.Title }}</title>
-    {{- if .Summary }}
-    <meta name="description" content="{{ .Summary }}">
-    {{- end }}
+    {{- partial "head-meta.html" . }}
 
     {{- /* Stylesheets: base, plus whatever this page type needs. */ -}}
     {{- $styles := slice "style" }}
