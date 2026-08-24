@@ -1,6 +1,7 @@
 {{/*
 Content List Partial
-Renders a leaf section (blogs, videos, slides, tools) as a grid of content cards.
+Renders a leaf section (blogs, videos, slides, tools) as a grid of content
+cards, paginated, with a year heading whenever the year changes.
 Usage: {{ partial "content-list.html" . }}
 */}}
 <div class="content-list">
@@ -11,11 +12,24 @@ Usage: {{ partial "content-list.html" . }}
   </div>
   {{ end }}
 
-  {{ with .RegularPages }}
+  {{- $all := .RegularPages }}
+  {{- with $all }}
+  {{- $paginator := $.Paginate $all }}
+  <p class="list-count">{{ len $all }} {{ if eq (len $all) 1 }}item{{ else }}items{{ end }}{{ if gt $paginator.TotalPages 1 }}, page {{ $paginator.PageNumber }} of {{ $paginator.TotalPages }}{{ end }}</p>
+
   <div class="posts-grid">
-    {{ range . }}
+    {{- $year := 0 }}
+    {{- range $paginator.Pages }}
+    {{- if not .Date.IsZero }}
+    {{- if ne .Date.Year $year }}
+    {{- $year = .Date.Year }}
+    <h2 class="list-year">{{ $year }}</h2>
+    {{- end }}
+    {{- end }}
     {{ partial "content-card.html" . }}
-    {{ end }}
+    {{- end }}
   </div>
-  {{ end }}
+
+  {{ partial "paginator.html" $paginator }}
+  {{- end }}
 </div>

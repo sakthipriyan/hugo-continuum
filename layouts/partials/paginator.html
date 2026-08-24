@@ -1,0 +1,50 @@
+{{- /*
+  Pagination for leaf lists. Rendered only when there is more than one page.
+  Usage: {{ partial "paginator.html" $paginator }}
+*/ -}}
+{{- $p := . -}}
+{{- if gt $p.TotalPages 1 }}
+<nav class="pagination" aria-label="Pagination">
+  <ul>
+    <li class="pagination-step">
+      {{- with $p.Prev }}
+      <a href="{{ .URL }}" rel="prev">&larr; <span>Newer</span></a>
+      {{- else }}
+      <span aria-hidden="true">&larr; <span>Newer</span></span>
+      {{- end }}
+    </li>
+
+    {{- /* A window around the current page, with the ends always reachable. */ -}}
+    {{- $cur := $p.PageNumber }}
+    {{- $last := $p.TotalPages }}
+    {{- $shown := slice }}
+    {{- range $i := seq $last }}
+      {{- if or (eq $i 1) (eq $i $last) (and (ge $i (sub $cur 1)) (le $i (add $cur 1))) }}
+        {{- $shown = $shown | append $i }}
+      {{- end }}
+    {{- end }}
+    {{- $prevShown := 0 }}
+    {{- range $i := $shown }}
+      {{- if and $prevShown (gt $i (add $prevShown 1)) }}
+      <li class="pagination-gap" aria-hidden="true">…</li>
+      {{- end }}
+      <li>
+        {{- if eq $i $cur }}
+        <span class="pagination-current" aria-current="page">{{ $i }}</span>
+        {{- else }}
+        <a href="{{ (index $p.Pagers (sub $i 1)).URL }}" aria-label="Page {{ $i }}">{{ $i }}</a>
+        {{- end }}
+      </li>
+      {{- $prevShown = $i }}
+    {{- end }}
+
+    <li class="pagination-step">
+      {{- with $p.Next }}
+      <a href="{{ .URL }}" rel="next"><span>Older</span> &rarr;</a>
+      {{- else }}
+      <span aria-hidden="true"><span>Older</span> &rarr;</span>
+      {{- end }}
+    </li>
+  </ul>
+</nav>
+{{- end }}

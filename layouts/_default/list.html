@@ -2,6 +2,18 @@
 <div class="container section-container">
   {{- /* Top-level section landing pages. Leaf sections have their own
          templates: layouts/<type>/list.html. */ -}}
+  {{- $section := . }}
+  {{- $groups := slice "blogs" "books" "slides" "tools" "videos" }}
+
+  {{- /* Resolve which groups actually have something first, so the jump nav can
+         be written before the groups it points at and can skip empty ones. */ -}}
+  {{- $present := slice }}
+  {{- range $group := $groups }}
+  {{- with $section.GetPage $group }}
+  {{- if .Pages }}{{ $present = $present | append (dict "id" $group "page" . "count" (len .Pages)) }}{{ end }}
+  {{- end }}
+  {{- end }}
+
   <div class="content-list">
     <h1>{{ .Title }}</h1>
     {{- with .Content }}
@@ -10,28 +22,39 @@
     </div>
     {{- end }}
 
-    {{- $section := . }}
-    {{- range $group := (slice "blogs" "books" "slides" "tools" "videos") }}
-    {{- with $section.GetPage $group }}
-    {{- $pages := .Pages }}
-    {{- if $pages }}
-    <div class="category-section-full">
+    {{- /* Jump nav: this page is long, and the groups are the reason someone
+           came. Only worth showing when there is more than one. */ -}}
+    {{- if gt (len $present) 1 }}
+    <nav class="section-jump" aria-label="Jump to a content type">
+      <ul>
+        {{- range $present }}
+        <li><a href="#{{ .id }}">{{ .page.Title }} <span class="section-jump-count">{{ .count }}</span></a></li>
+        {{- end }}
+      </ul>
+    </nav>
+    {{- end }}
+
+    {{- $preview := $section.Params.previewCount | default 3 }}
+    {{- range $present }}
+    {{- $sub := .page }}
+    <section class="category-section-full" id="{{ .id }}" aria-labelledby="heading-{{ .id }}">
       <div class="category-header-full">
-        <h2>{{ $group | title }}</h2>
+        <h2 id="heading-{{ .id }}">{{ $sub.Title }}</h2>
+        {{- if gt .count $preview }}
+        <a href="{{ $sub.RelPermalink }}" class="category-header-all">All {{ .count }} →</a>
+        {{- end }}
       </div>
       <div class="posts-grid">
-        {{- range first 6 $pages }}
+        {{- range first $preview $sub.Pages }}
         {{ partial "content-card.html" . }}
         {{- end }}
       </div>
-      {{- if gt (len $pages) 6 }}
+      {{- if gt .count $preview }}
       <div class="view-all-section">
-        <a href="{{ .Permalink }}" class="view-all-link">View all {{ len $pages }} {{ $group }} →</a>
+        <a href="{{ $sub.RelPermalink }}" class="view-all-link">View all {{ .count }} {{ lower $sub.Title }} →</a>
       </div>
       {{- end }}
-    </div>
-    {{- end }}
-    {{- end }}
+    </section>
     {{- end }}
   </div>
 </div>
