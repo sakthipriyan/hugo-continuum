@@ -3382,8 +3382,9 @@ main article table th {
    Field and button are one rectangle rather than two rounded controls. */
 .landing-search {
     display: flex;
+    flex: 1 1 20rem;
     max-width: 34rem;
-    margin: 2rem 0 0;
+    margin: 0;
 }
 
 .landing-search .search-input {
@@ -3568,18 +3569,22 @@ main article table th {
     padding-top: 0.9rem;
 }
 
-/* The doorway into a section: one wide card above the featured six, because
-   being first in a grid is not prominence -- on a phone everything stacks, so
-   first means nothing at all. */
-.landing-lead {
+/* Both halves of the entry row are the same object: a titled card. The search
+   form was a bare input beside a card, which read as one side of the row being
+   unfinished. */
+.landing-entry > * {
+    flex: 1 1 20rem;
     display: block;
-    margin: 2.5rem 0 0;
-    padding: 1.4rem 1.6rem;
+    margin: 0;
+    padding: 1rem 1.25rem;
     border-left: 4px solid var(--accent-from);
     border-radius: var(--border-radius);
     background: #fff;
     box-shadow: var(--box-shadow);
     text-decoration: none;
+}
+
+.landing-lead {
     transition: var(--transition);
 }
 
@@ -3593,7 +3598,17 @@ main article table th {
     outline-offset: 2px;
 }
 
-.landing-lead-kicker {
+.landing-lead:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
+}
+
+.landing-lead:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+.landing-entry-kicker {
     display: block;
     font-size: 0.8rem;
     font-weight: 700;
@@ -3602,7 +3617,7 @@ main article table th {
     color: var(--accent-ink);
 }
 
-.landing-lead-title {
+.landing-entry-title {
     display: block;
     margin-top: 0.35rem;
     font-size: 1.4rem;
@@ -3610,7 +3625,7 @@ main article table th {
     color: var(--primary-color);
 }
 
-.landing-lead-note {
+.landing-entry-note {
     display: block;
     margin-top: 0.45rem;
     color: var(--text-color);
@@ -3621,3 +3636,68 @@ main article table th {
 .subject-list {
     margin: 1.25rem 0 2rem;
 }
+
+/* The two ways into a section on one row -- search for the reader who knows
+   what they want, the guided page for the one who does not. They wrap to
+   separate rows below roughly 44rem, where neither would have room to read. */
+.landing-entry {
+    display: flex;
+    flex-wrap: wrap;
+    /* Stretch, so the two cards share an edge top and bottom. Centred, the
+       shorter one floated and the row stopped reading as one band. */
+    align-items: stretch;
+    gap: 1rem;
+    margin: 2rem 0 0;
+}
+
+/* Half the width it had, so the standfirst gives way to the title. */
+.landing-entry-note {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.95rem;
+}
+
+.landing-entry-title {
+    font-size: 1.2rem;
+    margin-top: 0;
+}
+
+/* The field and its button, pinned to the foot of the card so it lines up
+   with the bottom of the text beside it however the blurb wraps. */
+.landing-search {
+    display: flex;
+    flex-direction: column;
+}
+
+.landing-search-row {
+    display: flex;
+    margin-top: auto;
+    padding-top: 0.7rem;
+}
+
+.landing-entry-title {
+    cursor: default;
+}
+
+.landing-search .landing-entry-title {
+    cursor: pointer;
+}
+
+/* The search card says what it covers on the heading's own line: a full
+   sentence beneath it was a third line for something the placeholder already
+   half says. */
+.landing-entry-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.landing-entry-inline {
+    color: var(--gray-medium);
+    font-size: 0.95rem;
+}
+

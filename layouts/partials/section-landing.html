@@ -35,18 +35,12 @@
   <div class="section-content">{{ . }}</div>
   {{- end }}
 
-  {{- /* A plain GET form, not the search page's script: it hands the query to
-         that page, which already reads ?q=. So the landing costs no JavaScript
-         and no index fetch, and the box still works without either. */ -}}
-  {{- with $sec.GetPage "search" }}
-  <form class="landing-search" role="search" action="{{ .RelPermalink }}" method="get">
-    <label class="search-label" for="landing-q">Search {{ $sec.Title }}</label>
-    <input type="search" id="landing-q" name="q" class="search-input"
-           placeholder="Title, topic, or anything in the text…" autocomplete="off" spellcheck="false">
-    <button type="submit">Search</button>
-  </form>
-  {{- end }}
-
+  {{- /* The two ways in, side by side. The guided page leads, being what a
+         newcomer needs; search is for the reader who already knows what they
+         are after. Swapped in the markup rather than with CSS order, so the
+         mobile stack and a screen reader follow the same sequence. They wrap
+         to separate rows when there is not width for both. */ -}}
+  <div class="landing-entry">
   {{- /* A single wide card above the curated six. Being first in a grid is not
          prominence -- on a phone everything stacks, so first means nothing --
          and a doorway into the section should not look like one of six tiles. */ -}}
@@ -57,15 +51,34 @@
     {{- /* The kicker labels the card as the way in. A page already called
            "Start here" says that itself, so it is not said twice. */ -}}
     {{- if ne (lower .Title) "start here" }}
-    <span class="landing-lead-kicker">Start here</span>
+    <span class="landing-entry-kicker">Start here</span>
     {{- end }}
-    <span class="landing-lead-title">{{ .Title }}</span>
+    <span class="landing-entry-title">{{ .Title }}</span>
     {{- with (.Params.summary | default .Description) }}
-    <span class="landing-lead-note">{{ . }}</span>
+    <span class="landing-entry-note">{{ . }}</span>
     {{- end }}
   </a>
   {{- end }}
   {{- end }}
+  {{- /* A plain GET form, not the search page's script: it hands the query to
+         that page, which already reads ?q=. So the landing costs no JavaScript
+         and no index fetch, and the box still works without either. */ -}}
+  {{- with $sec.GetPage "search" }}
+  <form class="landing-search" role="search" action="{{ .RelPermalink }}" method="get">
+    {{- /* The label is the card's heading rather than hidden text, so this side
+           of the row carries the same weight as the card beside it. */ -}}
+    <span class="landing-entry-head">
+      <label class="landing-entry-title" for="landing-q">Search</label>
+      <span class="landing-entry-inline">every blog, book, slide, tool and video</span>
+    </span>
+    <span class="landing-search-row">
+      <input type="search" id="landing-q" name="q" class="search-input"
+             placeholder="Title, topic, or anything in the text…" autocomplete="off" spellcheck="false">
+      <button type="submit">Search</button>
+    </span>
+  </form>
+  {{- end }}
+  </div>
 
   {{- /* One curated block rather than two. Splitting "where to begin" from
          "what is worth attention now" meant two hand-kept lists of three that
@@ -74,7 +87,24 @@
   {{- with $cfg.featured }}
   {{- $picks := slice }}
   {{- range . }}
-  {{- with partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" "landing.featured") }}
+  {{- $pick := "" }}
+  {{- with .page }}
+    {{- $pick = partial "func/resolve-page.html" (dict "ref" . "site" $sec.Site "where" "landing.featured") }}
+  {{- end }}
+  {{- /* `topic:` features whichever piece under that topic is newest, so a
+         monthly series stays current without the list being edited each time
+         an edition lands. */ -}}
+  {{- with .topic }}
+    {{- $topic := . }}
+    {{- $tax := $sec.Params.taxonomy }}
+    {{- $matches := slice }}
+    {{- range $pages }}
+      {{- if and $tax (in (index .Params $tax | default slice) $topic) }}{{ $matches = $matches | append . }}{{ end }}
+    {{- end }}
+    {{- if $matches }}{{ $pick = index (sort $matches "Date" "desc") 0 }}
+    {{- else }}{{ errorf "landing.featured: nothing carries the topic %q" $topic }}{{ end }}
+  {{- end }}
+  {{- with $pick }}
   {{- if not (in $seen .RelPermalink) }}
     {{- $picks = $picks | append . }}{{ $seen = $seen | append .RelPermalink }}
     {{- /* Its other formats are on the row already, so Latest must not
