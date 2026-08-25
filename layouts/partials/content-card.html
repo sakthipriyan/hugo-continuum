@@ -28,13 +28,7 @@ Renders a content card with image, title, summary, meta, and tags
         <div class="card-content">
             <!-- Icon and Title -->
             <div class="card-header">
-                {{ $contentIcon := "📄" }}
-                {{ if in .RelPermalink "/videos/" }}{{ $contentIcon = "🎥" }}
-                {{ else if in .RelPermalink "/blogs/" }}{{ $contentIcon = "📝" }}
-                {{ else if in .RelPermalink "/tools/" }}{{ $contentIcon = "🛠️" }}
-                {{ else if in .RelPermalink "/slides/" }}{{ $contentIcon = "🎯" }}
-                {{ else if in .RelPermalink "/books/" }}{{ $contentIcon = "📚" }}
-                {{ end }}
+                {{ $contentIcon := partial "func/kind-icon.html" (partial "func/page-kind.html" .) }}
                 <span class="content-icon" aria-hidden="true">{{ $contentIcon }}</span>
                 <h3 class="card-title">
                     {{ if and (eq .Type "books") .Params.chapter }}

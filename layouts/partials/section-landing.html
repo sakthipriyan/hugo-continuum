@@ -3,13 +3,30 @@
   Rendered only for sections declaring `landing:`; every other section keeps the
   grouped listing, so bringing one over is opt-in.
 
-  The block order is fixed, and each block omits itself when the section has
-  nothing for it. A section without tools or videos therefore has fewer blocks
-  rather than a different layout.
+  The block order is fixed and each block omits itself when the section has
+  nothing for it, so a section without tools has fewer blocks rather than a
+  different layout.
+
+  Nothing appears twice: each block records what it showed, and later blocks
+  skip those pages and fill from the next candidate instead.
 */ -}}
 {{- $sec := . -}}
 {{- $cfg := .Params.landing -}}
 {{- $pages := where .RegularPagesRecursive "Params.private" "!=" true -}}
+{{- $seen := slice -}}
+{{- /* Pages a block has been told to show. Latest steps around these so an
+       explicit pick is never swallowed by recency and its block left with
+       nothing but the newest three. */ -}}
+{{- $reserved := slice -}}
+{{- $seenTitles := slice -}}
+{{- range $kind := (slice "tools" "videos" "slides") -}}
+  {{- $kc := index $cfg $kind | default dict -}}
+  {{- range $kc.featured | default slice -}}
+    {{- with partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" "landing featured") -}}
+      {{- $reserved = $reserved | append .RelPermalink -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
 
 <div class="content-list section-landing">
 
@@ -18,26 +35,28 @@
   <div class="section-content">{{ . }}</div>
   {{- end }}
 
-  {{- with $cfg.cta }}
-  <p class="landing-cta">
-    {{- range . }}
-    {{- $item := . }}
-    {{- with partial "func/resolve-page.html" (dict "ref" $item.page "site" $sec.Site "where" "landing.cta") }}
-    <a class="cta-link" href="{{ .RelPermalink }}">{{ $item.label | default .Title }}</a>
-    {{- end }}
-    {{- end }}
-  </p>
+  {{- /* A plain GET form, not the search page's script: it hands the query to
+         that page, which already reads ?q=. So the landing costs no JavaScript
+         and no index fetch, and the box still works without either. */ -}}
+  {{- with $sec.GetPage "search" }}
+  <form class="landing-search" role="search" action="{{ .RelPermalink }}" method="get">
+    <label class="search-label" for="landing-q">Search {{ $sec.Title }}</label>
+    <input type="search" id="landing-q" name="q" class="search-input"
+           placeholder="Title, topic, or anything in the text…" autocomplete="off" spellcheck="false">
+    <button type="submit">Search</button>
+  </form>
   {{- end }}
 
-  {{- /* Curated entry points. The blurb defaults to the target page's own
+  {{- /* Curated entry points, evergreen. The blurb defaults to the target's own
          summary, so nothing has to be written twice. */ -}}
   {{- with $cfg.startHere }}
   <section class="home-start landing-block" aria-labelledby="lp-start">
-    <h2 id="lp-start">Start here</h2>
+    <div class="block-head"><h2 id="lp-start">Start here</h2></div>
     <ul class="start-grid">
       {{- range . }}
       {{- $note := .note }}
       {{- with partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" "landing.startHere") }}
+      {{- $seen = $seen | append .RelPermalink }}
       <li class="start-item">
         <a href="{{ .RelPermalink }}">
           <span class="start-kind">{{ partial "func/page-kind.html" . | humanize | singularize }}</span>
@@ -51,9 +70,25 @@
   </section>
   {{- end }}
 
-  {{- /* Latest, deliberately format-agnostic: one publication rather than six
-         parallel ones. A talk published as both a slide deck and a video is one
-         entry naming both, not two near-identical rows. */ -}}
+  {{- /* What the section is pushing now, as opposed to where to begin. */ -}}
+  {{- with $cfg.featured }}
+  {{- $cards := slice }}
+  {{- range . }}
+  {{- with partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" "landing.featured") }}
+  {{- if not (in $seen .RelPermalink) }}{{ $cards = $cards | append . }}{{ $seen = $seen | append .RelPermalink }}{{ end }}
+  {{- end }}
+  {{- end }}
+  {{- with $cards }}
+  <section class="landing-block" aria-labelledby="lp-featured">
+    <div class="block-head"><h2 id="lp-featured">Featured</h2></div>
+    <div class="posts-grid">{{ range . }}{{ partial "content-card.html" . }}{{ end }}</div>
+  </section>
+  {{- end }}
+  {{- end }}
+
+  {{- /* Latest, deliberately format-agnostic: one publication rather than five
+         parallel ones. A talk published as both a deck and a video is one entry
+         naming both, not two near-identical rows. */ -}}
   {{- $dated := slice }}
   {{- range $pages }}{{ if not .Date.IsZero }}{{ $dated = $dated | append . }}{{ end }}{{ end }}
   {{- with $dated }}
@@ -61,77 +96,115 @@
   {{- $kindsByKey := dict }}
   {{- range $sorted }}
     {{- $key := trim (replaceRE "[^a-z0-9]+" " " (lower .Title)) " " }}
-    {{- $k := partial "func/page-kind.html" . | humanize | singularize }}
     {{- $cur := index $kindsByKey $key | default slice }}
-    {{- $kindsByKey = merge $kindsByKey (dict $key ($cur | append $k)) }}
+    {{- $kindsByKey = merge $kindsByKey (dict $key ($cur | append (partial "func/page-kind.html" .))) }}
   {{- end }}
   {{- $rows := slice }}
-  {{- $seen := slice }}
+  {{- $keys := slice }}
   {{- range $sorted }}
     {{- $key := trim (replaceRE "[^a-z0-9]+" " " (lower .Title)) " " }}
-    {{- if not (in $seen $key) }}
-      {{- $seen = $seen | append $key }}
+    {{- if and (not (in $keys $key)) (not (or (in $seen .RelPermalink) (in $reserved .RelPermalink))) }}
+      {{- $keys = $keys | append $key }}
       {{- $rows = $rows | append (dict "page" . "kinds" (index $kindsByKey $key | uniq | sort)) }}
     {{- end }}
   {{- end }}
+  {{- $rows = first (int ($cfg.latestCount | default 6)) $rows }}
+  {{- with $rows }}
   <section class="home-latest landing-block" aria-labelledby="lp-latest">
-    <h2 id="lp-latest">Latest</h2>
+    <div class="block-head"><h2 id="lp-latest">Latest</h2></div>
     <ul class="latest-list">
-      {{- range first (int ($cfg.latestCount | default 6)) $rows }}
+      {{- range . }}
       {{- $p := .page }}
+      {{- $seen = $seen | append $p.RelPermalink }}
       <li class="latest-item">
         <time datetime="{{ $p.Date.Format "2006-01-02" }}">{{ $p.Date.Format "Jan 2, 2006" }}</time>
         <a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a>
-        <span class="latest-section">{{ delimit .kinds " · " }}</span>
+        <span class="latest-section">
+          {{- range $i, $k := .kinds }}{{ if $i }} · {{ end }}<span aria-hidden="true">{{ partial "func/kind-icon.html" $k }}</span> {{ $k | humanize | singularize }}{{ end -}}
+        </span>
       </li>
       {{- end }}
     </ul>
   </section>
   {{- end }}
+  {{- end }}
 
-  {{- /* One block per format worth surfacing, each skipped when the section has
-         none. The navigation is what takes a reader to the full list. */ -}}
-  {{- range $kind := (slice "tools" "videos") }}
+  {{- /* Formats that publish rarely enough that Latest never surfaces them.
+         Blogs and books are deliberately absent: Latest is mostly blogs, and
+         the section's book leads Start here. */ -}}
+  {{- range $kind := (slice "tools" "videos" "slides") }}
   {{- with $sec.GetPage $kind }}
   {{- $child := . }}
-  {{- $items := sort (where .RegularPages "Params.private" "!=" true) "Date" "desc" }}
-  {{- with $items }}
+  {{- $all := sort (where .RegularPages "Params.private" "!=" true) "Date" "desc" }}
+  {{- $slots := int ($cfg.blockCount | default 3) }}
+  {{- $picked := slice }}
+  {{- $titles := $seenTitles }}
+  {{- /* A curated pick or two, then the newest to fill -- never the same page twice. */ -}}
+  {{- $kindCfg := index $cfg $kind | default dict }}
+  {{- range first (int ($cfg.featuredCount | default 1)) ($kindCfg.featured | default slice) }}
+  {{- with partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" (printf "landing.%s.featured" $kind)) }}
+  {{- $t := trim (replaceRE "[^a-z0-9]+" " " (lower .Title)) " " }}
+  {{- if not (in $seen .RelPermalink) }}{{ $picked = $picked | append . }}{{ $seen = $seen | append .RelPermalink }}{{ $titles = $titles | append $t }}{{ end }}
+  {{- end }}
+  {{- end }}
+  {{- range $all }}
+  {{- $t := trim (replaceRE "[^a-z0-9]+" " " (lower .Title)) " " }}
+  {{- if and (lt (len $picked) $slots) (not (in $seen .RelPermalink)) (not (in $titles $t)) }}
+  {{- $picked = $picked | append . }}{{ $seen = $seen | append .RelPermalink }}{{ $titles = $titles | append $t }}
+  {{- end }}
+  {{- end }}
+  {{- $seenTitles = $titles }}
+  {{- with $picked }}
   <section class="landing-block" aria-labelledby="lp-{{ $kind }}">
-    <h2 id="lp-{{ $kind }}">{{ $kind | humanize }}</h2>
-    <div class="posts-grid">
-      {{- range first 3 . }}{{ partial "content-card.html" . }}{{ end }}
+    {{- /* The heading carries the collection's size as a badge, the same one a
+           page title uses, so the link beside it need not repeat the number.
+           Both read the child page's own title, so a rename follows here. */ -}}
+    <div class="block-head">
+      <h2 id="lp-{{ $kind }}">{{ $child.Title }} <span class="title-count">{{ len $all }}</span></h2>
+      {{- if gt (len $all) $slots }}
+      <a class="block-more" href="{{ $child.RelPermalink }}">All {{ $child.Title }} →</a>
+      {{- end }}
     </div>
-    {{- if gt (len .) 3 }}
-    <p class="landing-more"><a href="{{ $child.RelPermalink }}">All {{ len . }} {{ $kind }} →</a></p>
-    {{- end }}
+    <div class="posts-grid">{{ range . }}{{ partial "content-card.html" . }}{{ end }}</div>
   </section>
   {{- end }}
   {{- end }}
   {{- end }}
 
-  {{- /* Topics: the section's own taxonomy, most used first. */ -}}
+  {{- /* Topics: the section's own taxonomy, most used first, in the same card
+         grid the topics index uses. */ -}}
   {{- with .Params.taxonomy }}
   {{- $terms := index $sec.Site.Taxonomies . }}
   {{- with $terms }}
+  {{- $topicsPage := $sec.GetPage "tags" }}
   <section class="landing-block" aria-labelledby="lp-topics">
-    <h2 id="lp-topics">Explore by topic</h2>
-    <div class="topic-row">
-      {{- range first (int ($cfg.topicsCount | default 10)) .ByCount }}
+    <div class="block-head">
+      <h2 id="lp-topics">{{ with $topicsPage }}{{ .Title }}{{ else }}Topics{{ end }} <span class="title-count">{{ len . }}</span></h2>
+      <a class="block-more" href="{{ (printf "/%s/tags/" $sec.Section) | absURL }}">All {{ with $topicsPage }}{{ .Title }}{{ else }}Topics{{ end }} →</a>
+    </div>
+    <div class="tags-grid">
+      {{- range first (int ($cfg.topicsCount | default 9)) .ByCount }}
       {{- $label := replace .Name "-" " " | title }}
       {{- with .Page }}{{ $label = .Title }}{{ end }}
-      <a class="tag-link" href="{{ (printf "/%s/tags/%s/" $sec.Section (.Name | urlize)) | absURL }}">{{ $label }}</a>
+      <div class="tag-card">
+        <a href="{{ (printf "/%s/tags/%s/" $sec.Section (.Name | urlize)) | absURL }}">
+          <h3 class="tag-name">{{ $label }}</h3>
+          <div class="tag-meta"><span class="tag-count-badge">{{ .Count }}</span></div>
+        </a>
+      </div>
       {{- end }}
     </div>
-    <p class="landing-more"><a href="{{ (printf "/%s/tags/" $sec.Section) | absURL }}">All {{ len . }} topics →</a></p>
   </section>
   {{- end }}
   {{- end }}
 
   {{- with $sec.GetPage "about" }}
   <section class="landing-block landing-about" aria-labelledby="lp-about">
-    <h2 id="lp-about">About</h2>
+    <div class="block-head">
+      <h2 id="lp-about">{{ .Title }}</h2>
+      <a class="block-more" href="{{ .RelPermalink }}">More about {{ $sec.Title }} →</a>
+    </div>
     <p>{{ .Params.summary | default .Description }}</p>
-    <p class="landing-more"><a href="{{ .RelPermalink }}">More about {{ $sec.Title }} →</a></p>
   </section>
   {{- end }}
 

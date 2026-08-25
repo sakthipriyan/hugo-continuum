@@ -1,0 +1,14 @@
+{{- /*
+  The emoji standing for a kind of content, so a card, a search result and a
+  Latest row all mark the same thing the same way.
+
+  Usage: {{ partial "func/kind-icon.html" "videos" }}
+*/ -}}
+{{- $icon := "📄" -}}
+{{- if eq . "videos" }}{{ $icon = "🎥" }}
+{{- else if eq . "blogs" }}{{ $icon = "📝" }}
+{{- else if eq . "tools" }}{{ $icon = "🛠️" }}
+{{- else if eq . "slides" }}{{ $icon = "🎯" }}
+{{- else if eq . "books" }}{{ $icon = "📚" }}
+{{- end -}}
+{{- return $icon -}}
