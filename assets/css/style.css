@@ -3464,3 +3464,42 @@ main article table th {
     margin: 0 0 0.5rem;
     max-width: 44rem;
 }
+
+/* "Also as" -- the same subject in another format, beside a page's meta. */
+.also-as {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.75rem 0 0;
+}
+
+.also-as-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--gray-medium);
+}
+
+.also-as a {
+    padding: 0.25rem 0.7rem;
+    border: 2px solid var(--gray-light);
+    border-radius: 20px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.also-as a:hover {
+    background: var(--accent-from);
+    border-color: var(--accent-from);
+    color: var(--on-accent);
+}
+
+.also-as a:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}

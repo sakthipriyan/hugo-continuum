@@ -18,7 +18,7 @@
        explicit pick is never swallowed by recency and its block left with
        nothing but the newest three. */ -}}
 {{- $reserved := slice -}}
-{{- $seenTitles := slice -}}
+{{- $seenCovers := slice -}}
 {{- range $kind := (slice "tools" "videos" "slides") -}}
   {{- $kc := index $cfg $kind | default dict -}}
   {{- range $kc.featured | default slice -}}
@@ -93,19 +93,22 @@
   {{- range $pages }}{{ if not .Date.IsZero }}{{ $dated = $dated | append . }}{{ end }}{{ end }}
   {{- with $dated }}
   {{- $sorted := sort . "Date" "desc" }}
-  {{- $kindsByKey := dict }}
-  {{- range $sorted }}
-    {{- $key := trim (replaceRE "[^a-z0-9]+" " " (lower .Title)) " " }}
-    {{- $cur := index $kindsByKey $key | default slice }}
-    {{- $kindsByKey = merge $kindsByKey (dict $key ($cur | append (partial "func/page-kind.html" .))) }}
-  {{- end }}
+  {{- /* One row per subject. A talk published as a deck and a recording is one
+         entry naming both, keyed on the `covers` id the pages declare rather
+         than on their titles matching, which cannot tell the same subject from
+         the same words. A page without an id is its own subject. */ -}}
   {{- $rows := slice }}
   {{- $keys := slice }}
   {{- range $sorted }}
-    {{- $key := trim (replaceRE "[^a-z0-9]+" " " (lower .Title)) " " }}
+    {{- $key := .Params.covers | default .RelPermalink }}
     {{- if and (not (in $keys $key)) (not (or (in $seen .RelPermalink) (in $reserved .RelPermalink))) }}
       {{- $keys = $keys | append $key }}
-      {{- $rows = $rows | append (dict "page" . "kinds" (index $kindsByKey $key | uniq | sort)) }}
+      {{- $group := partial "func/covers-group.html" . }}
+      {{- /* The fullest form speaks for the group; the date stays this one's,
+             since that is what put the row here. */ -}}
+      {{- $lead := . }}
+      {{- with $group }}{{ $lead = index . 0 }}{{ end }}
+      {{- $rows = $rows | append (dict "page" . "lead" $lead "group" $group) }}
     {{- end }}
   {{- end }}
   {{- $rows = first (int ($cfg.latestCount | default 6)) $rows }}
@@ -114,13 +117,21 @@
     <div class="block-head"><h2 id="lp-latest">Latest</h2></div>
     <ul class="latest-list">
       {{- range . }}
-      {{- $p := .page }}
+      {{- $p := .page }}{{ $lead := .lead }}{{ $group := .group }}
       {{- $seen = $seen | append $p.RelPermalink }}
       <li class="latest-item">
         <time datetime="{{ $p.Date.Format "2006-01-02" }}">{{ $p.Date.Format "Jan 2, 2006" }}</time>
-        <a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a>
+        <a href="{{ $lead.RelPermalink }}">{{ $lead.Title }}</a>
         <span class="latest-section">
-          {{- range $i, $k := .kinds }}{{ if $i }} · {{ end }}<span aria-hidden="true">{{ partial "func/kind-icon.html" $k }}</span> {{ $k | humanize | singularize }}{{ end -}}
+          {{- if $group -}}
+            {{- range $i, $m := $group }}{{ if $i }} · {{ end }}{{ $seen = $seen | append $m.RelPermalink }}
+            {{- $k := partial "func/page-kind.html" $m -}}
+            <a href="{{ $m.RelPermalink }}"><span aria-hidden="true">{{ partial "func/kind-icon.html" $k }}</span> {{ $k | humanize | singularize }}</a>
+            {{- end -}}
+          {{- else -}}
+            {{- $k := partial "func/page-kind.html" $p -}}
+            <span aria-hidden="true">{{ partial "func/kind-icon.html" $k }}</span> {{ $k | humanize | singularize }}
+          {{- end -}}
         </span>
       </li>
       {{- end }}
@@ -138,22 +149,22 @@
   {{- $all := sort (where .RegularPages "Params.private" "!=" true) "Date" "desc" }}
   {{- $slots := int ($cfg.blockCount | default 3) }}
   {{- $picked := slice }}
-  {{- $titles := $seenTitles }}
+  {{- $covers := $seenCovers }}
   {{- /* A curated pick or two, then the newest to fill -- never the same page twice. */ -}}
   {{- $kindCfg := index $cfg $kind | default dict }}
   {{- range first (int ($cfg.featuredCount | default 1)) ($kindCfg.featured | default slice) }}
   {{- with partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" (printf "landing.%s.featured" $kind)) }}
-  {{- $t := trim (replaceRE "[^a-z0-9]+" " " (lower .Title)) " " }}
-  {{- if not (in $seen .RelPermalink) }}{{ $picked = $picked | append . }}{{ $seen = $seen | append .RelPermalink }}{{ $titles = $titles | append $t }}{{ end }}
+  {{- $c := .Params.covers | default .RelPermalink }}
+  {{- if not (in $seen .RelPermalink) }}{{ $picked = $picked | append . }}{{ $seen = $seen | append .RelPermalink }}{{ $covers = $covers | append $c }}{{ end }}
   {{- end }}
   {{- end }}
   {{- range $all }}
-  {{- $t := trim (replaceRE "[^a-z0-9]+" " " (lower .Title)) " " }}
-  {{- if and (lt (len $picked) $slots) (not (in $seen .RelPermalink)) (not (in $titles $t)) }}
-  {{- $picked = $picked | append . }}{{ $seen = $seen | append .RelPermalink }}{{ $titles = $titles | append $t }}
+  {{- $c := .Params.covers | default .RelPermalink }}
+  {{- if and (lt (len $picked) $slots) (not (in $seen .RelPermalink)) (not (in $covers $c)) }}
+  {{- $picked = $picked | append . }}{{ $seen = $seen | append .RelPermalink }}{{ $covers = $covers | append $c }}
   {{- end }}
   {{- end }}
-  {{- $seenTitles = $titles }}
+  {{- $seenCovers = $covers }}
   {{- with $picked }}
   <section class="landing-block" aria-labelledby="lp-{{ $kind }}">
     {{- /* The heading carries the collection's size as a badge, the same one a
