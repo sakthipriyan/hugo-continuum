@@ -17,22 +17,22 @@
 
             <ul class="nav-links">
                 {{- /* Subsections shown only when they have something in them.
-                       `about`, `search` and `tags` are always shown when present:
-                       about has body content rather than child pages, search has
-                       neither, and tags is populated from the taxonomy rather
-                       than from .Pages.
+                       `about`, `search`, `start-here` and `tags` are always
+                       shown when present: the first three have body content
+                       rather than child pages, and tags is populated from the
+                       taxonomy rather than from .Pages.
 
                        Labels are each page's own title, so renaming a section
                        renames its nav entry, and the list is sorted on that
                        label to stay alphabetical whatever the titles say. */ -}}
                 {{- $hasTags := and $section.Params.taxonomy (isset .Site.Taxonomies $section.Params.taxonomy) }}
                 {{- $items := slice }}
-                {{- range (slice "about" "blogs" "books" "search" "slides" "tags" "tools" "videos") }}
+                {{- range (slice "about" "blogs" "books" "search" "slides" "start-here" "tags" "tools" "videos") }}
                     {{- $sub := $section.GetPage . }}
                     {{- if $sub }}
                         {{- $show := false }}
                         {{- if eq . "tags" }}{{ $show = $hasTags }}
-                        {{- else if or (eq . "about") (eq . "search") }}{{ $show = true }}
+                        {{- else if or (eq . "about") (eq . "search") (eq . "start-here") }}{{ $show = true }}
                         {{- else if $sub.Pages }}{{ $show = true }}{{ end }}
                         {{- if $show }}{{ $items = $items | append $sub }}{{ end }}
                     {{- end }}

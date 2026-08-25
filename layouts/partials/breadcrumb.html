@@ -31,11 +31,15 @@
                         {{ $subsectionPage := .Site.GetPage (printf "/%s/%s/" $actualSection $subsection) }}
                         {{ if $subsectionPage }}
                         {{ if eq .RelPermalink $subsectionPage.RelPermalink }}{{ $.Scratch.Set "crumbIsSelf" true }}{{ end }}
+                        {{- /* The page's own title, not its slug titlecased: a
+                               "start-here" page is called "Start here", not
+                               "Start-Here". */ -}}
+                        {{ $subLabel := $subsectionPage.Title | default ($subsection | title) }}
                         <li class="breadcrumb-item{{ if eq .RelPermalink $subsectionPage.RelPermalink }} active{{ end }}"{{ if eq .RelPermalink $subsectionPage.RelPermalink }} aria-current="page"{{ end }}>
                             {{ if eq .RelPermalink $subsectionPage.RelPermalink }}
-                                <span>{{ $subsection | title }}</span>
+                                <span>{{ $subLabel }}</span>
                             {{ else }}
-                                <a href="{{ $subsectionPage.RelPermalink }}">{{ $subsection | title }}</a>
+                                <a href="{{ $subsectionPage.RelPermalink }}">{{ $subLabel }}</a>
                             {{ end }}
                         </li>
                         
