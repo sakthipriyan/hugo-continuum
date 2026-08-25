@@ -3701,35 +3701,3 @@ main article table th {
     font-size: 0.95rem;
 }
 
-/* A book's chapters, listed under the book rather than each taking a row. */
-.chapter-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem 1.1rem;
-    list-style: none;
-    margin: 0.4rem 0 2rem;
-    padding: 0 0 0 0.2rem;
-    font-size: 0.95rem;
-}
-
-.chapter-list li {
-    display: flex;
-    align-items: baseline;
-    gap: 0.4rem;
-}
-
-.chapter-num {
-    color: var(--gray-medium);
-    font-variant-numeric: tabular-nums;
-    font-size: 0.85rem;
-}
-
-.chapter-list a {
-    color: var(--text-color);
-    text-decoration: none;
-    border-bottom: 1px solid var(--gray-light);
-}
-
-.chapter-list a:hover {
-    border-bottom-color: var(--accent-from);
-}
