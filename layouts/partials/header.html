@@ -22,9 +22,9 @@
                        rather than child pages, and tags is populated from the
                        taxonomy rather than from .Pages.
 
-                       Labels are each page's own title, so renaming a section
-                       renames its nav entry, and the list is sorted on that
-                       label to stay alphabetical whatever the titles say. */ -}}
+                       Labels come from each page, so renaming a section renames
+                       its nav entry, and the list is sorted on the label shown
+                       to stay alphabetical whatever the titles say. */ -}}
                 {{- $hasTags := and $section.Params.taxonomy (isset .Site.Taxonomies $section.Params.taxonomy) }}
                 {{- $items := slice }}
                 {{- range (slice "about" "blogs" "books" "search" "slides" "start-here" "tags" "tools" "videos") }}
@@ -37,8 +37,12 @@
                         {{- if $show }}{{ $items = $items | append $sub }}{{ end }}
                     {{- end }}
                 {{- end }}
-                {{- range sort $items "Title" }}
-                <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+                {{- /* LinkTitle, so a page can be called one thing in the nav
+                       and another at the top of itself -- "Start" among eight
+                       one-word siblings, "Start here" as a heading. It falls
+                       back to Title, so nothing else needs to say anything. */ -}}
+                {{- range sort $items "LinkTitle" }}
+                <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>
                 {{- end }}
             </ul>
         {{- else }}
