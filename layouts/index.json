@@ -1,7 +1,13 @@
 {{- /*
   Search index. Built at publish time and fetched only by the search page, so
-  it costs nothing on any other page. Body text is truncated: enough for recall
-  across a few hundred documents without shipping the whole site as JSON.
+  it costs nothing on any other page.
+
+  Body text is complete. It used to be cut at 1200 characters, which is past
+  the opening of only a fifth of these pages -- a word in the body of a long
+  post simply could not be found. Capping higher does not help: at 20000
+  characters the index is already within 10% of its full size, because a few
+  long pages dominate either way. Full text costs about 275KB gzipped, paid
+  once, by a reader who has gone to the search page and typed something.
 */ -}}
 {{- $docs := slice -}}
 {{- range where .Site.RegularPages "Params.private" "!=" true -}}
@@ -34,7 +40,7 @@
       "i" $icon
       "n" $section
       "d" (cond .Date.IsZero "" (.Date.Format "2006-01-02"))
-      "b" (.Plain | htmlUnescape | chomp | truncate 1200)
+      "b" (.Plain | htmlUnescape | chomp)
   ) -}}
 {{- end -}}
 {{- $docs | jsonify -}}
