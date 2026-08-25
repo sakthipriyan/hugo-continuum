@@ -4,7 +4,7 @@ Renders a leaf section (blogs, videos, slides, tools) as a grid of content cards
 Usage: {{ partial "content-list.html" . }}
 */}}
 <div class="content-list">
-  <h1>{{ .Title }}</h1>
+  {{ partial "page-title.html" (dict "title" .Title "count" (len .RegularPages)) }}
   {{ with .Content }}
   <div class="section-content">
     {{ . }}

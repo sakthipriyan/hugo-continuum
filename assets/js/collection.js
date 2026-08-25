@@ -59,11 +59,7 @@
             slot.hidden = !match;
             if (match) shown++;
         }
-        if (count) {
-            count.textContent = value
-                ? `${shown} of ${total} items`
-                : `${total} item${total === 1 ? '' : 's'}`;
-        }
+        if (count) count.textContent = value ? `${shown} of ${total} items` : '';
         if (empty) empty.hidden = shown > 0;
 
         if (push) {

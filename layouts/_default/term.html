@@ -35,7 +35,7 @@
   {{- end }}
 
   <div class="content-list">
-    <h1>{{ .Title | title }}</h1>
+    {{ partial "page-title.html" (dict "title" (.Title | title) "count" (len $articles)) }}
     {{- with .Content }}
     <div class="section-content">
       {{ . }}
@@ -43,7 +43,9 @@
     {{- end }}
 
     {{- if $articles }}
-    <p class="collection-count" id="collection-count" role="status" aria-live="polite">{{ len $articles }} item{{ if ne (len $articles) 1 }}s{{ end }}</p>
+    {{- /* Silent until a filter narrows the list; the badge beside the
+           heading already gives the total. */ -}}
+    <p class="collection-count" id="collection-count" role="status" aria-live="polite"></p>
 
     {{ partial "filter-pills.html" (dict
         "legend" "Filter by type"

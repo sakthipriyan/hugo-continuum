@@ -19,7 +19,7 @@
 
 <div class="container section-container">
   <div class="content-list">
-    <h1>{{ .Title }}</h1>
+    {{ partial "page-title.html" (dict "title" .Title "count" (len $items)) }}
     {{- with .Content }}
     <div class="section-content">{{ . }}</div>
     {{- end }}
@@ -54,9 +54,8 @@
     </form>
 
     {{- /* Same line, same place, as a term page's count. Empty until there is
-           a query to count; the noscript twin covers the unfiltered list. */ -}}
+           a query to count. */ -}}
     <p class="collection-count" id="collection-count" role="status" aria-live="polite"></p>
-    <noscript><p class="collection-count">{{ len $items }} item{{ if ne (len $items) 1 }}s{{ end }}</p></noscript>
 
     {{- /* Filled in by search.js from the types actually matching, so a query
            that finds no videos never offers a Videos pill. */ -}}

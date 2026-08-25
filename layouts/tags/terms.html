@@ -27,7 +27,7 @@
 
 <div class="container section-container">
     <div class="content-list">
-        <h1>{{ .Title }}</h1>
+        {{ partial "page-title.html" (dict "title" .Title "count" (len $taxonomyData)) }}
         {{ if .Content }}
         <div class="section-content">
             {{ .Content }}
@@ -35,8 +35,6 @@
         {{ end }}
         
         {{ if $taxonomyData }}
-        <p class="collection-count">{{ len $taxonomyData }} tag{{ if ne (len $taxonomyData) 1 }}s{{ end }}</p>
-
         {{- /* Popularity is the served order, so it is what a reader without
                scripting gets; alphabetical is a reordering of the same cards.
                Same pills as the search page's sort. */ -}}

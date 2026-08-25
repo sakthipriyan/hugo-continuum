@@ -3267,3 +3267,30 @@ main article table th {
     padding: 0 0.1em;
     border-radius: 2px;
 }
+
+/* Collection heading badge: how many items the page holds, beside its title.
+   Sized off the heading so it tracks the h1 at every breakpoint rather than
+   needing its own media queries.
+
+   Kept in inline flow rather than made a flex item: flex centres the badge on
+   the heading's line box, which for a 32px glyph inside a 51px line box put
+   the badge's middle right on the baseline, hanging it well below the text.
+   vertical-align does the alignment properly -- against the glyphs -- and lets
+   a long heading wrap with the badge trailing it. */
+.title-count {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 0.35rem;
+    padding: 0.15em 0.7em;
+    border-radius: 20px;
+    background: var(--accent-from);
+    color: var(--on-accent);
+    font-size: 0.45em;
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: 0;
+    /* Nudge from the x-height midpoint that `middle` targets up to the cap
+       midpoint, which is where the eye reads a heading's centre. */
+    position: relative;
+    top: -0.2em;
+}

@@ -20,7 +20,7 @@
     {{ partial "breadcrumb.html" . }}
     <main>
         <section class="books-list">
-            <h1>{{ .Title }}</h1>
+            {{ partial "page-title.html" (dict "title" .Title "count" (len .Pages)) }}
             {{- if .Content }}
             <div class="section-content">
                 {{ .Content }}

@@ -1,0 +1,8 @@
+{{- /*
+  A collection's heading with its size beside it.
+  Usage: {{ partial "page-title.html" (dict "title" .Title "count" (len .RegularPages)) }}
+
+  An empty collection gets no badge: "Videos 0" reads worse than "Videos",
+  and the page says so below anyway.
+*/ -}}
+<h1 class="page-title">{{ .title }}{{ with .count }} <span class="title-count">{{ . }}</span>{{ end }}</h1>
