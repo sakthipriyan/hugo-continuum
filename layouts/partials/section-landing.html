@@ -87,7 +87,24 @@
   {{- with $cfg.featured }}
   {{- $picks := slice }}
   {{- range . }}
-  {{- with partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" "landing.featured") }}
+  {{- $pick := "" }}
+  {{- with .page }}
+    {{- $pick = partial "func/resolve-page.html" (dict "ref" . "site" $sec.Site "where" "landing.featured") }}
+  {{- end }}
+  {{- /* `topic:` features whichever piece under that topic is newest, so a
+         monthly series stays current without the list being edited each time
+         an edition lands. */ -}}
+  {{- with .topic }}
+    {{- $topic := . }}
+    {{- $tax := $sec.Params.taxonomy }}
+    {{- $matches := slice }}
+    {{- range $pages }}
+      {{- if and $tax (in (index .Params $tax | default slice) $topic) }}{{ $matches = $matches | append . }}{{ end }}
+    {{- end }}
+    {{- if $matches }}{{ $pick = index (sort $matches "Date" "desc") 0 }}
+    {{- else }}{{ errorf "landing.featured: nothing carries the topic %q" $topic }}{{ end }}
+  {{- end }}
+  {{- with $pick }}
   {{- if not (in $seen .RelPermalink) }}
     {{- $picks = $picks | append . }}{{ $seen = $seen | append .RelPermalink }}
     {{- /* Its other formats are on the row already, so Latest must not
