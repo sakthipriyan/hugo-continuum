@@ -35,6 +35,10 @@
   <div class="section-content">{{ . }}</div>
   {{- end }}
 
+  {{- /* The two ways in, side by side: search for the reader who knows what
+         they want, and the guided page for the one who does not. They wrap to
+         separate rows when there is not width for both. */ -}}
+  <div class="landing-entry">
   {{- /* A plain GET form, not the search page's script: it hands the query to
          that page, which already reads ?q=. So the landing costs no JavaScript
          and no index fetch, and the box still works without either. */ -}}
@@ -46,7 +50,6 @@
     <button type="submit">Search</button>
   </form>
   {{- end }}
-
   {{- /* A single wide card above the curated six. Being first in a grid is not
          prominence -- on a phone everything stacks, so first means nothing --
          and a doorway into the section should not look like one of six tiles. */ -}}
@@ -66,6 +69,7 @@
   </a>
   {{- end }}
   {{- end }}
+  </div>
 
   {{- /* One curated block rather than two. Splitting "where to begin" from
          "what is worth attention now" meant two hand-kept lists of three that

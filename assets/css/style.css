@@ -3382,8 +3382,9 @@ main article table th {
    Field and button are one rectangle rather than two rounded controls. */
 .landing-search {
     display: flex;
+    flex: 1 1 20rem;
     max-width: 34rem;
-    margin: 2rem 0 0;
+    margin: 0;
 }
 
 .landing-search .search-input {
@@ -3573,8 +3574,9 @@ main article table th {
    first means nothing at all. */
 .landing-lead {
     display: block;
-    margin: 2.5rem 0 0;
-    padding: 1.4rem 1.6rem;
+    flex: 1 1 20rem;
+    margin: 0;
+    padding: 1rem 1.25rem;
     border-left: 4px solid var(--accent-from);
     border-radius: var(--border-radius);
     background: #fff;
@@ -3620,4 +3622,30 @@ main article table th {
 /* Rows inside an article need the spacing a block would otherwise give them. */
 .subject-list {
     margin: 1.25rem 0 2rem;
+}
+
+/* The two ways into a section on one row -- search for the reader who knows
+   what they want, the guided page for the one who does not. They wrap to
+   separate rows below roughly 44rem, where neither would have room to read. */
+.landing-entry {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0 0;
+}
+
+/* Half the width it had, so the standfirst gives way to the title. */
+.landing-entry .landing-lead-note {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.95rem;
+}
+
+.landing-entry .landing-lead-title {
+    font-size: 1.2rem;
+    margin-top: 0;
 }
