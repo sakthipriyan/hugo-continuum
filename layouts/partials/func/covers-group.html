@@ -1,0 +1,41 @@
+{{- /*
+  Every published page covering the same subject as this one, itself included,
+  ordered so the fullest form comes first.
+
+  Pages declare `covers: <id>` to say they are the same subject in a different
+  format -- a talk as a deck and a recording, a guide as a post and a video.
+  A page without `covers`, or the only one carrying its id, is a group of one.
+
+  Order comes from the site's `formatPrecedence`, because a deck accompanies a
+  talk rather than explaining it and should not speak for the group. Publication
+  order will not do: a deck usually predates its recording by a day and carries
+  the terser summary. Without the setting, oldest first.
+
+  Usage: {{ $group := partial "func/covers-group.html" . }}
+*/ -}}
+{{- $p := . -}}
+{{- $out := slice -}}
+{{- with $p.Params.covers -}}
+  {{- $id := . -}}
+  {{- $members := sort (where (where $p.Site.RegularPages "Params.covers" $id) "Params.private" "!=" true) "Date" -}}
+  {{- if gt (len $members) 1 -}}
+    {{- $seen := slice -}}
+    {{- range $p.Site.Params.formatPrecedence -}}
+      {{- $kind := . -}}
+      {{- range $members -}}
+        {{- if and (eq (partial "func/page-kind.html" .) $kind) (not (in $seen .RelPermalink)) -}}
+          {{- $out = $out | append . -}}{{- $seen = $seen | append .RelPermalink -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+    {{- /* Anything the precedence list does not name keeps its date order. */ -}}
+    {{- range $members -}}
+      {{- if not (in $seen .RelPermalink) -}}
+        {{- $out = $out | append . -}}{{- $seen = $seen | append .RelPermalink -}}
+      {{- end -}}
+    {{- end -}}
+  {{- else -}}
+    {{- $out = $members -}}
+  {{- end -}}
+{{- end -}}
+{{- return $out -}}

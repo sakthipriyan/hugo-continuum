@@ -27,9 +27,8 @@ Renders a content card with image, title, summary, meta, and tags
 
         <div class="card-content">
             <!-- Icon and Title -->
+            {{- $kind := partial "func/page-kind.html" . }}
             <div class="card-header">
-                {{ $contentIcon := partial "func/kind-icon.html" (partial "func/page-kind.html" .) }}
-                <span class="content-icon" aria-hidden="true">{{ $contentIcon }}</span>
                 <h3 class="card-title">
                     {{ if and (eq .Type "books") .Params.chapter }}
                         {{ .CurrentSection.Title }}
@@ -64,6 +63,11 @@ Renders a content card with image, title, summary, meta, and tags
 
             <!-- Meta information -->
             <div class="card-meta">
+                <span class="meta-item card-kind">
+                    <span class="meta-icon" aria-hidden="true">{{ partial "func/kind-icon.html" $kind }}</span>
+                    <span>{{ $kind | humanize | singularize }}</span>
+                </span>
+
                 {{ if .Date }}
                 <span class="meta-item">
                     <span class="meta-icon" aria-hidden="true">📅</span>

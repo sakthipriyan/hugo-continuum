@@ -3464,3 +3464,106 @@ main article table th {
     margin: 0 0 0.5rem;
     max-width: 44rem;
 }
+
+/* "Also as" -- the same subject in another format, beside a page's meta. */
+.also-as {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.75rem 0 0;
+}
+
+.also-as-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--gray-medium);
+}
+
+.also-as a {
+    padding: 0.25rem 0.7rem;
+    border: 2px solid var(--gray-light);
+    border-radius: 20px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.also-as a:hover {
+    background: var(--accent-from);
+    border-color: var(--accent-from);
+    color: var(--on-accent);
+}
+
+.also-as a:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* A compact card, for a showcase rather than a list. Six full-height cards
+   push everything below them off the page: the tags alone run to nine chips on
+   one card, and a grid row stretches every card to match its tallest. */
+.posts-grid-compact .content-card {
+    padding: 1.15rem 1.25rem;
+}
+
+/* Tags are navigation, and the topics block does that job further down. */
+.posts-grid-compact .card-tags,
+.posts-grid-compact .card-image {
+    display: none;
+}
+
+/* Three lines is the floor, not the ceiling. A fixed line clamp shows three
+   whatever the card's height, so a card sharing a row with a taller one left
+   its slack empty -- up to two blank lines with four more lines of summary
+   sitting unused. Clipping by height instead lets the box grow into whatever
+   the row gives it. The fade marks the cut, since a clipped line has no
+   ellipsis to explain itself. */
+.posts-grid-compact .card-summary {
+    flex: 1 1 4.65em;
+    line-height: 1.55;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 1em), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 1em), transparent);
+}
+
+/* Enough to say what it is and when: the kind and the date. Read time,
+   platform and the rest belong on the page itself. */
+.posts-grid-compact .card-meta .meta-item ~ .meta-item ~ .meta-item {
+    display: none;
+}
+
+/* The kind leads the meta row, so it reads as a label rather than as another
+   statistic beside the date. */
+.card-kind {
+    font-weight: 600;
+    color: var(--accent-ink);
+}
+
+/* With the cards stretched to a common height, the meta line ended wherever
+   the summary happened to stop. Pin it to the bottom so it forms one baseline
+   across the row.
+
+   Only in the compact grid: on a full card the tags follow the meta, and their
+   count runs from one chip to nine, so pinning there would open a gap rather
+   than close one. */
+.posts-grid-compact .content-card,
+.posts-grid-compact .card-link,
+.posts-grid-compact .card-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.posts-grid-compact .card-link,
+.posts-grid-compact .card-content {
+    flex: 1 1 auto;
+}
+
+.posts-grid-compact .card-meta {
+    margin-top: auto;
+    padding-top: 0.9rem;
+}

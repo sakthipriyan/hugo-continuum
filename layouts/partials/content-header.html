@@ -66,5 +66,20 @@ Displays title, summary, date, and reading/watching/use time
         {{- end }}
     </div>
 
+    {{- /* The same subject in its other formats. Navigational, so it sits with
+           the meta rather than at the foot of the article. */ -}}
+    {{- $group := partial "func/covers-group.html" . }}
+    {{- if gt (len $group) 1 }}
+    <p class="also-as">
+      <span class="also-as-label">Also as</span>
+      {{- range $group }}
+      {{- if ne .RelPermalink $.RelPermalink }}
+      {{- $kind := partial "func/page-kind.html" . }}
+      <a href="{{ .RelPermalink }}"><span aria-hidden="true">{{ partial "func/kind-icon.html" $kind }}</span> {{ $kind | humanize | singularize }}</a>
+      {{- end }}
+      {{- end }}
+    </p>
+    {{- end }}
+
     <hr class="content-divider">
 </header>
