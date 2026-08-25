@@ -3517,12 +3517,18 @@ main article table th {
     display: none;
 }
 
+/* Three lines is the floor, not the ceiling. A fixed line clamp shows three
+   whatever the card's height, so a card sharing a row with a taller one left
+   its slack empty -- up to two blank lines with four more lines of summary
+   sitting unused. Clipping by height instead lets the box grow into whatever
+   the row gives it. The fade marks the cut, since a clipped line has no
+   ellipsis to explain itself. */
 .posts-grid-compact .card-summary {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    -webkit-box-orient: vertical;
+    flex: 1 1 4.65em;
+    line-height: 1.55;
     overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 1em), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 1em), transparent);
 }
 
 /* Enough to say what it is and when: the kind and the date. Read time,
