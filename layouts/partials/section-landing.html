@@ -64,11 +64,13 @@
   {{- end }}
   {{- end }}
   {{- with $picks }}
-  <section class="home-latest landing-block" aria-labelledby="lp-featured">
+  <section class="landing-block" aria-labelledby="lp-featured">
     <div class="block-head"><h2 id="lp-featured">Featured</h2></div>
-    <ul class="latest-list">
-      {{- range . }}{{ partial "subject-row.html" (dict "page" . "lead" .) }}{{ end }}
-    </ul>
+    {{- /* The same card, trimmed to what a showcase needs: six of them at full
+           height push everything else off the page. */ -}}
+    <div class="posts-grid posts-grid-compact">
+      {{- range . }}{{ partial "content-card.html" . }}{{ end }}
+    </div>
   </section>
   {{- end }}
   {{- end }}

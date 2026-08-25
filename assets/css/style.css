@@ -3503,3 +3503,33 @@ main article table th {
     outline: 3px solid var(--focus-ring);
     outline-offset: 2px;
 }
+
+/* A compact card, for a showcase rather than a list. Six full-height cards
+   push everything below them off the page: the tags alone run to nine chips on
+   one card, and a grid row stretches every card to match its tallest. */
+.posts-grid-compact {
+    align-items: start;
+}
+
+.posts-grid-compact .content-card {
+    padding: 1.15rem 1.25rem;
+}
+
+/* Tags are navigation, and the topics block does that job further down. */
+.posts-grid-compact .card-tags,
+.posts-grid-compact .card-image {
+    display: none;
+}
+
+.posts-grid-compact .card-summary {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Enough to say when and what; the rest belongs on the page itself. */
+.posts-grid-compact .card-meta .meta-item ~ .meta-item {
+    display: none;
+}
