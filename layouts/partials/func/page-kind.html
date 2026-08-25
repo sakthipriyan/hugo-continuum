@@ -1,0 +1,13 @@
+{{- /*
+  The subsection a page lives in, as a slug: "blogs", "videos", "books"...
+
+  Derived from the logical content path, which -- unlike .Type or
+  .CurrentSection -- is unaffected by `cascade: url:` and by whether a section
+  declares a type of its own.
+
+  Usage: {{ partial "func/page-kind.html" . }}
+*/ -}}
+{{- $kind := .Type -}}
+{{- $parts := split (strings.TrimPrefix "/" .Path) "/" -}}
+{{- if ge (len $parts) 2 }}{{ $kind = index $parts 1 }}{{ end -}}
+{{- return $kind -}}

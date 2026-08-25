@@ -19,9 +19,7 @@
     {{- $section = .Title -}}
     {{- with .Params.taxonomy }}{{ with (index $p.Params .) }}{{ $tags = . }}{{ end }}{{ end -}}
   {{- end -}}
-  {{- $kind := .Type -}}
-  {{- $parts := split (strings.TrimPrefix "/" .Path) "/" -}}
-  {{- if ge (len $parts) 2 }}{{ $kind = index $parts 1 }}{{ end -}}
+  {{- $kind := partial "func/page-kind.html" . -}}
   {{- /* Same icons the content cards use, so a result looks like the thing it
          points at. */ -}}
   {{- $icon := "📄" -}}

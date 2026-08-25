@@ -1,0 +1,138 @@
+{{- /*
+  A curated section landing, driven entirely by the section's own front matter.
+  Rendered only for sections declaring `landing:`; every other section keeps the
+  grouped listing, so bringing one over is opt-in.
+
+  The block order is fixed, and each block omits itself when the section has
+  nothing for it. A section without tools or videos therefore has fewer blocks
+  rather than a different layout.
+*/ -}}
+{{- $sec := . -}}
+{{- $cfg := .Params.landing -}}
+{{- $pages := where .RegularPagesRecursive "Params.private" "!=" true -}}
+
+<div class="content-list section-landing">
+
+  {{ partial "page-title.html" (dict "title" .Title) }}
+  {{- with .Content }}
+  <div class="section-content">{{ . }}</div>
+  {{- end }}
+
+  {{- with $cfg.cta }}
+  <p class="landing-cta">
+    {{- range . }}
+    {{- $item := . }}
+    {{- with partial "func/resolve-page.html" (dict "ref" $item.page "site" $sec.Site "where" "landing.cta") }}
+    <a class="cta-link" href="{{ .RelPermalink }}">{{ $item.label | default .Title }}</a>
+    {{- end }}
+    {{- end }}
+  </p>
+  {{- end }}
+
+  {{- /* Curated entry points. The blurb defaults to the target page's own
+         summary, so nothing has to be written twice. */ -}}
+  {{- with $cfg.startHere }}
+  <section class="home-start landing-block" aria-labelledby="lp-start">
+    <h2 id="lp-start">Start here</h2>
+    <ul class="start-grid">
+      {{- range . }}
+      {{- $note := .note }}
+      {{- with partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" "landing.startHere") }}
+      <li class="start-item">
+        <a href="{{ .RelPermalink }}">
+          <span class="start-kind">{{ partial "func/page-kind.html" . | humanize | singularize }}</span>
+          <span class="start-title">{{ .Title }}</span>
+        </a>
+        <p class="start-note">{{ $note | default .Params.summary | default .Description | default .Summary }}</p>
+      </li>
+      {{- end }}
+      {{- end }}
+    </ul>
+  </section>
+  {{- end }}
+
+  {{- /* Latest, deliberately format-agnostic: one publication rather than six
+         parallel ones. A talk published as both a slide deck and a video is one
+         entry naming both, not two near-identical rows. */ -}}
+  {{- $dated := slice }}
+  {{- range $pages }}{{ if not .Date.IsZero }}{{ $dated = $dated | append . }}{{ end }}{{ end }}
+  {{- with $dated }}
+  {{- $sorted := sort . "Date" "desc" }}
+  {{- $kindsByKey := dict }}
+  {{- range $sorted }}
+    {{- $key := trim (replaceRE "[^a-z0-9]+" " " (lower .Title)) " " }}
+    {{- $k := partial "func/page-kind.html" . | humanize | singularize }}
+    {{- $cur := index $kindsByKey $key | default slice }}
+    {{- $kindsByKey = merge $kindsByKey (dict $key ($cur | append $k)) }}
+  {{- end }}
+  {{- $rows := slice }}
+  {{- $seen := slice }}
+  {{- range $sorted }}
+    {{- $key := trim (replaceRE "[^a-z0-9]+" " " (lower .Title)) " " }}
+    {{- if not (in $seen $key) }}
+      {{- $seen = $seen | append $key }}
+      {{- $rows = $rows | append (dict "page" . "kinds" (index $kindsByKey $key | uniq | sort)) }}
+    {{- end }}
+  {{- end }}
+  <section class="home-latest landing-block" aria-labelledby="lp-latest">
+    <h2 id="lp-latest">Latest</h2>
+    <ul class="latest-list">
+      {{- range first (int ($cfg.latestCount | default 6)) $rows }}
+      {{- $p := .page }}
+      <li class="latest-item">
+        <time datetime="{{ $p.Date.Format "2006-01-02" }}">{{ $p.Date.Format "Jan 2, 2006" }}</time>
+        <a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a>
+        <span class="latest-section">{{ delimit .kinds " · " }}</span>
+      </li>
+      {{- end }}
+    </ul>
+  </section>
+  {{- end }}
+
+  {{- /* One block per format worth surfacing, each skipped when the section has
+         none. The navigation is what takes a reader to the full list. */ -}}
+  {{- range $kind := (slice "tools" "videos") }}
+  {{- with $sec.GetPage $kind }}
+  {{- $child := . }}
+  {{- $items := sort (where .RegularPages "Params.private" "!=" true) "Date" "desc" }}
+  {{- with $items }}
+  <section class="landing-block" aria-labelledby="lp-{{ $kind }}">
+    <h2 id="lp-{{ $kind }}">{{ $kind | humanize }}</h2>
+    <div class="posts-grid">
+      {{- range first 3 . }}{{ partial "content-card.html" . }}{{ end }}
+    </div>
+    {{- if gt (len .) 3 }}
+    <p class="landing-more"><a href="{{ $child.RelPermalink }}">All {{ len . }} {{ $kind }} →</a></p>
+    {{- end }}
+  </section>
+  {{- end }}
+  {{- end }}
+  {{- end }}
+
+  {{- /* Topics: the section's own taxonomy, most used first. */ -}}
+  {{- with .Params.taxonomy }}
+  {{- $terms := index $sec.Site.Taxonomies . }}
+  {{- with $terms }}
+  <section class="landing-block" aria-labelledby="lp-topics">
+    <h2 id="lp-topics">Explore by topic</h2>
+    <div class="topic-row">
+      {{- range first (int ($cfg.topicsCount | default 10)) .ByCount }}
+      {{- $label := replace .Name "-" " " | title }}
+      {{- with .Page }}{{ $label = .Title }}{{ end }}
+      <a class="tag-link" href="{{ (printf "/%s/tags/%s/" $sec.Section (.Name | urlize)) | absURL }}">{{ $label }}</a>
+      {{- end }}
+    </div>
+    <p class="landing-more"><a href="{{ (printf "/%s/tags/" $sec.Section) | absURL }}">All {{ len . }} topics →</a></p>
+  </section>
+  {{- end }}
+  {{- end }}
+
+  {{- with $sec.GetPage "about" }}
+  <section class="landing-block landing-about" aria-labelledby="lp-about">
+    <h2 id="lp-about">About</h2>
+    <p>{{ .Params.summary | default .Description }}</p>
+    <p class="landing-more"><a href="{{ .RelPermalink }}">More about {{ $sec.Title }} →</a></p>
+  </section>
+  {{- end }}
+
+</div>
