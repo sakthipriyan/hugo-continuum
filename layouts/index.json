@@ -20,15 +20,7 @@
     {{- with .Params.taxonomy }}{{ with (index $p.Params .) }}{{ $tags = . }}{{ end }}{{ end -}}
   {{- end -}}
   {{- $kind := partial "func/page-kind.html" . -}}
-  {{- /* Same icons the content cards use, so a result looks like the thing it
-         points at. */ -}}
-  {{- $icon := "📄" -}}
-  {{- if eq $kind "books" }}{{ $icon = "📚" }}
-  {{- else if eq $kind "blogs" }}{{ $icon = "📝" }}
-  {{- else if eq $kind "slides" }}{{ $icon = "🎯" }}
-  {{- else if eq $kind "tools" }}{{ $icon = "🛠️" }}
-  {{- else if eq $kind "videos" }}{{ $icon = "🎥" }}
-  {{- end -}}
+  {{- $icon := partial "func/kind-icon.html" $kind -}}
   {{- $docs = $docs | append (dict
       "t" .Title
       "u" .RelPermalink
