@@ -54,10 +54,16 @@
     </form>
 
     {{- /* Filled in by search.js from the types actually matching, so a query
-           that finds no videos never offers a Videos pill. */ -}}
-    <fieldset class="filter-row" id="filter-row" data-filter="type" hidden>
-      <legend class="filter-legend">Filter by type</legend>
-    </fieldset>
+           that finds no videos never offers a Videos pill.
+
+           A div with role=radiogroup rather than a fieldset, matching what
+           filter-pills.html renders on a term page: a <legend> is taken out of
+           flex flow and lands above its controls, so the label sat on its own
+           line here while the identical row on a term page kept it inline. */ -}}
+    <div class="filter-row" id="filter-row" role="radiogroup" aria-label="Filter by type"
+         data-filter="type" hidden>
+      <span class="filter-legend">Filter by type</span>
+    </div>
 
     {{- /* Same line, same place, as a term page's count. Empty until there is
            a query to count. */ -}}

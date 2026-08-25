@@ -158,7 +158,7 @@
         const counts = new Map();
         for (const s of shown) counts.set(s.dataset.type, (counts.get(s.dataset.type) || 0) + 1);
 
-        filters.replaceChildren(filters.querySelector('legend'));
+        filters.replaceChildren(filters.querySelector('.filter-legend'));
         const mk = (value, label, n) => {
             const wrap = document.createElement('label');
             wrap.className = 'filter-pill';
