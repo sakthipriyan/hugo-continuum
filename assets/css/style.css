@@ -3529,7 +3529,15 @@ main article table th {
     overflow: hidden;
 }
 
-/* Enough to say when and what; the rest belongs on the page itself. */
-.posts-grid-compact .card-meta .meta-item ~ .meta-item {
+/* Enough to say what it is and when: the kind and the date. Read time,
+   platform and the rest belong on the page itself. */
+.posts-grid-compact .card-meta .meta-item ~ .meta-item ~ .meta-item {
     display: none;
+}
+
+/* The kind leads the meta row, so it reads as a label rather than as another
+   statistic beside the date. */
+.card-kind {
+    font-weight: 600;
+    color: var(--accent-ink);
 }
