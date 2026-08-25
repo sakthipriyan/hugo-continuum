@@ -35,21 +35,12 @@
   <div class="section-content">{{ . }}</div>
   {{- end }}
 
-  {{- /* The two ways in, side by side: search for the reader who knows what
-         they want, and the guided page for the one who does not. They wrap to
-         separate rows when there is not width for both. */ -}}
+  {{- /* The two ways in, side by side. The guided page leads, being what a
+         newcomer needs; search is for the reader who already knows what they
+         are after. Swapped in the markup rather than with CSS order, so the
+         mobile stack and a screen reader follow the same sequence. They wrap
+         to separate rows when there is not width for both. */ -}}
   <div class="landing-entry">
-  {{- /* A plain GET form, not the search page's script: it hands the query to
-         that page, which already reads ?q=. So the landing costs no JavaScript
-         and no index fetch, and the box still works without either. */ -}}
-  {{- with $sec.GetPage "search" }}
-  <form class="landing-search" role="search" action="{{ .RelPermalink }}" method="get">
-    <label class="search-label" for="landing-q">Search {{ $sec.Title }}</label>
-    <input type="search" id="landing-q" name="q" class="search-input"
-           placeholder="Title, topic, or anything in the text…" autocomplete="off" spellcheck="false">
-    <button type="submit">Search</button>
-  </form>
-  {{- end }}
   {{- /* A single wide card above the curated six. Being first in a grid is not
          prominence -- on a phone everything stacks, so first means nothing --
          and a doorway into the section should not look like one of six tiles. */ -}}
@@ -68,6 +59,17 @@
     {{- end }}
   </a>
   {{- end }}
+  {{- end }}
+  {{- /* A plain GET form, not the search page's script: it hands the query to
+         that page, which already reads ?q=. So the landing costs no JavaScript
+         and no index fetch, and the box still works without either. */ -}}
+  {{- with $sec.GetPage "search" }}
+  <form class="landing-search" role="search" action="{{ .RelPermalink }}" method="get">
+    <label class="search-label" for="landing-q">Search {{ $sec.Title }}</label>
+    <input type="search" id="landing-q" name="q" class="search-input"
+           placeholder="Title, topic, or anything in the text…" autocomplete="off" spellcheck="false">
+    <button type="submit">Search</button>
+  </form>
   {{- end }}
   </div>
 
