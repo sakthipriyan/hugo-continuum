@@ -27,7 +27,7 @@
 
 <div class="container section-container">
     <div class="content-list">
-        <h1>{{ .Title }}</h1>
+        {{ partial "page-title.html" (dict "title" .Title "count" (len $taxonomyData)) }}
         {{ if .Content }}
         <div class="section-content">
             {{ .Content }}
@@ -35,15 +35,32 @@
         {{ end }}
         
         {{ if $taxonomyData }}
-        <div class="tags-grid">
+        {{- /* Popularity is the served order, so it is what a reader without
+               scripting gets; alphabetical is a reordering of the same cards.
+               Same pills as the search page's sort. */ -}}
+        <div class="filter-row" role="radiogroup" aria-label="Sort by" data-sort="sort">
+            <span class="filter-legend">Sort by</span>
+            <label class="filter-pill">
+                <input type="radio" name="sort" value="" checked>
+                <span>Popularity</span>
+            </label>
+            <label class="filter-pill">
+                <input type="radio" name="sort" value="alpha">
+                <span>Alphabetically</span>
+            </label>
+        </div>
+
+        <div class="tags-grid" data-sort-list>
             {{ range $taxonomyData }}
                 {{ $tagUrl := printf "/%s/tags/%s/" $currentSection (.Name | urlize) }}
-                
-                <div class="tag-card">
+                {{- /* .Name is the lowercased taxonomy key, so `| title` turns AWS into Aws.
+                       The term's own page keeps the casing the author wrote. */ -}}
+                {{ $label := replace .Name "-" " " | title }}
+                {{ with .Page }}{{ $label = .Title }}{{ end }}
+
+                <div class="tag-card" data-sort-count="{{ .Count }}" data-sort-name="{{ lower $label }}">
                     <a href="{{ $tagUrl | absURL }}">
-                        {{- /* .Name is the lowercased taxonomy key, so `| title` turns AWS into Aws.
-                               The term's own page keeps the casing the author wrote. */ -}}
-                        <h3 class="tag-name">{{ with .Page }}{{ .Title }}{{ else }}{{ replace .Name "-" " " | title }}{{ end }}</h3>
+                        <h3 class="tag-name">{{ $label }}</h3>
                         <div class="tag-meta">
                             <span class="tag-count-badge">{{ .Count }}</span>
                         </div>
@@ -56,4 +73,8 @@
         {{ end }}
     </div>
 </div>
+{{ end }}
+
+{{ define "scripts" }}
+{{ partial "js.html" (slice "collection") }}
 {{ end }}

@@ -4,12 +4,31 @@
        position, so no configuration is needed either way. */ -}}
 {{- $scope := "" }}
 {{- with partial "func/owning-section.html" . }}{{ $scope = .Title }}{{ end }}
+
+{{- /* The same pages index.json carries, in the same scope, so every result
+       has a card waiting for it. They are rendered by Hugo rather than built
+       in JavaScript: the card stays one implementation, and a reader without
+       JavaScript gets the whole collection instead of an apology. */ -}}
+{{- $items := slice }}
+{{- range where .Site.RegularPages "Params.private" "!=" true }}
+  {{- $name := "" }}
+  {{- with partial "func/owning-section.html" . }}{{ $name = .Title }}{{ end }}
+  {{- if or (not $scope) (eq $name $scope) }}{{ $items = $items | append . }}{{ end }}
+{{- end }}
+{{- $items = sort $items "Date" "desc" }}
+
 <div class="container section-container">
   <div class="content-list">
-    <h1>{{ .Title }}</h1>
+    {{ partial "page-title.html" (dict "title" .Title "count" (len $items)) }}
     {{- with .Content }}
     <div class="section-content">{{ . }}</div>
     {{- end }}
+
+    {{- /* Without scripting the controls do nothing, so they are not shown --
+           and the cards, which script would otherwise keep hidden until a
+           query, are revealed instead. A reader without JavaScript gets the
+           whole collection rather than an apology. */ -}}
+    <noscript><style>.search-form,.filter-row{display:none}.card-slot[hidden]{display:contents}</style></noscript>
 
     <form class="search-form" role="search" onsubmit="return false;"
           {{ with $scope }}data-scope="{{ . }}"{{ end }}>
@@ -21,32 +40,41 @@
                taken out of flex flow and lands above its controls, which is not
                what this row wants. The radios keep their own semantics. */ -}}
         <div class="search-sort" role="radiogroup" aria-labelledby="sort-by-label">
-          <span class="search-filters-legend" id="sort-by-label">Sort by</span>
-          <label class="search-filter">
+          <span class="filter-legend" id="sort-by-label">Sort by</span>
+          <label class="filter-pill">
             <input type="radio" name="search-sort" value="" checked>
             <span>Best match</span>
           </label>
-          <label class="search-filter">
+          <label class="filter-pill">
             <input type="radio" name="search-sort" value="latest">
             <span>Latest</span>
           </label>
         </div>
       </div>
-      <p class="search-status" id="search-status" role="status" aria-live="polite"></p>
     </form>
 
-    {{- /* Filled in by search.js from the kinds actually present in the index,
-           so a section without videos never offers a Videos filter. */ -}}
-    <fieldset class="search-filters" id="search-filters" hidden>
-      <legend class="search-filters-legend">Filter by type</legend>
-    </fieldset>
+    {{- /* Filled in by search.js from the types actually matching, so a query
+           that finds no videos never offers a Videos pill.
 
-    <noscript>
-      <p class="no-content">Search needs JavaScript. You can browse by
-        section or tag instead — every page is reachable without it.</p>
-    </noscript>
+           A div with role=radiogroup rather than a fieldset, matching what
+           filter-pills.html renders on a term page: a <legend> is taken out of
+           flex flow and lands above its controls, so the label sat on its own
+           line here while the identical row on a term page kept it inline. */ -}}
+    <div class="filter-row" id="filter-row" role="radiogroup" aria-label="Filter by type"
+         data-filter="type" hidden>
+      <span class="filter-legend">Filter by type</span>
+    </div>
 
-    <ol class="search-results" id="search-results"></ol>
+    {{- /* Same line, same place, as a term page's count. Empty until there is
+           a query to count. */ -}}
+    <p class="collection-count" id="collection-count" role="status" aria-live="polite"></p>
+
+    <div class="posts-grid" id="collection">
+      {{- range $items }}
+      <div class="card-slot" data-type="{{ .Type }}" data-url="{{ .RelPermalink }}" hidden>{{ partial "content-card.html" . }}</div>
+      {{- end }}
+    </div>
+    <p class="no-content" id="collection-empty" hidden>No matches.</p>
   </div>
 </div>
 {{ end }}
