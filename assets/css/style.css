@@ -3507,10 +3507,6 @@ main article table th {
 /* A compact card, for a showcase rather than a list. Six full-height cards
    push everything below them off the page: the tags alone run to nine chips on
    one card, and a grid row stretches every card to match its tallest. */
-.posts-grid-compact {
-    align-items: start;
-}
-
 .posts-grid-compact .content-card {
     padding: 1.15rem 1.25rem;
 }
