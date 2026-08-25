@@ -3537,3 +3537,27 @@ main article table th {
     font-weight: 600;
     color: var(--accent-ink);
 }
+
+/* With the cards stretched to a common height, the meta line ended wherever
+   the summary happened to stop. Pin it to the bottom so it forms one baseline
+   across the row.
+
+   Only in the compact grid: on a full card the tags follow the meta, and their
+   count runs from one chip to nine, so pinning there would open a gap rather
+   than close one. */
+.posts-grid-compact .content-card,
+.posts-grid-compact .card-link,
+.posts-grid-compact .card-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.posts-grid-compact .card-link,
+.posts-grid-compact .card-content {
+    flex: 1 1 auto;
+}
+
+.posts-grid-compact .card-meta {
+    margin-top: auto;
+    padding-top: 0.9rem;
+}
