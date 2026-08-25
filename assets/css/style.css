@@ -3567,3 +3567,57 @@ main article table th {
     margin-top: auto;
     padding-top: 0.9rem;
 }
+
+/* The doorway into a section: one wide card above the featured six, because
+   being first in a grid is not prominence -- on a phone everything stacks, so
+   first means nothing at all. */
+.landing-lead {
+    display: block;
+    margin: 2.5rem 0 0;
+    padding: 1.4rem 1.6rem;
+    border-left: 4px solid var(--accent-from);
+    border-radius: var(--border-radius);
+    background: #fff;
+    box-shadow: var(--box-shadow);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.landing-lead:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
+}
+
+.landing-lead:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+.landing-lead-kicker {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+}
+
+.landing-lead-title {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.landing-lead-note {
+    display: block;
+    margin-top: 0.45rem;
+    color: var(--text-color);
+    max-width: 52rem;
+}
+
+/* Rows inside an article need the spacing a block would otherwise give them. */
+.subject-list {
+    margin: 1.25rem 0 2rem;
+}

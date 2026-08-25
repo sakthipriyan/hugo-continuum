@@ -47,6 +47,26 @@
   </form>
   {{- end }}
 
+  {{- /* A single wide card above the curated six. Being first in a grid is not
+         prominence -- on a phone everything stacks, so first means nothing --
+         and a doorway into the section should not look like one of six tiles. */ -}}
+  {{- with $cfg.lead }}
+  {{- with partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" "landing.lead") }}
+  {{- $seen = $seen | append .RelPermalink }}
+  <a class="landing-lead" href="{{ .RelPermalink }}">
+    {{- /* The kicker labels the card as the way in. A page already called
+           "Start here" says that itself, so it is not said twice. */ -}}
+    {{- if ne (lower .Title) "start here" }}
+    <span class="landing-lead-kicker">Start here</span>
+    {{- end }}
+    <span class="landing-lead-title">{{ .Title }}</span>
+    {{- with (.Params.summary | default .Description) }}
+    <span class="landing-lead-note">{{ . }}</span>
+    {{- end }}
+  </a>
+  {{- end }}
+  {{- end }}
+
   {{- /* One curated block rather than two. Splitting "where to begin" from
          "what is worth attention now" meant two hand-kept lists of three that
          looked identical on the page and were hard to choose between when
