@@ -43,16 +43,16 @@
     {{- end }}
 
     {{- if $articles }}
-    {{- /* Silent until a filter narrows the list; the badge beside the
-           heading already gives the total. */ -}}
-    <p class="collection-count" id="collection-count" role="status" aria-live="polite"></p>
-
     {{ partial "filter-pills.html" (dict
         "legend" "Filter by type"
         "name"   "type"
         "total"  (len $articles)
         "items"  $items
         "active" "") }}
+
+    {{- /* Silent until a filter narrows the list; the badge beside the
+           heading already gives the total. */ -}}
+    <p class="collection-count" id="collection-count" role="status" aria-live="polite"></p>
 
     <div class="posts-grid" id="collection">
       {{- range $articles }}

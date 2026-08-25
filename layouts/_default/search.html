@@ -53,15 +53,15 @@
       </div>
     </form>
 
-    {{- /* Same line, same place, as a term page's count. Empty until there is
-           a query to count. */ -}}
-    <p class="collection-count" id="collection-count" role="status" aria-live="polite"></p>
-
     {{- /* Filled in by search.js from the types actually matching, so a query
            that finds no videos never offers a Videos pill. */ -}}
     <fieldset class="filter-row" id="filter-row" data-filter="type" hidden>
       <legend class="filter-legend">Filter by type</legend>
     </fieldset>
+
+    {{- /* Same line, same place, as a term page's count. Empty until there is
+           a query to count. */ -}}
+    <p class="collection-count" id="collection-count" role="status" aria-live="polite"></p>
 
     <div class="posts-grid" id="collection">
       {{- range $items }}

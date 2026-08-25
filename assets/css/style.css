@@ -3074,8 +3074,11 @@ main article table th {
 
 /* ---- Search ------------------------------------------------------------- */
 
+/* Same gap below the page header as a list page leaves before its first card,
+   so the search box sits where those pages start their content. The bottom
+   margin collapses into the filter row's, which owns the spacing below. */
 .search-form {
-    margin: 1.5rem 0 2rem;
+    margin: 2rem 0 0;
 }
 
 /* The page heading and its subtitle already say what is being searched, so
@@ -3155,7 +3158,10 @@ main article table th {
 .filter-row {
     border: 0;
     padding: 0;
-    margin: 0 0 1.5rem;
+    /* Separated from the page header by the same gap a plain list page puts
+       between its subtitle and its first card, then held close to the results
+       it controls. */
+    margin: 2rem 0 1rem;
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
@@ -3230,9 +3236,10 @@ main article table th {
     font-size: 0.9rem;
 }
 
-/* The filter row sits directly above its grid, whose own margin-top would
-   otherwise double the gap. */
-.filter-row + .posts-grid {
+/* The grid's own top margin is for a plain list page, where it follows the
+   subtitle directly. Anything between the two already provides the gap. */
+.filter-row + .posts-grid,
+.collection-count + .posts-grid {
     margin-top: 0;
 }
 
