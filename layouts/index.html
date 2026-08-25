@@ -53,30 +53,13 @@
         <h2 id="start-here">Start here</h2>
         <ul class="start-grid">
             {{- range . }}
-            {{- $ref := .page }}
-            {{- /* Accept either a content path or a published URL: sections that
-                   set `cascade: url:` publish at a path GetPage cannot resolve. */ -}}
-            {{- $target := $.Site.GetPage $ref }}
-            {{- if not $target }}
-            {{- range $.Site.Pages }}
-            {{- if eq .RelPermalink $ref }}{{ $target = . }}{{ end }}
-            {{- end }}
-            {{- end }}
-            {{- if not $target }}
-            {{- warnf "startHere: no page matches %q -- check content/_index.md" $ref }}
-            {{- end }}
+            {{- $target := partial "func/resolve-page.html" (dict "ref" .page "site" $.Site "where" "startHere (content/_index.md)") }}
             {{- if $target }}
             {{- $owner := partial "func/owning-section.html" $target }}
             <li class="start-item"
                 {{- with $owner }}{{ with .Params.accentFrom }} style="--accent-from:{{ . }};--accent-ink:{{ $owner.Params.accentInk | default . }};"{{ end }}{{ end }}>
                 <a href="{{ $target.RelPermalink }}">
-                    {{- /* The kind is the subsection the page lives in. Derive it from the
-                           logical content path, which -- unlike .Type or .CurrentSection --
-                           is unaffected by `cascade: url:` and by whether a section
-                           declares a type of its own. */ -}}
-                    {{- $kind := $target.Type }}
-                    {{- $parts := split (strings.TrimPrefix "/" $target.Path) "/" }}
-                    {{- if ge (len $parts) 2 }}{{ $kind = index $parts 1 }}{{ end }}
+                    {{- $kind := partial "func/page-kind.html" $target }}
                     <span class="start-kind">{{ with $owner }}<span aria-hidden="true">{{ .Params.emoji }}</span> {{ end }}{{ $kind | humanize | singularize }}</span>
                     <span class="start-title">{{ $target.Title }}</span>
                 </a>

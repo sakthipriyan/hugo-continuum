@@ -1,0 +1,21 @@
+{{- /*
+  Resolves a front-matter page reference to a Page, and warns if it matches
+  nothing so a typo surfaces at build time rather than as a missing card.
+
+  Accepts either a content path or a published URL: a section that sets
+  `cascade: url:` publishes at a path GetPage cannot resolve, so fall back to
+  scanning permalinks.
+
+  Usage: {{ with partial "func/resolve-page.html" (dict "ref" $ref "site" .Site "where" "landing.startHere") }}
+*/ -}}
+{{- $ref := .ref -}}
+{{- $target := .site.GetPage $ref -}}
+{{- if not $target -}}
+  {{- range .site.Pages -}}
+    {{- if eq .RelPermalink $ref }}{{ $target = . }}{{ end -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $target -}}
+  {{- warnf "%s: no page matches %q" (.where | default "page reference") $ref -}}
+{{- end -}}
+{{- return $target -}}

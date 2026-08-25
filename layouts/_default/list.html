@@ -1,7 +1,14 @@
 {{ define "main" }}
 <div class="container section-container">
   {{- /* Top-level section landing pages. Leaf sections have their own
-         templates: layouts/<type>/list.html. */ -}}
+         templates: layouts/<type>/list.html.
+
+         A section that declares `landing:` in its front matter gets the
+         curated landing instead of the grouped listing below, so moving a
+         section over is opt-in and nothing changes until it is. */ -}}
+  {{- if .Params.landing }}
+  {{ partial "section-landing.html" . }}
+  {{- else }}
   <div class="content-list">
     <h1>{{ .Title }}</h1>
     {{- with .Content }}
@@ -34,5 +41,6 @@
     {{- end }}
     {{- end }}
   </div>
+  {{- end }}
 </div>
 {{ end }}

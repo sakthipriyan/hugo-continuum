@@ -507,7 +507,8 @@ main {
     margin-right: 0.25rem;
 }
 
-.card-tags .tag-link {
+.card-tags .tag-link,
+.topic-row .tag-link {
     padding: 0.3rem 0.8rem;
     background: var(--gray-light);
     color: var(--text-color);
@@ -519,8 +520,8 @@ main {
     border: 1px solid transparent;
 }
 
-.card-tags .tag-link:hover {
-    background: var(--secondary-color);
+.card-tags .tag-link:hover,
+.topic-row .tag-link:hover {
     color: white;
     transform: translateY(-1px);
 }
@@ -1847,7 +1848,8 @@ main article table th {
     border-left: 4px solid var(--accent-from);
 }
 
-.card-tags .tag-link:hover {
+.card-tags .tag-link:hover,
+.topic-row .tag-link:hover {
     background: var(--accent-from);
     color: var(--on-accent);
 }
@@ -3304,4 +3306,84 @@ main article table th {
        midpoint, which is where the eye reads a heading's centre. */
     position: relative;
     top: -0.2em;
+}
+
+/* ---------------------------------------------------------------------------
+   Curated section landing
+   --------------------------------------------------------------------------- */
+
+/* Blocks are separated by their own rhythm rather than the 32/16 a collection
+   screen uses: these are distinct sections of a front page, not one list. */
+.landing-block {
+    margin-top: 3rem;
+}
+
+.landing-block > h2 {
+    margin: 0 0 1.25rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--gray-light);
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+/* The grid inside a block starts right under the heading; its own top margin
+   is for a list page, where it follows a subtitle. */
+.landing-block .posts-grid {
+    margin-top: 0;
+}
+
+.landing-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1.5rem 0 0;
+}
+
+.cta-link {
+    display: inline-block;
+    padding: 0.6rem 1.3rem;
+    border-radius: 24px;
+    background: var(--accent-from);
+    color: var(--on-accent);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.cta-link:hover {
+    filter: brightness(0.92);
+}
+
+.cta-link:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+.topic-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.topic-row .tag-link {
+    font-size: 0.9rem;
+}
+
+.landing-more {
+    margin: 1.25rem 0 0;
+}
+
+.landing-more a {
+    font-weight: 600;
+    color: var(--accent-ink);
+    text-decoration: none;
+}
+
+.landing-more a:hover {
+    text-decoration: underline;
+}
+
+.landing-about p {
+    margin: 0 0 0.5rem;
+    max-width: 44rem;
 }
