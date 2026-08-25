@@ -52,16 +52,23 @@
          looked identical on the page and were hard to choose between when
          adding something. */ -}}
   {{- with $cfg.featured }}
-  {{- $cards := slice }}
+  {{- $picks := slice }}
   {{- range . }}
   {{- with partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" "landing.featured") }}
-  {{- if not (in $seen .RelPermalink) }}{{ $cards = $cards | append . }}{{ $seen = $seen | append .RelPermalink }}{{ end }}
+  {{- if not (in $seen .RelPermalink) }}
+    {{- $picks = $picks | append . }}{{ $seen = $seen | append .RelPermalink }}
+    {{- /* Its other formats are on the row already, so Latest must not
+           surface one of them as if it were a separate subject. */ -}}
+    {{- range partial "func/covers-group.html" . }}{{ $seen = $seen | append .RelPermalink }}{{ end }}
   {{- end }}
   {{- end }}
-  {{- with $cards }}
-  <section class="landing-block" aria-labelledby="lp-featured">
+  {{- end }}
+  {{- with $picks }}
+  <section class="home-latest landing-block" aria-labelledby="lp-featured">
     <div class="block-head"><h2 id="lp-featured">Featured</h2></div>
-    <div class="posts-grid">{{ range . }}{{ partial "content-card.html" . }}{{ end }}</div>
+    <ul class="latest-list">
+      {{- range . }}{{ partial "subject-row.html" (dict "page" . "lead" .) }}{{ end }}
+    </ul>
   </section>
   {{- end }}
   {{- end }}
@@ -97,23 +104,9 @@
     <div class="block-head"><h2 id="lp-latest">Latest</h2></div>
     <ul class="latest-list">
       {{- range . }}
-      {{- $p := .page }}{{ $lead := .lead }}{{ $group := .group }}
-      {{- $seen = $seen | append $p.RelPermalink }}
-      <li class="latest-item">
-        <time datetime="{{ $p.Date.Format "2006-01-02" }}">{{ $p.Date.Format "Jan 2, 2006" }}</time>
-        <a href="{{ $lead.RelPermalink }}">{{ $lead.Title }}</a>
-        <span class="latest-section">
-          {{- if $group -}}
-            {{- range $i, $m := $group }}{{ if $i }} · {{ end }}{{ $seen = $seen | append $m.RelPermalink }}
-            {{- $k := partial "func/page-kind.html" $m -}}
-            <a href="{{ $m.RelPermalink }}"><span aria-hidden="true">{{ partial "func/kind-icon.html" $k }}</span> {{ $k | humanize | singularize }}</a>
-            {{- end -}}
-          {{- else -}}
-            {{- $k := partial "func/page-kind.html" $p -}}
-            <span aria-hidden="true">{{ partial "func/kind-icon.html" $k }}</span> {{ $k | humanize | singularize }}
-          {{- end -}}
-        </span>
-      </li>
+      {{- $seen = $seen | append .page.RelPermalink }}
+      {{- range .group }}{{ $seen = $seen | append .RelPermalink }}{{ end }}
+      {{- partial "subject-row.html" (dict "page" .page "lead" .lead) }}
       {{- end }}
     </ul>
   </section>
