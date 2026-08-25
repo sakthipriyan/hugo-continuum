@@ -59,7 +59,18 @@
             slot.hidden = !match;
             if (match) shown++;
         }
-        if (count) count.textContent = value ? `${shown} of ${total} items` : '';
+        if (count) {
+            // Named like a search result line -- "3 videos tagged Asset
+            // Allocation" beside "4 video results for x" -- rather than a bare
+            // ratio. The total cannot join the phrase: 18 is every item on the
+            // page, not 18 videos, so "3 of 18 videos" would be a lie. It is
+            // on the badge and the All pill already.
+            const noun = shown === 1 ? value.replace(/s$/, '') : value;
+            const suffix = count.dataset.suffix;
+            count.textContent = value
+                ? `${shown} ${noun}${suffix ? ' ' + suffix : ''}`
+                : '';
+        }
         if (empty) empty.hidden = shown > 0;
 
         if (push) {

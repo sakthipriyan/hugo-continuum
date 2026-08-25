@@ -52,7 +52,8 @@
 
     {{- /* Silent until a filter narrows the list; the badge beside the
            heading already gives the total. */ -}}
-    <p class="collection-count" id="collection-count" role="status" aria-live="polite"></p>
+    <p class="collection-count" id="collection-count" role="status" aria-live="polite"
+       data-suffix="tagged {{ .Title | title }}"></p>
 
     <div class="posts-grid" id="collection">
       {{- range $articles }}
