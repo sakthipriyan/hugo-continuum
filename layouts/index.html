@@ -159,7 +159,7 @@
                     {{- $tagsPage := $.Site.GetPage (printf "%stags/" $sectionPath) }}
                     {{- if $tagsPage }}
                     <a href="{{ $tagsPage.Permalink }}" class="stat-link">
-                        <span aria-hidden="true">🏷️</span> {{ len $terms }} tags
+                        <span aria-hidden="true">🏷️</span> {{ len $terms }} topics
                     </a>
                     {{- end }}
                     {{- end }}

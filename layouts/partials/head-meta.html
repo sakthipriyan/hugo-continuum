@@ -21,7 +21,7 @@
   {{- $authored = false -}}
   {{- $count := len .Pages -}}
   {{- if and (eq .Kind "term") $count -}}
-    {{- $desc = printf "%d %s tagged “%s” on %s." $count (cond (eq $count 1) "item" "items") .Title $site.Title -}}
+    {{- $desc = printf "%d %s on “%s” in %s." $count (cond (eq $count 1) "item" "items") .Title $site.Title -}}
   {{- else if and (eq .Kind "section") $count -}}
     {{- $desc = printf "%d %s in %s on %s." $count (cond (eq $count 1) "item" "items") .Title $site.Title -}}
   {{- else -}}

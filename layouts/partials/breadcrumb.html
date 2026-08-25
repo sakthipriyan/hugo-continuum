@@ -58,11 +58,14 @@
                         {{ end }}
                     {{ else if eq $subsection "tags" }}
                         {{ $tagsPath := printf "/%s/tags/" $actualSection }}
+                        {{- /* Label from the page itself, so the crumb follows a rename. */ -}}
+                        {{ $tagsLabel := "Tags" }}
+                        {{ with $.Site.GetPage (printf "/%s/tags" $actualSection) }}{{ $tagsLabel = .Title }}{{ end }}
                         <li class="breadcrumb-item{{ if eq .RelPermalink $tagsPath }} active{{ end }}"{{ if eq .RelPermalink $tagsPath }} aria-current="page"{{ end }}>
                             {{ if eq .RelPermalink $tagsPath }}
-                                <span>Tags</span>
+                                <span>{{ $tagsLabel }}</span>
                             {{ else }}
-                                <a href="{{ printf "/%s/tags/" $actualSection | absURL }}">Tags</a>
+                                <a href="{{ printf "/%s/tags/" $actualSection | absURL }}">{{ $tagsLabel }}</a>
                             {{ end }}
                         </li>
                     {{ end }}

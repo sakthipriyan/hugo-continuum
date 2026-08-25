@@ -53,7 +53,7 @@
     {{- /* Silent until a filter narrows the list; the badge beside the
            heading already gives the total. */ -}}
     <p class="collection-count" id="collection-count" role="status" aria-live="polite"
-       data-suffix="tagged {{ .Title | title }}"></p>
+       data-suffix="on {{ .Title | title }}"></p>
 
     <div class="posts-grid" id="collection">
       {{- range $articles }}
@@ -62,7 +62,7 @@
     </div>
     <p class="no-content" id="collection-empty" hidden>No items of that type.</p>
     {{- else }}
-    <p class="no-content">No content found with the tag "{{ .Title | title }}"{{- if $currentSection }} in {{ $sectionName }}{{- end }}.</p>
+    <p class="no-content">Nothing filed under "{{ .Title | title }}"{{- if $currentSection }} in {{ $sectionName }}{{- end }}.</p>
     {{- end }}
   </div>
 </div>

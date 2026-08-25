@@ -35,7 +35,7 @@
       <label class="search-label" for="search-input">Search {{ with $scope }}{{ . }}{{ else }}{{ $.Site.Title }}{{ end }}</label>
       <div class="search-row">
         <input type="search" id="search-input" class="search-input" autocomplete="off"
-               placeholder="Title, tag, or anything in the text…" spellcheck="false">
+               placeholder="Title, topic, or anything in the text…" spellcheck="false">
         {{- /* A div with role=radiogroup rather than a fieldset: a <legend> is
                taken out of flex flow and lands above its controls, which is not
                what this row wants. The radios keep their own semantics. */ -}}
