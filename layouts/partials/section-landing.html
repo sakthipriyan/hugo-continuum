@@ -47,30 +47,10 @@
   </form>
   {{- end }}
 
-  {{- /* Curated entry points, evergreen. The blurb defaults to the target's own
-         summary, so nothing has to be written twice. */ -}}
-  {{- with $cfg.startHere }}
-  <section class="home-start landing-block" aria-labelledby="lp-start">
-    <div class="block-head"><h2 id="lp-start">Start here</h2></div>
-    <ul class="start-grid">
-      {{- range . }}
-      {{- $note := .note }}
-      {{- with partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" "landing.startHere") }}
-      {{- $seen = $seen | append .RelPermalink }}
-      <li class="start-item">
-        <a href="{{ .RelPermalink }}">
-          <span class="start-kind">{{ partial "func/page-kind.html" . | humanize | singularize }}</span>
-          <span class="start-title">{{ .Title }}</span>
-        </a>
-        <p class="start-note">{{ $note | default .Params.summary | default .Description | default .Summary }}</p>
-      </li>
-      {{- end }}
-      {{- end }}
-    </ul>
-  </section>
-  {{- end }}
-
-  {{- /* What the section is pushing now, as opposed to where to begin. */ -}}
+  {{- /* One curated block rather than two. Splitting "where to begin" from
+         "what is worth attention now" meant two hand-kept lists of three that
+         looked identical on the page and were hard to choose between when
+         adding something. */ -}}
   {{- with $cfg.featured }}
   {{- $cards := slice }}
   {{- range . }}
