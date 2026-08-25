@@ -51,11 +51,11 @@
     {{- /* The kicker labels the card as the way in. A page already called
            "Start here" says that itself, so it is not said twice. */ -}}
     {{- if ne (lower .Title) "start here" }}
-    <span class="landing-lead-kicker">Start here</span>
+    <span class="landing-entry-kicker">Start here</span>
     {{- end }}
-    <span class="landing-lead-title">{{ .Title }}</span>
+    <span class="landing-entry-title">{{ .Title }}</span>
     {{- with (.Params.summary | default .Description) }}
-    <span class="landing-lead-note">{{ . }}</span>
+    <span class="landing-entry-note">{{ . }}</span>
     {{- end }}
   </a>
   {{- end }}
@@ -65,10 +65,15 @@
          and no index fetch, and the box still works without either. */ -}}
   {{- with $sec.GetPage "search" }}
   <form class="landing-search" role="search" action="{{ .RelPermalink }}" method="get">
-    <label class="search-label" for="landing-q">Search {{ $sec.Title }}</label>
-    <input type="search" id="landing-q" name="q" class="search-input"
-           placeholder="Title, topic, or anything in the text…" autocomplete="off" spellcheck="false">
-    <button type="submit">Search</button>
+    {{- /* The label is the card's heading rather than hidden text, so this side
+           of the row carries the same weight as the card beside it. */ -}}
+    <label class="landing-entry-title" for="landing-q">Search</label>
+    <span class="landing-entry-note">Every blog, book, slide, tool and video in {{ $sec.Title }}.</span>
+    <span class="landing-search-row">
+      <input type="search" id="landing-q" name="q" class="search-input"
+             placeholder="Title, topic, or anything in the text…" autocomplete="off" spellcheck="false">
+      <button type="submit">Search</button>
+    </span>
   </form>
   {{- end }}
   </div>

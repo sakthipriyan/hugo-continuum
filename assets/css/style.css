@@ -3569,12 +3569,12 @@ main article table th {
     padding-top: 0.9rem;
 }
 
-/* The doorway into a section: one wide card above the featured six, because
-   being first in a grid is not prominence -- on a phone everything stacks, so
-   first means nothing at all. */
-.landing-lead {
-    display: block;
+/* Both halves of the entry row are the same object: a titled card. The search
+   form was a bare input beside a card, which read as one side of the row being
+   unfinished. */
+.landing-entry > * {
     flex: 1 1 20rem;
+    display: block;
     margin: 0;
     padding: 1rem 1.25rem;
     border-left: 4px solid var(--accent-from);
@@ -3582,6 +3582,9 @@ main article table th {
     background: #fff;
     box-shadow: var(--box-shadow);
     text-decoration: none;
+}
+
+.landing-lead {
     transition: var(--transition);
 }
 
@@ -3595,7 +3598,17 @@ main article table th {
     outline-offset: 2px;
 }
 
-.landing-lead-kicker {
+.landing-lead:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
+}
+
+.landing-lead:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+.landing-entry-kicker {
     display: block;
     font-size: 0.8rem;
     font-weight: 700;
@@ -3604,7 +3617,7 @@ main article table th {
     color: var(--accent-ink);
 }
 
-.landing-lead-title {
+.landing-entry-title {
     display: block;
     margin-top: 0.35rem;
     font-size: 1.4rem;
@@ -3612,7 +3625,7 @@ main article table th {
     color: var(--primary-color);
 }
 
-.landing-lead-note {
+.landing-entry-note {
     display: block;
     margin-top: 0.45rem;
     color: var(--text-color);
@@ -3630,13 +3643,15 @@ main article table th {
 .landing-entry {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
+    /* Stretch, so the two cards share an edge top and bottom. Centred, the
+       shorter one floated and the row stopped reading as one band. */
+    align-items: stretch;
     gap: 1rem;
     margin: 2rem 0 0;
 }
 
 /* Half the width it had, so the standfirst gives way to the title. */
-.landing-entry .landing-lead-note {
+.landing-entry-note {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
@@ -3645,7 +3660,28 @@ main article table th {
     font-size: 0.95rem;
 }
 
-.landing-entry .landing-lead-title {
+.landing-entry-title {
     font-size: 1.2rem;
     margin-top: 0;
+}
+
+/* The field and its button, pinned to the foot of the card so it lines up
+   with the bottom of the text beside it however the blurb wraps. */
+.landing-search {
+    display: flex;
+    flex-direction: column;
+}
+
+.landing-search-row {
+    display: flex;
+    margin-top: auto;
+    padding-top: 0.7rem;
+}
+
+.landing-entry-title {
+    cursor: default;
+}
+
+.landing-search .landing-entry-title {
+    cursor: pointer;
 }
