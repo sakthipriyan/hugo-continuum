@@ -4,12 +4,31 @@
        position, so no configuration is needed either way. */ -}}
 {{- $scope := "" }}
 {{- with partial "func/owning-section.html" . }}{{ $scope = .Title }}{{ end }}
+
+{{- /* The same pages index.json carries, in the same scope, so every result
+       has a card waiting for it. They are rendered by Hugo rather than built
+       in JavaScript: the card stays one implementation, and a reader without
+       JavaScript gets the whole collection instead of an apology. */ -}}
+{{- $items := slice }}
+{{- range where .Site.RegularPages "Params.private" "!=" true }}
+  {{- $name := "" }}
+  {{- with partial "func/owning-section.html" . }}{{ $name = .Title }}{{ end }}
+  {{- if or (not $scope) (eq $name $scope) }}{{ $items = $items | append . }}{{ end }}
+{{- end }}
+{{- $items = sort $items "Date" "desc" }}
+
 <div class="container section-container">
   <div class="content-list">
     <h1>{{ .Title }}</h1>
     {{- with .Content }}
     <div class="section-content">{{ . }}</div>
     {{- end }}
+
+    {{- /* Without scripting the controls do nothing, so they are not shown --
+           and the cards, which script would otherwise keep hidden until a
+           query, are revealed instead. A reader without JavaScript gets the
+           whole collection rather than an apology. */ -}}
+    <noscript><style>.search-form,.filter-row{display:none}.card-slot[hidden]{display:contents}</style></noscript>
 
     <form class="search-form" role="search" onsubmit="return false;"
           {{ with $scope }}data-scope="{{ . }}"{{ end }}>
@@ -32,21 +51,25 @@
           </label>
         </div>
       </div>
-      <p class="search-status" id="search-status" role="status" aria-live="polite"></p>
     </form>
 
-    {{- /* Filled in by search.js from the kinds actually present in the index,
-           so a section without videos never offers a Videos filter. */ -}}
-    <fieldset class="filter-row" id="filter-row" hidden>
+    {{- /* Same line, same place, as a term page's count. Empty until there is
+           a query to count; the noscript twin covers the unfiltered list. */ -}}
+    <p class="collection-count" id="collection-count" role="status" aria-live="polite"></p>
+    <noscript><p class="collection-count">{{ len $items }} item{{ if ne (len $items) 1 }}s{{ end }}</p></noscript>
+
+    {{- /* Filled in by search.js from the types actually matching, so a query
+           that finds no videos never offers a Videos pill. */ -}}
+    <fieldset class="filter-row" id="filter-row" data-filter="type" hidden>
       <legend class="filter-legend">Filter by type</legend>
     </fieldset>
 
-    <noscript>
-      <p class="no-content">Search needs JavaScript. You can browse by
-        section or tag instead — every page is reachable without it.</p>
-    </noscript>
-
-    <ol class="search-results" id="search-results"></ol>
+    <div class="posts-grid" id="collection">
+      {{- range $items }}
+      <div class="card-slot" data-type="{{ .Type }}" data-url="{{ .RelPermalink }}" hidden>{{ partial "content-card.html" . }}</div>
+      {{- end }}
+    </div>
+    <p class="no-content" id="collection-empty" hidden>No matches.</p>
   </div>
 </div>
 {{ end }}

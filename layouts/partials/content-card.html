@@ -73,7 +73,7 @@ Renders a content card with image, title, summary, meta, and tags
                 {{ if .Date }}
                 <span class="meta-item">
                     <span class="meta-icon" aria-hidden="true">📅</span>
-                    <time datetime="{{ .Date.Format " 2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+                    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
                 </span>
                 {{ end }}
 

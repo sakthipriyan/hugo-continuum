@@ -3199,75 +3199,6 @@ main article table th {
     outline-offset: 2px;
 }
 
-.search-results {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-/* Each result is its own block. With real space between them the shared
-   bottom rule is redundant, and the accent edge does the separating. */
-.search-result {
-    padding: 0.9rem 1rem;
-    border-left: 3px solid var(--accent-from);
-    background: #fff;
-    border-radius: 0 var(--border-radius) var(--border-radius) 0;
-}
-
-.search-result > a {
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: var(--primary-color);
-    text-decoration: none;
-    line-height: 1.35;
-}
-
-.search-result > a:hover {
-    text-decoration: underline;
-}
-
-.search-meta {
-    margin: 0.35rem 0 0.6rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-    color: var(--accent-ink);
-}
-
-.search-excerpt {
-    margin: 0 0 0.55rem;
-    color: var(--text-color);
-    font-size: 0.95rem;
-    line-height: 1.55;
-}
-
-/* Second and later snippets are additional matches within the same page. */
-.search-excerpt + .search-excerpt {
-    padding-top: 0.55rem;
-    border-top: 1px dashed var(--gray-light);
-}
-
-.search-excerpt:last-child {
-    margin-bottom: 0;
-}
-
-.search-icon {
-    margin-right: 0.4rem;
-    font-size: 0.95rem;
-}
-
-.search-result mark {
-    background: var(--gray-light);
-    color: inherit;
-    font-weight: 600;
-    padding: 0 0.1em;
-    border-radius: 2px;
-}
-
 /* ---------------------------------------------------------------------------
    Filterable collections (term pages, search results)
    --------------------------------------------------------------------------- */
@@ -3293,4 +3224,36 @@ main article table th {
    otherwise double the gap. */
 .filter-row + .posts-grid {
     margin-top: 0;
+}
+
+/* Search replaces a card's own summary with the passages that matched, so the
+   card says why it is here rather than what it is generally about. */
+.card-snippets {
+    margin: 0 0 0.75rem;
+}
+
+.card-snippet {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 0.92rem;
+    line-height: 1.55;
+}
+
+/* A second snippet is another match inside the same page. */
+.card-snippet + .card-snippet {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--gray-light);
+}
+
+/* Tinted from the section accent rather than grey, which is already the
+   read-time chip's background -- a match should not look like a chip. */
+.card-snippet mark,
+.card-title mark {
+    background: var(--gray-light);
+    background: color-mix(in srgb, var(--accent-from) 26%, #fff);
+    color: inherit;
+    font-weight: 600;
+    padding: 0 0.1em;
+    border-radius: 2px;
 }

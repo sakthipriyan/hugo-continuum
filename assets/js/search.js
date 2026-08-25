@@ -1,11 +1,19 @@
 // Client-side search. The index is fetched once, on this page only, and every
 // query is scored in the browser -- nothing about a search leaves the machine.
+//
+// The results are the cards Hugo already rendered into the page: a query shows,
+// ranks and annotates them rather than building new markup. So a search result
+// and a term-page entry are the same card, by construction.
 (function () {
     const input = document.getElementById('search-input');
-    const results = document.getElementById('search-results');
-    const status = document.getElementById('search-status');
+    const grid = document.getElementById('collection');
+    const status = document.getElementById('collection-count');
     const filters = document.getElementById('filter-row');
-    if (!input || !results || !status) return;
+    const empty = document.getElementById('collection-empty');
+    if (!input || !grid || !status) return;
+
+    const slots = [...grid.querySelectorAll('.card-slot')];
+    const byUrl = new Map(slots.map(s => [s.dataset.url, s]));
 
     const params = new URLSearchParams(location.search);
     let activeType = params.get('type') || '';
@@ -16,7 +24,6 @@
     const scope = document.querySelector('.search-form')?.dataset.scope || '';
 
     let docs = null;
-    let allKinds = [];
     let loading = null;
 
     function load() {
@@ -28,9 +35,7 @@
                 return r.json();
             })
             .then(d => {
-                docs = scope ? d.filter(x => x.n === scope) : d;
-                allKinds = docs.map(x => x.k).filter(Boolean);
-                status.textContent = '';
+                docs = (scope ? d.filter(x => x.n === scope) : d).filter(x => byUrl.has(x.u));
                 return docs;
             })
             .catch(() => { status.textContent = 'Could not load the search index.'; return []; });
@@ -56,9 +61,9 @@
         return total;
     }
 
-    // Several snippets per document, each around a different match, so a long
-    // page shows where it is relevant rather than just its opening line.
-    const MAX_SNIPPETS = 3;
+    // Two snippets per card, each around a different match, so a long page
+    // shows where it is relevant without the card growing without bound.
+    const MAX_SNIPPETS = 2;
 
     function excerpts(doc, terms) {
         const body = doc.b || doc.s || '';
@@ -91,8 +96,6 @@
     }
 
     function mark(text, terms) {
-        let out = '';
-        let rest = text;
         // Build with text nodes so nothing from the index is ever parsed as HTML.
         const pattern = terms.filter(Boolean)
             .map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
@@ -101,33 +104,66 @@
         const frag = document.createDocumentFragment();
         const re = new RegExp('(' + pattern + ')', 'ig');
         let last = 0, m;
-        while ((m = re.exec(rest)) !== null) {
-            if (m.index > last) frag.appendChild(document.createTextNode(rest.slice(last, m.index)));
+        while ((m = re.exec(text)) !== null) {
+            if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
             const el = document.createElement('mark');
             el.textContent = m[0];
             frag.appendChild(el);
             last = m.index + m[0].length;
             if (m[0].length === 0) re.lastIndex++;
         }
-        if (last < rest.length) frag.appendChild(document.createTextNode(rest.slice(last)));
+        if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
         return frag;
+    }
+
+    // Annotating a card is reversible: the card's own summary is hidden rather
+    // than overwritten, and the title keeps its original text in a dataset.
+    function annotate(slot, doc, terms) {
+        const title = slot.querySelector('.card-title');
+        if (title) {
+            if (title.dataset.orig === undefined) title.dataset.orig = title.textContent.trim();
+            title.replaceChildren(mark(title.dataset.orig, terms));
+        }
+        const summary = slot.querySelector('.card-summary');
+        const lines = excerpts(doc, terms);
+        slot.querySelector('.card-snippets')?.remove();
+        if (!lines.length) { if (summary) summary.hidden = false; return; }
+        if (summary) summary.hidden = true;
+
+        const box = document.createElement('div');
+        box.className = 'card-snippets';
+        for (const line of lines) {
+            const p = document.createElement('p');
+            p.className = 'card-snippet';
+            p.appendChild(mark(line, terms));
+            box.appendChild(p);
+        }
+        const anchor = summary || slot.querySelector('.card-meta');
+        if (anchor) anchor.parentNode.insertBefore(box, summary ? summary.nextSibling : anchor);
+        else slot.querySelector('.card-content')?.appendChild(box);
+    }
+
+    function reset(slot) {
+        const title = slot.querySelector('.card-title');
+        if (title && title.dataset.orig !== undefined) title.textContent = title.dataset.orig;
+        slot.querySelector('.card-snippets')?.remove();
+        const summary = slot.querySelector('.card-summary');
+        if (summary) summary.hidden = false;
     }
 
     // Pills are built from the matches themselves: only types that actually have
     // a hit for this query are offered.
-    function renderFilters(all) {
+    function renderFilters(shown) {
         if (!filters) return;
         const counts = new Map();
-        for (const { doc } of all) counts.set(doc.k, (counts.get(doc.k) || 0) + 1);
-        const kinds = [...new Set(allKinds)].sort();
+        for (const s of shown) counts.set(s.dataset.type, (counts.get(s.dataset.type) || 0) + 1);
 
         filters.replaceChildren(filters.querySelector('legend'));
         const mk = (value, label, n) => {
             const wrap = document.createElement('label');
             wrap.className = 'filter-pill';
             const r = document.createElement('input');
-            r.type = 'radio'; r.name = 'search-type'; r.id = 'filter-' + (value || 'all');
-            r.value = value;
+            r.type = 'radio'; r.name = 'type'; r.value = value;
             r.checked = activeType === value;
             r.addEventListener('change', () => { activeType = value; run(input.value); });
             const span = document.createElement('span');
@@ -135,61 +171,28 @@
             wrap.append(r, span);
             return wrap;
         };
-        filters.appendChild(mk('', 'All', all.length));
-        for (const k of kinds) {
-            const n = counts.get(k) || 0;
-            if (n === 0) continue;
-            filters.appendChild(mk(k, k + 's', n));
+        filters.appendChild(mk('', 'All', shown.length));
+        for (const k of [...counts.keys()].sort()) {
+            filters.appendChild(mk(k, k.charAt(0).toUpperCase() + k.slice(1), counts.get(k)));
         }
         // With one type left, All and that type mean the same thing.
-        filters.hidden = all.length === 0 || filters.querySelectorAll('.filter-pill').length < 3;
+        filters.hidden = filters.querySelectorAll('.filter-pill').length < 3;
     }
 
-    function render(matches, terms) {
-        results.replaceChildren();
-        for (const { doc } of matches) {
-            const li = document.createElement('li');
-            li.className = 'search-result';
-
-            const a = document.createElement('a');
-            a.href = doc.u;
-            a.appendChild(mark(doc.t, terms));
-            li.appendChild(a);
-
-            const meta = document.createElement('p');
-            meta.className = 'search-meta';
-            if (doc.i) {
-                const ic = document.createElement('span');
-                ic.className = 'search-icon';
-                ic.setAttribute('aria-hidden', 'true');
-                ic.textContent = doc.i;
-                meta.appendChild(ic);
-            }
-            // The section is only worth saying when results can span sections.
-            const bits = [!scope ? doc.n : '', doc.k, doc.d].filter(Boolean);
-            meta.appendChild(document.createTextNode(bits.join(' · ')));
-            li.appendChild(meta);
-
-            for (const snippet of excerpts(doc, terms)) {
-                const p = document.createElement('p');
-                p.className = 'search-excerpt';
-                p.appendChild(mark(snippet, terms));
-                li.appendChild(p);
-            }
-
-            results.appendChild(li);
-        }
+    // No query, nothing to show. The cards stay in the page, hidden, ready to
+    // be revealed and ranked as soon as there is something to rank them by.
+    function clear() {
+        for (const slot of slots) { reset(slot); slot.hidden = true; }
+        if (filters) filters.hidden = true;
+        if (empty) empty.hidden = true;
+        status.textContent = '';
+        syncUrl('');
     }
 
     function run(q) {
         const terms = norm(q).split(/\s+/).filter(t => t.length > 1);
-        if (!terms.length) {
-            results.replaceChildren();
-            status.textContent = '';
-            if (filters) filters.hidden = true;
-            syncUrl('');
-            return;
-        }
+        if (!terms.length) { clear(); return; }
+
         load().then(() => {
             if (!docs) return;
             const all = docs
@@ -202,17 +205,28 @@
 
             // Resolve the fallback before drawing the pills, or the row shows a
             // type as selected while All is actually in effect.
-            if (activeType && !all.some(m => m.doc.k === activeType)) activeType = '';
+            const kinds = new Set(all.map(m => byUrl.get(m.doc.u).dataset.type));
+            if (activeType && !kinds.has(activeType)) activeType = '';
 
-            renderFilters(all);
+            renderFilters(all.map(m => byUrl.get(m.doc.u)));
 
-            const matches = (activeType ? all.filter(m => m.doc.k === activeType) : all).slice(0, 40);
-            const label = activeType ? `${activeType.toLowerCase()} result` : 'result';
-            status.textContent = matches.length
-                ? `${matches.length}${matches.length === 40 ? '+' : ''} ${label}${matches.length === 1 ? '' : 's'} for “${q.trim()}”`
+            for (const slot of slots) { reset(slot); slot.hidden = true; }
+            let shown = 0;
+            for (const { doc } of all) {
+                const slot = byUrl.get(doc.u);
+                if (activeType && slot.dataset.type !== activeType) continue;
+                annotate(slot, doc, terms);
+                slot.hidden = false;
+                grid.appendChild(slot);          // appending an existing node moves it
+                shown++;
+            }
+
+            const label = activeType ? activeType.replace(/s$/, '') + ' result' : 'result';
+            status.textContent = shown
+                ? `${shown} ${label}${shown === 1 ? '' : 's'} for “${q.trim()}”`
                 : `No results for “${q.trim()}”`;
+            if (empty) empty.hidden = shown > 0;
             syncUrl(q);
-            render(matches, terms);
         });
     }
 
@@ -221,8 +235,7 @@
         if (q.trim()) p.set('q', q.trim());
         if (activeType) p.set('type', activeType);
         if (activeSort) p.set('sort', activeSort);
-        const url = location.pathname + (p.toString() ? '?' + p : '');
-        history.replaceState(null, '', url);
+        history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : ''));
     }
 
     for (const r of sortInputs) {
@@ -241,6 +254,6 @@
 
     // Deep-link support: /search/?q=term
     const q = new URLSearchParams(location.search).get('q');
-    if (q) { input.value = q; run(q); }
+    if (q) { input.value = q; run(q); } else { clear(); }
     input.focus();
 })();
