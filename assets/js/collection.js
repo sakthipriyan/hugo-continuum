@@ -1,6 +1,45 @@
-// Filters an already-rendered collection in place. The cards come from Hugo, so
-// nothing is reconstructed in the browser and a reader without JavaScript still
-// gets the whole list -- just unfiltered.
+// Controls for an already-rendered collection: filtering cards by type, and
+// reordering a sortable list. The markup comes from Hugo either way, so nothing
+// is reconstructed in the browser and a reader without JavaScript still gets
+// the whole list -- just in the order it was served.
+
+// Sorting: any [data-sort-list] whose children carry data-sort-* keys, driven
+// by a .filter-row[data-sort]. The served order is the default, so it needs no
+// key of its own.
+(function () {
+    const row = document.querySelector('.filter-row[data-sort]');
+    const list = document.querySelector('[data-sort-list]');
+    if (!row || !list) return;
+
+    const param = row.dataset.sort;
+    const items = [...list.children];
+    const radios = [...row.querySelectorAll('input[type="radio"]')];
+
+    function apply(value, push) {
+        const ordered = value === 'alpha'
+            ? [...items].sort((a, b) =>
+                (a.dataset.sortName || '').localeCompare(b.dataset.sortName || ''))
+            : items;
+        for (const el of ordered) list.appendChild(el);   // appending moves it
+
+        if (push) {
+            const p = new URLSearchParams(location.search);
+            if (value) p.set(param, value); else p.delete(param);
+            history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : ''));
+        }
+    }
+
+    for (const r of radios) {
+        r.addEventListener('change', () => { if (r.checked) apply(r.value, true); });
+    }
+
+    // Deep-link support: /tags/?sort=alpha
+    const wanted = new URLSearchParams(location.search).get(param) || '';
+    const target = radios.find(r => r.value === wanted) || radios.find(r => r.value === '');
+    if (target) { target.checked = true; apply(target.value, false); }
+})();
+
+// Filtering: cards in #collection shown or hidden by a .filter-row[data-filter].
 (function () {
     const grid = document.getElementById('collection');
     const row = document.querySelector('.filter-row[data-filter]');
