@@ -146,11 +146,77 @@ main:focus {
     --focus-ring: var(--on-accent);
 }
 
-/* The dark header band is deep enough that the section's own on-accent -- a
-   near-black, picked to read on bright gold -- would disappear into it.
-   Redefining the token inside the header carries the logo, the nav, and the
-   toggle icon with it, and leaves every other use of the accent alone. */
-:root.dark .site-header {
+/* --accent-from was doing two jobs, the way --gray-light and --primary-color
+   were: filling a badge or a button, where it carries --on-accent text, and
+   drawing a line, where it carries nothing. Dark has to treat those
+   differently -- a fill has to recede far enough for light text to sit on it,
+   a line has to stay bright enough to be seen -- so they are separate roles
+   now. Light leaves both as the accent itself, unchanged.
+
+   Derived here rather than in the generated stylesheet, because the home page
+   sets --accent-from inline, per card, and CSS can re-derive from that where a
+   generator cannot reach. Both blocks are needed: a custom property resolves
+   var() against the element it is declared on, so --accent-surface set on
+   :root would never see a section's own --accent-from. */
+body,
+.section-card,
+.start-item,
+.latest-item,
+.nav-links .section-link-pill {
+    --accent-surface: var(--accent-from);
+    --accent-surface-to: var(--accent-to);
+    --accent-line: var(--accent-from);
+}
+
+/* Elements carrying a section's accent inline bring both on-accents with them,
+   for the same reason they bring both inks: an inline --on-accent would beat
+   the palette. */
+.section-card,
+.start-item,
+.latest-item,
+.nav-links .section-link-pill {
+    --on-accent: var(--on-accent-light, #fff);
+}
+
+:root.dark .section-card,
+:root.dark .start-item,
+:root.dark .latest-item,
+:root.dark .nav-links .section-link-pill {
+    --on-accent: var(--on-accent-dark, #fafafa);
+}
+
+:root.dark body,
+:root.dark .section-card,
+:root.dark .start-item,
+:root.dark .latest-item,
+:root.dark .nav-links .section-link-pill {
+    --accent-surface: color-mix(in srgb, var(--accent-from) 60%, transparent);
+    --accent-surface-to: color-mix(in srgb, var(--accent-to) 55%, transparent);
+    --accent-line: color-mix(in srgb, var(--accent-from) 62%, transparent);
+}
+
+@supports (color: oklch(from red l c h)) {
+    :root.dark body,
+    :root.dark .section-card,
+    :root.dark .start-item,
+    :root.dark .latest-item,
+    :root.dark .nav-links .section-link-pill {
+        --accent-surface: oklch(from var(--accent-from) 0.56 c h / 0.85);
+        --accent-surface-to: oklch(from var(--accent-to) 0.50 c h / 0.85);
+        --accent-line: oklch(from var(--accent-from) 0.62 c h / 0.85);
+    }
+}
+
+/* The header band gets away with being a much fainter wash than these -- it is
+   the width of the page and its text is large. A badge is forty pixels with a
+   two-digit number in it, and the same treatment left it at 1.8:1 against the
+   page: a pill you cannot see. These sit at the one setting that clears both
+   bars for both sections at once -- the fill at least 3:1 against the card it
+   sits on, and its text at least 4.5:1 on the fill.
+
+   Every accent fill is dimmed, so the near-black a section picked to read on
+   bright gold would vanish on all of them, not just the header. */
+:root.dark body {
     --on-accent: #fafafa;
 }
 
@@ -440,12 +506,12 @@ main:focus {
 /* Section-specific navigation link backgrounds for homepage */
 /* Home-page pills: each carries its own accent tokens inline (see header.html). */
 .nav-links .section-link-pill {
-    background: linear-gradient(135deg, var(--accent-from) 0%, var(--accent-to) 100%);
+    background: linear-gradient(135deg, var(--accent-surface) 0%, var(--accent-surface-to) 100%);
     color: var(--on-accent);
 }
 
 .nav-links .section-link-pill:hover {
-    background: linear-gradient(135deg, var(--accent-to) 0%, var(--accent-from) 100%);
+    background: linear-gradient(135deg, var(--accent-surface-to) 0%, var(--accent-surface) 100%);
     color: var(--on-accent);
     transform: translateY(-1px);
 }
@@ -558,12 +624,12 @@ main {
 
 /* Section-specific view-all button colors */
 .view-all-link {
-    background: linear-gradient(135deg, var(--accent-from) 0%, var(--accent-to) 100%);
+    background: linear-gradient(135deg, var(--accent-surface) 0%, var(--accent-surface-to) 100%);
     color: var(--on-accent);
 }
 
 .view-all-link:hover {
-    background: linear-gradient(135deg, var(--accent-to) 0%, var(--accent-from) 100%);
+    background: linear-gradient(135deg, var(--accent-surface-to) 0%, var(--accent-surface) 100%);
     color: var(--on-accent);
 }
 
@@ -1458,7 +1524,7 @@ main {
     box-shadow: var(--box-shadow);
     padding: 2rem;
     transition: var(--transition);
-    border-left: 4px solid var(--accent-from);
+    border-left: 4px solid var(--accent-line);
 }
 
 .section-card:hover {
@@ -1542,7 +1608,7 @@ main {
 }
 
 .section-card .stat-link:hover {
-    background: linear-gradient(135deg, var(--accent-from) 0%, var(--accent-to) 100%);
+    background: linear-gradient(135deg, var(--accent-surface) 0%, var(--accent-surface-to) 100%);
     color: var(--on-accent);
     border-color: transparent;
 }
@@ -1926,7 +1992,7 @@ main article blockquote {
 
 .post-content blockquote,
 main article blockquote {
-    border-left-color: var(--accent-from);
+    border-left-color: var(--accent-line);
 }
 
 .post-content code,
@@ -1952,7 +2018,7 @@ main article pre {
 
 .post-content pre,
 main article pre {
-    border-color: var(--accent-from);
+    border-color: var(--accent-line);
 }
 
 .post-content pre code,
@@ -2046,11 +2112,11 @@ main article table th {
 .tool-card,
 .tag-card,
 .content-card {
-    border-left: 4px solid var(--accent-from);
+    border-left: 4px solid var(--accent-line);
 }
 
 .card-tags .tag-link:hover {
-    background: var(--accent-from);
+    background: var(--accent-surface);
     color: var(--on-accent);
 }
 
@@ -2386,7 +2452,7 @@ main article table th {
 }
 
 .tag-count-badge {
-    background: var(--accent-from);
+    background: var(--accent-surface);
     color: var(--on-accent);
 }
 
@@ -3148,7 +3214,7 @@ main article table th {
 .start-item {
     background: var(--card);
     border: 1px solid var(--border);
-    border-left: 4px solid var(--accent-from);
+    border-left: 4px solid var(--accent-line);
     border-radius: var(--border-radius);
     padding: 1rem 1.25rem;
     transition: var(--transition);
@@ -3220,7 +3286,7 @@ main article table th {
 
 .latest-item > a:hover {
     text-decoration: underline;
-    text-decoration-color: var(--accent-from);
+    text-decoration-color: var(--accent-line);
     text-underline-offset: 3px;
 }
 
@@ -3412,8 +3478,8 @@ main article table th {
 }
 
 .filter-pill input:checked + span {
-    background: var(--accent-from);
-    border-color: var(--accent-from);
+    background: var(--accent-surface);
+    border-color: var(--accent-line);
     color: var(--on-accent);
     font-weight: 600;
 }
@@ -3499,7 +3565,7 @@ main article table th {
     margin-left: 0.35rem;
     padding: 0.15em 0.7em;
     border-radius: 20px;
-    background: var(--accent-from);
+    background: var(--accent-surface);
     color: var(--on-accent);
     font-size: 0.45em;
     font-weight: 700;
@@ -3603,9 +3669,9 @@ main article table th {
     justify-content: center;
     width: 2.9rem;
     padding: 0;
-    border: 2px solid var(--accent-from);
+    border: 2px solid var(--accent-line);
     border-radius: 0;
-    background: var(--accent-from);
+    background: var(--accent-surface);
     color: var(--on-accent);
     font: inherit;
     font-weight: 600;
@@ -3634,7 +3700,7 @@ main article table th {
     display: inline-block;
     padding: 0.6rem 1.3rem;
     border-radius: 24px;
-    background: var(--accent-from);
+    background: var(--accent-surface);
     color: var(--on-accent);
     font-weight: 600;
     text-decoration: none;
@@ -3700,8 +3766,8 @@ main article table th {
 }
 
 .also-as a:hover {
-    background: var(--accent-from);
-    border-color: var(--accent-from);
+    background: var(--accent-surface);
+    border-color: var(--accent-line);
     color: var(--on-accent);
 }
 
@@ -3781,7 +3847,7 @@ main article table th {
     display: block;
     margin: 0;
     padding: 1rem 1.25rem;
-    border-left: 4px solid var(--accent-from);
+    border-left: 4px solid var(--accent-line);
     border-radius: var(--border-radius);
     background: var(--card);
     box-shadow: var(--box-shadow);

@@ -3,9 +3,12 @@
   page's own -- the home page, where every section appears at once and the
   body class cannot speak for all of them.
 
-  Emits both inks rather than one. An inline --accent-ink would outrank any
-  rule the dark palette could write, so the choice is left to CSS: the theme
-  picks --accent-ink-light or --accent-ink-dark and assigns --accent-ink.
+  Emits both inks rather than one, and both on-accents. An inline value would
+  outrank any rule the dark palette could write, so the choice is left to CSS:
+  the theme picks the -light or -dark half and assigns --accent-ink and
+  --on-accent. A section's own onAccent is chosen to read on the accent at full
+  brightness -- near-black, on this site's gold -- and dark dims every fill, so
+  it needs the other answer there.
 
   Usage: {{ partial "func/accent-style.html" (dict "section" $s) }}
          {{ partial "func/accent-style.html" (dict "section" $s "full" true) }}
@@ -19,7 +22,7 @@
     {{- $ink := $s.Params.accentInk | default . -}}
     {{- $inkDark := $s.Params.accentInkDark | default (printf "color-mix(in srgb, %s 55%%, #fff)" .) -}}
     {{- if $.full -}}
-      {{- $out = printf "--accent-from:%s;--accent-to:%s;--accent-ink-light:%s;--accent-ink-dark:%s;--on-accent:%s;"
+      {{- $out = printf "--accent-from:%s;--accent-to:%s;--accent-ink-light:%s;--accent-ink-dark:%s;--on-accent-light:%s;--on-accent-dark:#fafafa;"
           . ($s.Params.accentTo | default .) $ink $inkDark ($s.Params.onAccent | default "#fff") -}}
     {{- else -}}
       {{- $out = printf "--accent-from:%s;--accent-ink-light:%s;--accent-ink-dark:%s;" . $ink $inkDark -}}
