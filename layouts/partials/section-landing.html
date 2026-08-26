@@ -19,6 +19,11 @@
        nothing but the newest three. */ -}}
 {{- $reserved := slice -}}
 {{- $seenCovers := slice -}}
+{{- /* Resolved once, used by the lead card and again by Latest's heading. */ -}}
+{{- $leadPage := "" -}}
+{{- with $cfg.lead }}
+  {{- $leadPage = partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" "landing.lead") }}
+{{- end -}}
 {{- range $kind := (slice "tools" "videos" "slides") -}}
   {{- $kc := index $cfg $kind | default dict -}}
   {{- range $kc.featured | default slice -}}
@@ -44,8 +49,7 @@
   {{- /* A single wide card above the curated six. Being first in a grid is not
          prominence -- on a phone everything stacks, so first means nothing --
          and a doorway into the section should not look like one of six tiles. */ -}}
-  {{- with $cfg.lead }}
-  {{- with partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" "landing.lead") }}
+  {{- with $leadPage }}
   {{- $seen = $seen | append .RelPermalink }}
   <a class="landing-lead" href="{{ .RelPermalink }}">
     {{- /* The kicker labels the card as the way in. A page already called
@@ -59,22 +63,27 @@
     {{- end }}
   </a>
   {{- end }}
-  {{- end }}
   {{- /* A plain GET form, not the search page's script: it hands the query to
          that page, which already reads ?q=. So the landing costs no JavaScript
          and no index fetch, and the box still works without either. */ -}}
   {{- with $sec.GetPage "search" }}
   <form class="landing-search" role="search" action="{{ .RelPermalink }}" method="get">
     {{- /* The label is the card's heading rather than hidden text, so this side
-           of the row carries the same weight as the card beside it. */ -}}
-    <span class="landing-entry-head">
-      <label class="landing-entry-title" for="landing-q">Search</label>
-      <span class="landing-entry-inline">every blog, book, slide, tool and video</span>
-    </span>
+           of the row carries the same weight as the card beside it. What is
+           searched is said by the placeholder rather than on a line of its
+           own -- two sentences for one control was one too many. */ -}}
+    <label class="landing-entry-title" for="landing-q">Search</label>
     <span class="landing-search-row">
       <input type="search" id="landing-q" name="q" class="search-input"
-             placeholder="Title, topic, or anything in the text…" autocomplete="off" spellcheck="false">
-      <button type="submit">Search</button>
+             placeholder="Title or topic in any format…" autocomplete="off" spellcheck="false">
+      {{- /* An icon, not the word: the card is already headed "Search", and a
+             text button plus the field overflowed the card on a phone. */ -}}
+      <button type="submit" aria-label="Search {{ $sec.Title }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round" aria-hidden="true" focusable="false">
+          <circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4.2-4.2"></path>
+        </svg>
+      </button>
     </span>
   </form>
   {{- end }}
@@ -153,7 +162,14 @@
   {{- $rows = first (int ($cfg.latestCount | default 6)) $rows }}
   {{- with $rows }}
   <section class="home-latest landing-block" aria-labelledby="lp-latest">
-    <div class="block-head"><h2 id="lp-latest">Latest</h2></div>
+    {{- /* Latest has no "all of them" page of its own; the guided page is where
+           the whole thing is laid out in order, so the heading points there. */ -}}
+    <div class="block-head">
+      <h2 id="lp-latest">Latest</h2>
+      {{- with $leadPage }}
+      <a class="block-more" href="{{ .RelPermalink }}">{{ .Title }} →</a>
+      {{- end }}
+    </div>
     <ul class="latest-list">
       {{- range . }}
       {{- $seen = $seen | append .page.RelPermalink }}
@@ -175,9 +191,11 @@
   {{- $slots := int ($cfg.blockCount | default 3) }}
   {{- $picked := slice }}
   {{- $covers := $seenCovers }}
-  {{- /* A curated pick or two, then the newest to fill -- never the same page twice. */ -}}
+  {{- /* Every pick the section names, then the newest to fill what is left --
+         never the same page twice. Naming three fills the block; naming one
+         pins the lead and lets recency choose the rest. */ -}}
   {{- $kindCfg := index $cfg $kind | default dict }}
-  {{- range first (int ($cfg.featuredCount | default 1)) ($kindCfg.featured | default slice) }}
+  {{- range first $slots ($kindCfg.featured | default slice) }}
   {{- with partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" (printf "landing.%s.featured" $kind)) }}
   {{- $c := .Params.covers | default .RelPermalink }}
   {{- if not (in $seen .RelPermalink) }}{{ $picked = $picked | append . }}{{ $seen = $seen | append .RelPermalink }}{{ $covers = $covers | append $c }}{{ end }}
