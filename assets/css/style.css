@@ -3701,18 +3701,4 @@ main article table th {
     cursor: pointer;
 }
 
-/* The search card says what it covers on the heading's own line: a full
-   sentence beneath it was a third line for something the placeholder already
-   half says. */
-.landing-entry-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.5rem;
-}
-
-.landing-entry-inline {
-    color: var(--gray-medium);
-    font-size: 0.95rem;
-}
 

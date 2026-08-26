@@ -66,14 +66,13 @@
   {{- with $sec.GetPage "search" }}
   <form class="landing-search" role="search" action="{{ .RelPermalink }}" method="get">
     {{- /* The label is the card's heading rather than hidden text, so this side
-           of the row carries the same weight as the card beside it. */ -}}
-    <span class="landing-entry-head">
-      <label class="landing-entry-title" for="landing-q">Search</label>
-      <span class="landing-entry-inline">every blog, book, slide, tool and video</span>
-    </span>
+           of the row carries the same weight as the card beside it. What is
+           searched is said by the placeholder rather than on a line of its
+           own -- two sentences for one control was one too many. */ -}}
+    <label class="landing-entry-title" for="landing-q">Search</label>
     <span class="landing-search-row">
       <input type="search" id="landing-q" name="q" class="search-input"
-             placeholder="Title, topic, or text…" autocomplete="off" spellcheck="false">
+             placeholder="Title or topic in any format…" autocomplete="off" spellcheck="false">
       {{- /* An icon, not the word: the card is already headed "Search", and a
              text button plus the field overflowed the card on a phone. */ -}}
       <button type="submit" aria-label="Search {{ $sec.Title }}">
