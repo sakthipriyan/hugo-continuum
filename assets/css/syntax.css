@@ -1,4 +1,15 @@
-/* Generated using: hugo gen chromastyles --style=github */
+/* Chroma syntax highlighting.
+
+   Both palettes live here, generated rather than hand-tuned:
+
+     hugo gen chromastyles --style=github
+     hugo gen chromastyles --style=github-dark
+
+   The dark set is the same generator output with every selector scoped under
+   :root.dark. Regenerate both together rather than editing either by hand --
+   there are seventy-odd token classes and no chance of keeping a hand edit in
+   step across two themes.
+*/
 
 /* Background */ .bg { background-color:#f7f7f7; }
 /* PreWrapper */ .chroma { background-color:#f7f7f7;-webkit-text-size-adjust:none; }
@@ -73,3 +84,90 @@
 /* GenericOutput */ .chroma .go { color:#1f2328 }
 /* GenericUnderline */ .chroma .gl { text-decoration:underline }
 /* TextWhitespace */ .chroma .w { color:#fff }
+
+/* --- dark --- */
+
+/* Background */ :root.dark .bg { color:#e6edf3;background-color:#0d1117; }
+/* PreWrapper */ :root.dark .chroma { color:#e6edf3;background-color:#0d1117;-webkit-text-size-adjust:none; }
+/* Error */ :root.dark .chroma .err { color:#f85149 }
+/* LineLink */ :root.dark .chroma .lnlinks { outline:none;text-decoration:none;color:inherit }
+/* LineTableTD */ :root.dark .chroma .lntd { vertical-align:top;padding:0;margin:0;border:0; }
+/* LineTable */ :root.dark .chroma .lntable { border-spacing:0;padding:0;margin:0;border:0; }
+/* LineHighlight */ :root.dark .chroma .hl { background-color:#6e7681 }
+/* LineNumbersTable */ :root.dark .chroma .lnt { white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#737679 }
+/* LineNumbers */ :root.dark .chroma .ln { white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#6e7681 }
+/* Line */ :root.dark .chroma .line { display:flex; }
+/* Keyword */ :root.dark .chroma .k { color:#ff7b72 }
+/* KeywordConstant */ :root.dark .chroma .kc { color:#79c0ff }
+/* KeywordDeclaration */ :root.dark .chroma .kd { color:#ff7b72 }
+/* KeywordNamespace */ :root.dark .chroma .kn { color:#ff7b72 }
+/* KeywordPseudo */ :root.dark .chroma .kp { color:#79c0ff }
+/* KeywordReserved */ :root.dark .chroma .kr { color:#ff7b72 }
+/* KeywordType */ :root.dark .chroma .kt { color:#ff7b72 }
+/* NameClass */ :root.dark .chroma .nc { color:#f0883e;font-weight:bold }
+/* NameConstant */ :root.dark .chroma .no { color:#79c0ff;font-weight:bold }
+/* NameDecorator */ :root.dark .chroma .nd { color:#d2a8ff;font-weight:bold }
+/* NameEntity */ :root.dark .chroma .ni { color:#ffa657 }
+/* NameException */ :root.dark .chroma .ne { color:#f0883e;font-weight:bold }
+/* NameLabel */ :root.dark .chroma .nl { color:#79c0ff;font-weight:bold }
+/* NameNamespace */ :root.dark .chroma .nn { color:#ff7b72 }
+/* NameOther */ :root.dark .chroma .nx { color:#e6edf3 }
+/* NameProperty */ :root.dark .chroma .py { color:#79c0ff }
+/* NameTag */ :root.dark .chroma .nt { color:#7ee787 }
+/* NameVariable */ :root.dark .chroma .nv { color:#79c0ff }
+/* NameVariableClass */ :root.dark .chroma .vc { color:#79c0ff }
+/* NameVariableGlobal */ :root.dark .chroma .vg { color:#79c0ff }
+/* NameVariableInstance */ :root.dark .chroma .vi { color:#79c0ff }
+/* NameVariableMagic */ :root.dark .chroma .vm { color:#79c0ff }
+/* NameFunction */ :root.dark .chroma .nf { color:#d2a8ff;font-weight:bold }
+/* NameFunctionMagic */ :root.dark .chroma .fm { color:#d2a8ff;font-weight:bold }
+/* Literal */ :root.dark .chroma .l { color:#a5d6ff }
+/* LiteralDate */ :root.dark .chroma .ld { color:#79c0ff }
+/* LiteralString */ :root.dark .chroma .s { color:#a5d6ff }
+/* LiteralStringAffix */ :root.dark .chroma .sa { color:#79c0ff }
+/* LiteralStringBacktick */ :root.dark .chroma .sb { color:#a5d6ff }
+/* LiteralStringChar */ :root.dark .chroma .sc { color:#a5d6ff }
+/* LiteralStringDelimiter */ :root.dark .chroma .dl { color:#79c0ff }
+/* LiteralStringDoc */ :root.dark .chroma .sd { color:#a5d6ff }
+/* LiteralStringDouble */ :root.dark .chroma .s2 { color:#a5d6ff }
+/* LiteralStringEscape */ :root.dark .chroma .se { color:#79c0ff }
+/* LiteralStringHeredoc */ :root.dark .chroma .sh { color:#79c0ff }
+/* LiteralStringInterpol */ :root.dark .chroma .si { color:#a5d6ff }
+/* LiteralStringOther */ :root.dark .chroma .sx { color:#a5d6ff }
+/* LiteralStringRegex */ :root.dark .chroma .sr { color:#79c0ff }
+/* LiteralStringSingle */ :root.dark .chroma .s1 { color:#a5d6ff }
+/* LiteralStringSymbol */ :root.dark .chroma .ss { color:#a5d6ff }
+/* LiteralNumber */ :root.dark .chroma .m { color:#a5d6ff }
+/* LiteralNumberBin */ :root.dark .chroma .mb { color:#a5d6ff }
+/* LiteralNumberFloat */ :root.dark .chroma .mf { color:#a5d6ff }
+/* LiteralNumberHex */ :root.dark .chroma .mh { color:#a5d6ff }
+/* LiteralNumberInteger */ :root.dark .chroma .mi { color:#a5d6ff }
+/* LiteralNumberIntegerLong */ :root.dark .chroma .il { color:#a5d6ff }
+/* LiteralNumberOct */ :root.dark .chroma .mo { color:#a5d6ff }
+/* Operator */ :root.dark .chroma .o { color:#ff7b72;font-weight:bold }
+/* OperatorWord */ :root.dark .chroma .ow { color:#ff7b72;font-weight:bold }
+/* OperatorReserved */ :root.dark .chroma .or { color:#ff7b72;font-weight:bold }
+/* Comment */ :root.dark .chroma .c { color:#8b949e;font-style:italic }
+/* CommentHashbang */ :root.dark .chroma .ch { color:#8b949e;font-style:italic }
+/* CommentMultiline */ :root.dark .chroma .cm { color:#8b949e;font-style:italic }
+/* CommentSingle */ :root.dark .chroma .c1 { color:#8b949e;font-style:italic }
+/* CommentSpecial */ :root.dark .chroma .cs { color:#8b949e;font-weight:bold;font-style:italic }
+/* CommentPreproc */ :root.dark .chroma .cp { color:#8b949e;font-weight:bold;font-style:italic }
+/* CommentPreprocFile */ :root.dark .chroma .cpf { color:#8b949e;font-weight:bold;font-style:italic }
+/* GenericDeleted */ :root.dark .chroma .gd { color:#ffa198;background-color:#490202 }
+/* GenericEmph */ :root.dark .chroma .ge { font-style:italic }
+/* GenericError */ :root.dark .chroma .gr { color:#ffa198 }
+/* GenericHeading */ :root.dark .chroma .gh { color:#79c0ff;font-weight:bold }
+/* GenericInserted */ :root.dark .chroma .gi { color:#56d364;background-color:#0f5323 }
+/* GenericOutput */ :root.dark .chroma .go { color:#8b949e }
+/* GenericPrompt */ :root.dark .chroma .gp { color:#8b949e }
+/* GenericStrong */ :root.dark .chroma .gs { font-weight:bold }
+/* GenericSubheading */ :root.dark .chroma .gu { color:#79c0ff }
+/* GenericTraceback */ :root.dark .chroma .gt { color:#ff7b72 }
+/* GenericUnderline */ :root.dark .chroma .gl { text-decoration:underline }
+/* TextWhitespace */ :root.dark .chroma .w { color:#6e7681 }
+
+/* Classes the light theme colours and the dark one does not: without
+   this the light ink survives onto the dark ground -- .na is what makes
+   a gitconfig key vanish into the block it sits in. */
+:root.dark .chroma .bp,:root.dark .chroma .na,:root.dark .chroma .nb,:root.dark .chroma .p { color: inherit }
