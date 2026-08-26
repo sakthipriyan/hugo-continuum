@@ -12,6 +12,14 @@
     --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     --transition: all 0.3s ease;
 
+    /* The chain glyph for a heading anchor, as a mask so it takes its colour
+       from the text around it and needs no dark-mode variant. */
+    --anchor-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/%3E%3C/svg%3E");
+
+    /* Enough to clear the sticky .site-header: 1rem of padding either side of a
+       1.3rem logo line. Kept here so headings and the header agree in one place. */
+    --header-height: 5rem;
+
     /* Section accent tokens. Overridden per section by the generated
        section-accents.css, which is built from each section's own front matter. */
     --accent-from: var(--secondary-color);
@@ -3704,3 +3712,38 @@ main article table th {
 }
 
 
+
+
+/* Heading anchors, from layouts/_default/_markup/render-heading.html. The hook
+   emits an empty <a>; the glyph is masked in here so no SVG markup reaches the
+   rendered content, where it would be counted into .Summary. */
+.post-content h2, .post-content h3, .post-content h4, .post-content h5, .post-content h6,
+.section-content h2, .section-content h3, .section-content h4, .section-content h5, .section-content h6,
+main article h2, main article h3, main article h4, main article h5, main article h6,
+.book-content h2, .book-content h3, .book-content h4, .book-content h5, .book-content h6,
+.chapter-content h2, .chapter-content h3, .chapter-content h4, .chapter-content h5, .chapter-content h6 {
+    scroll-margin-top: var(--header-height);
+}
+
+.anchor-link {
+    display: inline-block;
+    width: 0.8em;
+    height: 0.8em;
+    margin-right: 0.25em;
+    vertical-align: middle;
+    opacity: 0.4;
+    text-decoration: none;
+    background-color: currentColor;
+    -webkit-mask: var(--anchor-icon) center / contain no-repeat;
+    mask: var(--anchor-icon) center / contain no-repeat;
+}
+
+.anchor-link:hover {
+    opacity: 1;
+}
+
+@media print {
+    .anchor-link {
+        display: none;
+    }
+}
