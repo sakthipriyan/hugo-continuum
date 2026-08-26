@@ -3382,8 +3382,6 @@ main article table th {
    Field and button are one rectangle rather than two rounded controls. */
 .landing-search {
     display: flex;
-    flex: 1 1 20rem;
-    max-width: 34rem;
     margin: 0;
 }
 
@@ -3397,7 +3395,11 @@ main article table th {
 
 .landing-search button {
     flex: 0 0 auto;
-    padding: 0 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.9rem;
+    padding: 0;
     border: 2px solid var(--accent-from);
     border-radius: 0;
     background: var(--accent-from);
@@ -3573,7 +3575,6 @@ main article table th {
    form was a bare input beside a card, which read as one side of the row being
    unfinished. */
 .landing-entry > * {
-    flex: 1 1 20rem;
     display: block;
     margin: 0;
     padding: 1rem 1.25rem;
@@ -3640,14 +3641,28 @@ main article table th {
 /* The two ways into a section on one row -- search for the reader who knows
    what they want, the guided page for the one who does not. They wrap to
    separate rows below roughly 44rem, where neither would have room to read. */
+/* Three columns, the third deliberately empty and reserved. A grid rather than
+   a flex row so the empty track holds its width: flex would let the two cards
+   spread across it and there would be nothing to fill later. */
 .landing-entry {
-    display: flex;
-    flex-wrap: wrap;
-    /* Stretch, so the two cards share an edge top and bottom. Centred, the
-       shorter one floated and the row stopped reading as one band. */
-    align-items: stretch;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
     margin: 2rem 0 0;
+}
+
+/* Two up once a third of the width stops being enough for a search field, one
+   up when that in turn runs out. */
+@media (max-width: 1080px) {
+    .landing-entry {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .landing-entry {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Half the width it had, so the standfirst gives way to the title. */
