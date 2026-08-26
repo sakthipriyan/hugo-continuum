@@ -2,11 +2,13 @@
 
 :root {
     /* Surfaces and ink. These carry role names rather than colour names, so a
-       dark palette can redefine the six of them and every rule below follows.
-       --card and --background are the same white today; they part company in
-       dark, where a card must lift off the page rather than merge into it. */
+       dark palette can redefine the seven of them and every rule below
+       follows. --card and --background are the same white today; they part
+       company in dark, where a card must lift off the page rather than merge
+       into it. */
     --background: #fff;
     --foreground: #333;
+    --foreground-strong: #2c3e50;
     --card: #fff;
     --muted: #ecf0f1;
     --muted-foreground: #95a5a6;
@@ -45,6 +47,48 @@
     --bg-color: var(--background);
     --gray-light: var(--border);
     --gray-medium: var(--muted-foreground);
+}
+
+/* Light and dark are both declared, so the browser paints form controls,
+   scrollbars and the canvas behind the page to match rather than flashing a
+   white gutter next to a dark page. */
+:root { color-scheme: light; }
+:root.dark { color-scheme: dark; }
+
+/* Almost everything on the page carries `transition: all 0.3s ease`, so
+   flipping the theme cross-fades every card, pill and border at once -- three
+   hundred milliseconds of the whole page smearing between two palettes. The
+   switch should be instant; the script adds this class for one frame while it
+   changes the palette, and takes it off again. */
+:root.theme-switching *,
+:root.theme-switching *::before,
+:root.theme-switching *::after {
+    transition: none !important;
+}
+
+/* The dark palette. Only these tokens move: every rule in this file reads them
+   rather than a literal, so there is no second copy of the stylesheet to keep
+   in step.
+
+   --card lifts one step off --background rather than matching it, because
+   Continuum separates cards with a shadow and a shadow is invisible against
+   near-black -- the step in lightness is what draws the edge instead.
+
+   --primary-color does not move. It is the navy band behind the footer, the
+   nav drawer and the skip link, and it carries white text in both themes;
+   only its use as ink was split out, into --foreground-strong. */
+:root.dark {
+    --background: #09090b;
+    --foreground: #e4e4e7;
+    --foreground-strong: #fafafa;
+    --card: #18181b;
+    --muted: #27272a;
+    --muted-foreground: #a1a1aa;
+    --border: #27272a;
+
+    --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+    /* #2c3e50 is 1.5:1 on this background -- a ring nobody could see. */
+    --focus-ring: #fafafa;
 }
 
 * {
@@ -190,12 +234,86 @@ main:focus {
     transform: rotate(-45deg) translate(7px, -7px);
 }
 
+/* Theme toggle. One button, on the site header and the book reader header
+   alike; both sit on a coloured band, so the icon takes --on-accent there and
+   the reader's own header ink inside the reader. */
+.theme-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: var(--border-radius);
+    transition: background 0.3s ease;
+}
+
+.main-nav .nav-links {
+    margin-left: auto;
+}
+
+.main-nav .theme-toggle {
+    margin-left: 0.25rem;
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* The reader's header is a flex row ordered by rule, not by markup: the
+   toggle belongs at the far end, after the title and the author. */
+.book-header .theme-toggle {
+    order: 4;
+}
+
+.book-header .theme-toggle:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+:root.dark .book-header .theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.theme-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--on-accent);
+}
+
+.book-header .theme-icon {
+    color: var(--book-header-text);
+}
+
+/* The button shows where pressing it goes, not where you are: a moon while
+   the page is light, a sun while it is dark. Which one is visible follows the
+   class on <html>, so it is right on the first paint without waiting for
+   script to label it. */
+.theme-icon-light {
+    display: none;
+}
+
+:root.dark .theme-icon-dark {
+    display: none;
+}
+
+:root.dark .theme-icon-light {
+    display: block;
+}
+
 /* Mobile Navigation Styles */
 @media (max-width: 1024px) {
     .hamburger {
         display: flex;
-        order: 2;
+        order: 3;
         flex-shrink: 0;
+    }
+
+    .main-nav .theme-toggle {
+        order: 2;
     }
 
     .main-nav {
@@ -377,7 +495,7 @@ main {
 .category-header-full h2 {
     margin: 0;
     font-size: 1.75rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .view-all-section {
@@ -483,7 +601,7 @@ main {
     margin: 0;
     font-size: 1.25rem;
     font-weight: 600;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     line-height: 1.3;
     transition: color 0.3s ease;
 }
@@ -603,7 +721,7 @@ main {
 .book-card a,
 .video-card a,
 .tool-card a {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
 }
 
@@ -727,7 +845,7 @@ main {
 }
 
 .video-title a {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
     font-size: 1.1rem;
     font-weight: 600;
@@ -762,7 +880,7 @@ main {
 
 .watch-link {
     align-self: flex-start;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
     font-weight: 500;
     padding: 0.5rem 1rem;
@@ -888,7 +1006,7 @@ main {
 
 .section-header h1 {
     font-size: 2.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 1rem;
 }
 
@@ -920,7 +1038,7 @@ main {
 }
 
 .content-category h2 {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 1rem;
     font-size: 1.5rem;
 }
@@ -975,7 +1093,7 @@ main {
 }
 
 .view-all:hover {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 /* Breadcrumb */
@@ -1033,7 +1151,7 @@ main {
 }
 
 .related-tools h3 {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 1rem;
 }
 
@@ -1218,7 +1336,7 @@ main {
     background: var(--card);
     border: 1px solid rgba(255, 255, 255, 0.8);
     border-radius: var(--border-radius);
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
     transition: var(--transition);
     font-weight: 500;
@@ -1240,6 +1358,13 @@ main {
 /* Brand colour comes from each link's --social-color (set in config.yaml). */
 .social-link[style*="--social-color"] {
     color: var(--social-color);
+}
+
+/* Brand colours are chosen against white. GitHub's #333 is 1.4:1 on a dark
+   card -- a label you cannot read. Dark drops the tint and keeps the brand for
+   the hover fill, which still carries white text at every one of them. */
+:root.dark .social-link[style*="--social-color"] {
+    color: var(--foreground);
 }
 
 .social-link[style*="--social-color"]:hover {
@@ -1276,6 +1401,21 @@ main {
     margin-bottom: 4rem;
 }
 
+/* The home page shows every section at once, so each element brings its own
+   pair of inks -- see func/accent-style.html -- and the theme picks between
+   them here, which an inline --accent-ink would not have allowed. */
+.section-card,
+.start-item,
+.latest-item {
+    --accent-ink: var(--accent-ink-light, var(--secondary-color));
+}
+
+:root.dark .section-card,
+:root.dark .start-item,
+:root.dark .latest-item {
+    --accent-ink: var(--accent-ink-dark, var(--secondary-color));
+}
+
 .section-card {
     background: var(--card);
     border-radius: var(--border-radius);
@@ -1291,7 +1431,7 @@ main {
 }
 
 .section-card h2 {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 1rem;
     font-size: 1.8rem;
 }
@@ -1354,7 +1494,7 @@ main {
 }
 
 .section-link:hover {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: underline;
 }
 
@@ -1457,7 +1597,7 @@ main {
 
 .content-title {
     font-size: 2rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 1rem;
 }
 
@@ -1510,7 +1650,7 @@ main {
 
 .video-header h1 {
     font-size: 2rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 1rem;
 }
 
@@ -1714,7 +1854,7 @@ main article h2 {
     font-size: 1.75rem;
     margin-top: 2.5rem;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     line-height: 1.3;
 }
 
@@ -1724,7 +1864,7 @@ main article h3 {
     font-size: 1.4rem;
     margin-top: 2rem;
     margin-bottom: 0.75rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     line-height: 1.4;
 }
 
@@ -1733,7 +1873,7 @@ main article h4 {
     font-size: 1.2rem;
     margin-top: 1.5rem;
     margin-bottom: 0.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     line-height: 1.4;
 }
 
@@ -1745,7 +1885,7 @@ main article blockquote {
     background: var(--muted);
     font-style: italic;
     font-size: 1.5rem;
-    color: #555;
+    color: var(--foreground);
 }
 
 .post-content blockquote,
@@ -1901,7 +2041,7 @@ main article table th {
 }
 
 .category-header h2 a {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
     transition: var(--transition);
 }
@@ -2048,7 +2188,7 @@ main article table th {
 }
 
 .view-all a:hover {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: underline;
 }
 
@@ -2175,7 +2315,7 @@ main article table th {
 
 .tag-card .tag-name {
     margin: 0;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1.25rem;
     font-weight: 600;
     transition: color 0.3s ease;
@@ -2383,7 +2523,7 @@ main article table th {
 .post-title {
     margin: 0;
     font-size: 2rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     line-height: 1.2;
 }
 
@@ -2530,7 +2670,7 @@ main article table th {
 
 .book-chapters h2 {
     margin-bottom: 1.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .chapters-list {
@@ -2555,7 +2695,7 @@ main article table th {
 }
 
 .chapter-link:hover {
-    border-color: var(--primary-color);
+    border-color: var(--foreground-strong);
     box-shadow: var(--box-shadow);
     transform: translateX(5px);
 }
@@ -2564,7 +2704,7 @@ main article table th {
     display: block;
     font-size: 1.25rem;
     font-weight: 600;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 0.5rem;
 }
 
@@ -2612,7 +2752,7 @@ main article table th {
 .book-content h2 {
     margin-top: 2.5rem;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .book-content h3 {
@@ -2664,7 +2804,7 @@ main article table th {
 }
 
 .book-nav-title a {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
 }
 
@@ -2690,7 +2830,7 @@ main article table th {
 
 .book-toc-item a:hover {
     background: var(--card);
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .book-toc-item.active a {
@@ -2734,7 +2874,7 @@ main article table th {
 .chapter-content h2 {
     margin-top: 2.5rem;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1.75rem;
 }
 
@@ -2801,7 +2941,7 @@ main article table th {
 
 .book-nav-prev:hover,
 .book-nav-next:hover {
-    border-color: var(--primary-color);
+    border-color: var(--foreground-strong);
     box-shadow: var(--box-shadow);
 }
 
@@ -2819,7 +2959,7 @@ main article table th {
 
 .book-nav-title {
     font-weight: 600;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 /* Responsive */
@@ -2872,9 +3012,9 @@ main article table th {
     padding: 2rem;
     text-align: center;
     font-family: monospace;
-    color: #888;
-    background: #f9f9f9;
-    border: 1px dashed #ccc;
+    color: var(--muted-foreground);
+    background: var(--muted);
+    border: 1px dashed var(--border);
     border-radius: 4px;
 }
 
@@ -2957,7 +3097,7 @@ main article table th {
 .home-start > h2,
 .home-latest > h2 {
     font-size: 1.35rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 1rem;
 }
 
@@ -3002,7 +3142,7 @@ main article table th {
     display: block;
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     line-height: 1.3;
 }
 
@@ -3037,7 +3177,7 @@ main article table th {
 
 .latest-item > a {
     flex: 1 1 16rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
     font-weight: 500;
 }
@@ -3079,7 +3219,7 @@ main article table th {
 
 .section-newest > a {
     flex: 1 1 12rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
     font-weight: 600;
     line-height: 1.35;
@@ -3365,7 +3505,7 @@ main article table th {
 .block-head h2 {
     margin: 0;
     font-size: 1.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 /* A block heading is two thirds the size of a page title, so the badge needs a
@@ -3650,7 +3790,7 @@ main article table th {
     margin-top: 0.35rem;
     font-size: 1.4rem;
     font-weight: 700;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .landing-entry-note {

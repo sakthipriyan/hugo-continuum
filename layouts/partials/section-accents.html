@@ -3,6 +3,13 @@
   Every value comes from the section's own _index.md front matter, so the theme
   carries no knowledge of which sections a site has or what colours they use.
   Sections declaring no accentFrom simply inherit the :root defaults.
+
+  Dark needs its own ink. A section picks accentInk to read against white, and
+  the darker that choice is the better it works there and the worse it works
+  against near-black: this site's gold section uses #7a5c12, which is 1.6:1 on
+  a dark page. Sections can name accentInkDark; the fallback lightens accentFrom
+  itself, on the reasoning that the accent is the brand colour and accentInk was
+  only ever a legibility compromise for one background.
 */ -}}
 {{- $rules := slice -}}
 {{- range .Site.Sections -}}
@@ -16,6 +23,8 @@
         ($s.Params.onAccent   | default "#fff")
         $s.Params.accentFrom
         ($s.Params.accentTo   | default $s.Params.accentFrom)) -}}
+    {{- $inkDark := $s.Params.accentInkDark | default (printf "color-mix(in srgb, %s 55%%, #fff)" $s.Params.accentFrom) -}}
+    {{- $rules = $rules | append (printf ":root.dark body.%s{--accent-ink:%s;}" $s.Section $inkDark) -}}
   {{- end -}}
 {{- end -}}
 {{- with $rules -}}

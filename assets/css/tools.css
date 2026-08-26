@@ -410,7 +410,7 @@
 
 .results h4 {
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .summary-table {
@@ -508,7 +508,7 @@
 
 .investment-plan h4 {
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .plan-table-wrapper {
@@ -597,7 +597,7 @@
 
 .sip-inputs h4 {
     margin-bottom: 1.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1.2rem;
 }
 
@@ -611,7 +611,7 @@
 
 .sip-outputs h4 {
     margin-bottom: 1.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1.2rem;
 }
 
@@ -638,7 +638,7 @@
 
 .summary-item .value {
     font-weight: bold;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .summary-item .value.highlight {
@@ -664,7 +664,7 @@
 
 .ef-inputs h4 {
     margin-bottom: 1.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1.2rem;
 }
 
@@ -678,7 +678,7 @@
 
 .ef-outputs h4 {
     margin-bottom: 1.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1.2rem;
 }
 
@@ -752,7 +752,7 @@
 
 .savings-timeline h5 {
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1rem;
 }
 
@@ -836,7 +836,7 @@
 
 .recommendations h4 {
     margin-bottom: 1.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1.2rem;
 }
 
@@ -931,7 +931,7 @@
 .investors-group h4 {
     margin-top: 0;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .assets-group {
@@ -941,7 +941,7 @@
 .assets-group h4 {
     margin-top: 0;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .section-block {
@@ -954,7 +954,7 @@
 .section-block h4 {
     margin-top: 0;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 /* Investor and Asset Row Styles */

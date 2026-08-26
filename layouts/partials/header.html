@@ -45,6 +45,8 @@
                 <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>
                 {{- end }}
             </ul>
+
+            {{- partial "theme-toggle.html" . }}
         {{- else }}
             {{- /* Site header: one pill per top-level section, each carrying its
                    own accent tokens so the pills stay section-agnostic in CSS. */}}
@@ -70,6 +72,8 @@
                     {{- with $style }} style="{{ . | safeCSS }}"{{ end }}>{{ $s.Title }}</a></li>
                 {{- end }}
             </ul>
+
+            {{- partial "theme-toggle.html" . }}
         {{- end }}
     </nav>
 </header>
