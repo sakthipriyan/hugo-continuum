@@ -1,13 +1,22 @@
 /* Continuum Theme CSS */
 
 :root {
+    /* Surfaces and ink. These carry role names rather than colour names, so a
+       dark palette can redefine the six of them and every rule below follows.
+       --card and --background are the same white today; they part company in
+       dark, where a card must lift off the page rather than merge into it. */
+    --background: #fff;
+    --foreground: #333;
+    --card: #fff;
+    --muted: #ecf0f1;
+    --muted-foreground: #95a5a6;
+    --border: #ecf0f1;
+
+    /* Brand */
     --primary-color: #2c3e50;
     --secondary-color: #3498db;
     --accent-color: #e74c3c;
-    --text-color: #333;
-    --bg-color: #fff;
-    --gray-light: #ecf0f1;
-    --gray-medium: #95a5a6;
+
     --border-radius: 8px;
     --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     --transition: all 0.3s ease;
@@ -28,6 +37,14 @@
     --on-accent: #fff;
     --header-bg: var(--primary-color);
     --focus-ring: var(--primary-color);
+
+    /* Superseded names. --gray-light did two jobs, filling panels and drawing
+       hairlines, which dark mode needs to pull apart: a border lightens where a
+       fill darkens. Kept as aliases so a site's own CSS keeps working. */
+    --text-color: var(--foreground);
+    --bg-color: var(--background);
+    --gray-light: var(--border);
+    --gray-medium: var(--muted-foreground);
 }
 
 * {
@@ -37,10 +54,10 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--bg-color);
+    color: var(--foreground);
+    background-color: var(--background);
 }
 
 body.book-layout {
@@ -289,7 +306,7 @@ main:focus {
     position: absolute;
     top: 100%;
     left: 0;
-    background: white;
+    background: var(--card);
     min-width: 200px;
     box-shadow: var(--box-shadow);
     border-radius: var(--border-radius);
@@ -306,14 +323,14 @@ main:focus {
 }
 
 .dropdown-menu a {
-    color: var(--text-color);
+    color: var(--foreground);
     padding: 0.75rem 1rem;
     display: block;
     transition: var(--transition);
 }
 
 .dropdown-menu a:hover {
-    background: var(--gray-light);
+    background: var(--muted);
     color: var(--secondary-color);
 }
 
@@ -354,7 +371,7 @@ main {
     gap: 1rem;
     margin-bottom: 1.5rem;
     padding-bottom: 0.75rem;
-    border-bottom: 2px solid var(--gray-light);
+    border-bottom: 2px solid var(--border);
 }
 
 .category-header-full h2 {
@@ -403,7 +420,7 @@ main {
 .video-card,
 .tool-card,
 .content-card {
-    background: white;
+    background: var(--card);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     padding: 1.5rem;
@@ -479,7 +496,7 @@ main {
 
 .card-summary {
     margin: 0;
-    color: var(--text-color);
+    color: var(--foreground);
     line-height: 1.6;
     opacity: 0.9;
 }
@@ -490,7 +507,7 @@ main {
     gap: 1rem;
     align-items: center;
     font-size: 0.9rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .meta-item {
@@ -519,8 +536,8 @@ main {
 
 .card-tags .tag-link {
     padding: 0.3rem 0.8rem;
-    background: var(--gray-light);
-    color: var(--text-color);
+    background: var(--muted);
+    color: var(--foreground);
     text-decoration: none;
     border-radius: 20px;
     font-size: 0.85rem;
@@ -608,8 +625,8 @@ main {
 }
 
 .tag {
-    background: var(--gray-light);
-    color: var(--text-color);
+    background: var(--muted);
+    color: var(--foreground);
     padding: 0.25rem 0.5rem;
     border-radius: 12px;
     font-size: 0.875rem;
@@ -830,7 +847,7 @@ main {
 }
 
 .status-planning {
-    background: var(--gray-medium);
+    background: var(--muted-foreground);
     color: white;
 }
 
@@ -879,7 +896,7 @@ main {
     max-width: 600px;
     margin: 0 auto;
     font-size: 1.1rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .section-grid {
@@ -890,7 +907,7 @@ main {
 }
 
 .content-category {
-    background: white;
+    background: var(--card);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     padding: 2rem;
@@ -919,7 +936,7 @@ main {
 
 .mini-card {
     padding: 1rem 0;
-    border-bottom: 1px solid var(--gray-light);
+    border-bottom: 1px solid var(--border);
 }
 
 .mini-card:last-child {
@@ -932,7 +949,7 @@ main {
 }
 
 .mini-card h3 a {
-    color: var(--text-color);
+    color: var(--foreground);
     text-decoration: none;
 }
 
@@ -945,7 +962,7 @@ main {
 .mini-card .event,
 .mini-card .tool-type {
     font-size: 0.875rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .view-all {
@@ -967,7 +984,7 @@ main {
     margin: 1.25rem auto 0.25rem auto;
     padding: 0 2rem;
     font-size: 0.875rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .breadcrumb-list {
@@ -986,11 +1003,11 @@ main {
 .breadcrumb-item:not(:last-child)::after {
     content: ">";
     margin: 0 0.5rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .breadcrumb-item.active span {
-    color: var(--text-color);
+    color: var(--foreground);
 }
 
 .breadcrumb a {
@@ -1005,14 +1022,14 @@ main {
 /* Custom Tool Interface */
 .custom-tool iframe {
     border-radius: var(--border-radius);
-    border: 1px solid var(--gray-light);
+    border: 1px solid var(--border);
 }
 
 /* Related Tools */
 .related-tools {
     margin-top: 3rem;
     padding-top: 2rem;
-    border-top: 2px solid var(--gray-light);
+    border-top: 2px solid var(--border);
 }
 
 .related-tools h3 {
@@ -1031,7 +1048,7 @@ main {
 .json-diff-tool textarea {
     width: 100%;
     padding: 1rem;
-    border: 1px solid var(--gray-medium);
+    border: 1px solid var(--muted-foreground);
     border-radius: var(--border-radius);
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     font-size: 0.875rem;
@@ -1053,7 +1070,7 @@ main {
 .allocation-breakdown {
     margin-top: 1.5rem;
     padding: 1rem;
-    background: var(--gray-light);
+    background: var(--muted);
     border-radius: var(--border-radius);
 }
 
@@ -1198,7 +1215,7 @@ main {
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    background: white;
+    background: var(--card);
     border: 1px solid rgba(255, 255, 255, 0.8);
     border-radius: var(--border-radius);
     color: var(--primary-color);
@@ -1260,7 +1277,7 @@ main {
 }
 
 .section-card {
-    background: white;
+    background: var(--card);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     padding: 2rem;
@@ -1280,7 +1297,7 @@ main {
 }
 
 .section-card>p {
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     margin-bottom: 1.5rem;
     font-size: 1.1rem;
 }
@@ -1296,8 +1313,8 @@ main {
 }
 
 .stats-grid span {
-    background: var(--gray-light);
-    color: var(--text-color);
+    background: var(--muted);
+    color: var(--foreground);
     padding: 0.25rem 0.75rem;
     border-radius: 15px;
     font-size: 0.875rem;
@@ -1305,7 +1322,7 @@ main {
 }
 
 .stats-grid .stat-link {
-    background: white;
+    background: var(--card);
     color: var(--secondary-color);
     padding: 0.5rem 1rem;
     border-radius: 20px;
@@ -1343,7 +1360,7 @@ main {
 
 /* Section-specific button colors */
 .section-card .stat-link {
-    background: white;
+    background: var(--card);
     color: var(--accent-ink);
     border-color: var(--accent-ink);
 }
@@ -1446,7 +1463,7 @@ main {
 
 .content-summary {
     font-size: 1.25rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-style: italic;
     margin: 1rem 0;
     line-height: 1.6;
@@ -1457,7 +1474,7 @@ main {
     flex-wrap: wrap;
     gap: 1.5rem;
     margin: 1rem 0;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.95rem;
 }
 
@@ -1469,7 +1486,7 @@ main {
 
 .content-divider {
     border: none;
-    border-top: 2px solid var(--gray-light);
+    border-top: 2px solid var(--border);
     margin: 1.5rem 0;
 }
 
@@ -1498,7 +1515,7 @@ main {
 }
 
 .video-date {
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.9rem;
 }
 
@@ -1549,7 +1566,7 @@ main {
 }
 
 .video-meta {
-    background: var(--gray-light);
+    background: var(--muted);
     padding: 1rem;
     border-radius: var(--border-radius);
     margin-bottom: 2rem;
@@ -1597,7 +1614,7 @@ main {
 main article {
     font-size: 1.125rem;
     line-height: 1.56;
-    color: var(--text-color);
+    color: var(--foreground);
 }
 
 .post-content p,
@@ -1725,7 +1742,7 @@ main article blockquote {
     border-left: 4px solid var(--secondary-color);
     padding: 1rem 1.5rem;
     margin: 1.5rem 0;
-    background: var(--gray-light);
+    background: var(--muted);
     font-style: italic;
     font-size: 1.5rem;
     color: #555;
@@ -1781,13 +1798,13 @@ main article table {
 main article table th,
 main article table td {
     padding: 0.75rem;
-    border: 1px solid var(--gray-light);
+    border: 1px solid var(--border);
     text-align: left;
 }
 
 .post-content table th,
 main article table th {
-    background: var(--gray-light);
+    background: var(--muted);
     font-weight: 600;
 }
 
@@ -1836,7 +1853,7 @@ main article table th {
 }
 
 .category-card {
-    background: white;
+    background: var(--card);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     padding: 1.5rem;
@@ -1875,7 +1892,7 @@ main article table th {
     justify-content: space-between;
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--gray-light);
+    border-bottom: 1px solid var(--border);
 }
 
 .category-header h2 {
@@ -1895,7 +1912,7 @@ main article table th {
 
 .item-count {
     font-size: 0.9rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-weight: normal;
 }
 
@@ -1958,7 +1975,7 @@ main article table th {
 }
 
 .preview-content h4 a {
-    color: var(--text-color);
+    color: var(--foreground);
     text-decoration: none;
     transition: var(--transition);
 }
@@ -1972,7 +1989,7 @@ main article table th {
     gap: 0.75rem;
     align-items: center;
     font-size: 0.8rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .platform-small {
@@ -1988,8 +2005,8 @@ main article table th {
 }
 
 .tag-small {
-    background: var(--gray-light);
-    color: var(--text-color);
+    background: var(--muted);
+    color: var(--foreground);
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 0.7rem;
@@ -2019,7 +2036,7 @@ main article table th {
 .view-all {
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid var(--gray-light);
+    border-top: 1px solid var(--border);
 }
 
 .view-all a {
@@ -2058,10 +2075,10 @@ main article table th {
 
 /* Read Time Styling */
 .read-time {
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.8rem;
     padding: 2px 6px;
-    background: var(--gray-light);
+    background: var(--muted);
     border-radius: 3px;
     font-weight: 500;
 }
@@ -2078,7 +2095,7 @@ main article table th {
 /* Preview Description Styling */
 .preview-description {
     font-size: 0.85rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     line-height: 1.4;
     margin: 0.5rem 0;
     display: -webkit-box;
@@ -2113,7 +2130,7 @@ main article table th {
 }
 
 .tag-card {
-    background: white;
+    background: var(--card);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     padding: 1.2rem 1.5rem;
@@ -2264,11 +2281,11 @@ main article table th {
 .tags-stats {
     margin-top: 1rem;
     padding: 1rem;
-    background: var(--gray-light);
+    background: var(--muted);
     border-radius: var(--border-radius);
     text-align: center;
     font-style: italic;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 /* Responsive Design */
@@ -2320,7 +2337,7 @@ main article table th {
 /* Post Summary */
 .post-summary {
     font-size: 1.1rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-style: italic;
     margin: 0 0 1.5rem 0;
     line-height: 1.5;
@@ -2333,7 +2350,7 @@ main article table th {
     align-items: center;
     margin-bottom: 1rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--gray-light);
+    border-bottom: 1px solid var(--border);
     flex-wrap: wrap;
     gap: 1rem;
 }
@@ -2343,7 +2360,7 @@ main article table th {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.9rem;
 }
 
@@ -2372,7 +2389,7 @@ main article table th {
 
 .post-subtitle {
     font-size: 1.1rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-style: italic;
     font-weight: normal;
     margin-top: 0.5rem;
@@ -2383,7 +2400,7 @@ main article table th {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.9rem;
     white-space: nowrap;
     flex-shrink: 0;
@@ -2407,7 +2424,7 @@ main article table th {
 
 .tags-label {
     font-weight: 600;
-    color: var(--text-color);
+    color: var(--foreground);
     margin-right: 0.5rem;
 }
 
@@ -2451,8 +2468,8 @@ main article table th {
 .post-tags .tag {
     display: inline-block;
     padding: 0.2rem 0.4rem;
-    background: var(--gray-light);
-    color: var(--text-color);
+    background: var(--muted);
+    color: var(--foreground);
     text-decoration: none;
     font-size: 0.8rem;
     border-radius: 4px;
@@ -2479,7 +2496,7 @@ main article table th {
     gap: 0.8rem;
     align-items: center;
     font-size: 0.9rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .post-meta time,
@@ -2508,7 +2525,7 @@ main article table th {
 .book-chapters {
     margin-top: 3rem;
     padding-top: 2rem;
-    border-top: 2px solid var(--gray-light);
+    border-top: 2px solid var(--border);
 }
 
 .book-chapters h2 {
@@ -2529,8 +2546,8 @@ main article table th {
 .chapter-link {
     display: block;
     padding: 1.5rem;
-    background: white;
-    border: 1px solid var(--gray-light);
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: var(--border-radius);
     text-decoration: none;
     color: inherit;
@@ -2568,7 +2585,7 @@ main article table th {
     text-align: center;
     margin-bottom: 3rem;
     padding-bottom: 2rem;
-    border-bottom: 2px solid var(--gray-light);
+    border-bottom: 2px solid var(--border);
 }
 
 .book-subtitle {
@@ -2632,7 +2649,7 @@ main article table th {
     width: 280px;
     min-width: 280px;
     background: #f8f9fa;
-    border-right: 1px solid var(--gray-light);
+    border-right: 1px solid var(--border);
     padding: 2rem 1.5rem;
     position: sticky;
     top: 0;
@@ -2664,7 +2681,7 @@ main article table th {
 .book-toc-item a {
     display: block;
     padding: 0.5rem 0.75rem;
-    color: var(--text-color);
+    color: var(--foreground);
     text-decoration: none;
     border-radius: 4px;
     transition: var(--transition);
@@ -2672,7 +2689,7 @@ main article table th {
 }
 
 .book-toc-item a:hover {
-    background: white;
+    background: var(--card);
     color: var(--primary-color);
 }
 
@@ -2691,7 +2708,7 @@ main article table th {
 .chapter-header {
     margin-bottom: 2rem;
     padding-bottom: 1.5rem;
-    border-bottom: 2px solid var(--gray-light);
+    border-bottom: 2px solid var(--border);
 }
 
 .chapter-header h1 {
@@ -2765,7 +2782,7 @@ main article table th {
     gap: 2rem;
     margin-top: 4rem;
     padding-top: 2rem;
-    border-top: 1px solid var(--gray-light);
+    border-top: 1px solid var(--border);
 }
 
 .book-nav-prev,
@@ -2774,10 +2791,10 @@ main article table th {
     flex-direction: column;
     gap: 0.25rem;
     padding: 1rem;
-    border: 1px solid var(--gray-light);
+    border: 1px solid var(--border);
     border-radius: 6px;
     text-decoration: none;
-    color: var(--text-color);
+    color: var(--foreground);
     transition: var(--transition);
     flex: 1;
 }
@@ -2827,7 +2844,7 @@ main article table th {
         height: auto;
         position: static;
         border-right: none;
-        border-bottom: 1px solid var(--gray-light);
+        border-bottom: 1px solid var(--border);
     }
 
     .book-main {
@@ -2953,8 +2970,8 @@ main article table th {
 }
 
 .start-item {
-    background: #fff;
-    border: 1px solid var(--gray-light);
+    background: var(--card);
+    border: 1px solid var(--border);
     border-left: 4px solid var(--accent-from);
     border-radius: var(--border-radius);
     padding: 1rem 1.25rem;
@@ -2991,7 +3008,7 @@ main article table th {
 
 .start-note {
     margin: 0.5rem 0 0;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.95rem;
     line-height: 1.5;
 }
@@ -2999,7 +3016,7 @@ main article table th {
 /* Latest: a compact dated list, not a wall of cards */
 .latest-list {
     list-style: none;
-    border-top: 1px solid var(--gray-light);
+    border-top: 1px solid var(--border);
 }
 
 .latest-item {
@@ -3008,12 +3025,12 @@ main article table th {
     align-items: baseline;
     gap: 0.75rem;
     padding: 0.7rem 0;
-    border-bottom: 1px solid var(--gray-light);
+    border-bottom: 1px solid var(--border);
 }
 
 .latest-item > time {
     flex: 0 0 7.5rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.9rem;
     font-variant-numeric: tabular-nums;
 }
@@ -3048,7 +3065,7 @@ main article table th {
     gap: 0.5rem;
     margin: 1rem 0 1.25rem;
     padding: 0.75rem 1rem;
-    background: var(--gray-light);
+    background: var(--muted);
     border-radius: var(--border-radius);
 }
 
@@ -3073,7 +3090,7 @@ main article table th {
 }
 
 .section-newest > time {
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.85rem;
     white-space: nowrap;
 }
@@ -3143,9 +3160,9 @@ main article table th {
     padding: 0.75rem 1rem;
     font-size: 1.05rem;
     font-family: inherit;
-    color: var(--text-color);
-    background: #fff;
-    border: 2px solid var(--gray-light);
+    color: var(--foreground);
+    background: var(--card);
+    border: 2px solid var(--border);
     border-radius: var(--border-radius);
 }
 
@@ -3163,7 +3180,7 @@ main article table th {
 
 .search-status {
     margin: 0.6rem 0 0;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.9rem;
     min-height: 1.2em;
 }
@@ -3196,7 +3213,7 @@ main article table th {
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .filter-pill input {
@@ -3209,11 +3226,11 @@ main article table th {
 .filter-pill span {
     display: inline-block;
     padding: 0.35rem 0.85rem;
-    border: 2px solid var(--gray-light);
+    border: 2px solid var(--border);
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 500;
-    color: var(--text-color);
+    color: var(--foreground);
     cursor: pointer;
     transition: var(--transition);
 }
@@ -3247,7 +3264,7 @@ main article table th {
 
 .collection-count {
     margin: 0 0 1rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.9rem;
 }
 
@@ -3267,7 +3284,7 @@ main article table th {
 
 .card-snippet {
     margin: 0;
-    color: var(--text-color);
+    color: var(--foreground);
     font-size: 0.92rem;
     line-height: 1.55;
 }
@@ -3276,15 +3293,15 @@ main article table th {
 .card-snippet + .card-snippet {
     margin-top: 0.5rem;
     padding-top: 0.5rem;
-    border-top: 1px dashed var(--gray-light);
+    border-top: 1px dashed var(--border);
 }
 
 /* Tinted from the section accent rather than grey, which is already the
    read-time chip's background -- a match should not look like a chip. */
 .card-snippet mark,
 .card-title mark {
-    background: var(--gray-light);
-    background: color-mix(in srgb, var(--accent-from) 26%, #fff);
+    background: var(--muted);
+    background: color-mix(in srgb, var(--accent-from) 26%, var(--card));
     color: inherit;
     font-weight: 600;
     padding: 0 0.1em;
@@ -3342,7 +3359,7 @@ main article table th {
     gap: 0.5rem 1.5rem;
     margin: 0 0 1.25rem;
     padding-bottom: 0.6rem;
-    border-bottom: 2px solid var(--gray-light);
+    border-bottom: 2px solid var(--border);
 }
 
 .block-head h2 {
@@ -3492,16 +3509,16 @@ main article table th {
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .also-as a {
     padding: 0.25rem 0.7rem;
-    border: 2px solid var(--gray-light);
+    border: 2px solid var(--border);
     border-radius: 20px;
     font-size: 0.88rem;
     font-weight: 500;
-    color: var(--text-color);
+    color: var(--foreground);
     text-decoration: none;
     transition: var(--transition);
 }
@@ -3590,7 +3607,7 @@ main article table th {
     padding: 1rem 1.25rem;
     border-left: 4px solid var(--accent-from);
     border-radius: var(--border-radius);
-    background: #fff;
+    background: var(--card);
     box-shadow: var(--box-shadow);
     text-decoration: none;
 }
@@ -3639,7 +3656,7 @@ main article table th {
 .landing-entry-note {
     display: block;
     margin-top: 0.45rem;
-    color: var(--text-color);
+    color: var(--foreground);
     max-width: 52rem;
 }
 

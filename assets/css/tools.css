@@ -29,7 +29,7 @@
 .input-group-col input {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid var(--gray-medium);
+    border: 1px solid var(--muted-foreground);
     border-radius: var(--border-radius);
     font-size: 1rem;
 }
@@ -47,7 +47,7 @@
 .input-group select {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid var(--gray-medium);
+    border: 1px solid var(--muted-foreground);
     border-radius: var(--border-radius);
     font-size: 1rem;
 }
@@ -179,8 +179,8 @@
 
 .unit-buttons button {
     padding: 0.5rem;
-    border: 2px solid var(--gray-medium);
-    background: white;
+    border: 2px solid var(--muted-foreground);
+    background: var(--card);
     border-radius: var(--border-radius);
     cursor: pointer;
     font-size: 0.9rem;
@@ -202,8 +202,8 @@
 /* Inactive style button for Import/Export/Add */
 .unit-buttons-btn {
     padding: 0.35rem 0.6rem;
-    border: 2px solid var(--gray-medium);
-    background: white;
+    border: 2px solid var(--muted-foreground);
+    background: var(--card);
     border-radius: var(--border-radius);
     cursor: pointer;
     font-size: 0.9rem;
@@ -231,8 +231,8 @@
 .mode-toggle button {
     flex: 1;
     padding: 0.5rem 0.875rem;
-    border: 2px solid var(--gray-medium);
-    background: white;
+    border: 2px solid var(--muted-foreground);
+    background: var(--card);
     border-radius: var(--border-radius);
     cursor: pointer;
     font-size: 0.9rem;
@@ -254,7 +254,7 @@
 .mode-toggle button.btn-clear-all {
     border-color: #e74c3c;
     color: #c0392b;
-    background: white;
+    background: var(--card);
 }
 
 .mode-toggle button.btn-clear-all:hover {
@@ -267,7 +267,7 @@
 .share-button {
     padding: 0.5rem 1rem;
     border: 2px solid var(--secondary-color);
-    background: white;
+    background: var(--card);
     color: var(--secondary-color);
     border-radius: var(--border-radius);
     cursor: pointer;
@@ -368,7 +368,7 @@
     border: 2px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
-    background: white;
+    background: var(--card);
     cursor: pointer;
 }
 
@@ -395,13 +395,13 @@
 }
 
 .calculate-btn:disabled {
-    background: var(--gray-medium);
+    background: var(--muted-foreground);
     cursor: not-allowed;
 }
 
 /* Results and Summary Styles */
 .results {
-    background: white;
+    background: var(--card);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     margin-top: 1rem;
@@ -443,7 +443,7 @@
 
 .summary-table td:first-child {
     font-weight: 500;
-    color: var(--text-color);
+    color: var(--foreground);
 }
 
 .summary-table td.highlight {
@@ -454,7 +454,7 @@
 
 .summary-table .total-row {
     font-weight: 600;
-    border-top: 2px solid var(--gray-medium);
+    border-top: 2px solid var(--muted-foreground);
 }
 
 /* Target Fields Background */
@@ -486,12 +486,12 @@
 }
 
 .placeholder-content h4 {
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     margin-bottom: 1rem;
 }
 
 .placeholder-content p {
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     margin-bottom: 1.5rem;
 }
 
@@ -588,7 +588,7 @@
 }
 
 .sip-inputs {
-    background: white;
+    background: var(--card);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
@@ -602,7 +602,7 @@
 }
 
 .sip-outputs {
-    background: white;
+    background: var(--card);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
@@ -633,7 +633,7 @@
 
 .summary-item .label {
     font-weight: 500;
-    color: var(--text-color);
+    color: var(--foreground);
 }
 
 .summary-item .value {
@@ -655,7 +655,7 @@
 }
 
 .ef-inputs {
-    background: white;
+    background: var(--card);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
@@ -669,7 +669,7 @@
 }
 
 .ef-outputs {
-    background: white;
+    background: var(--card);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
@@ -791,7 +791,7 @@
     height: 12px;
     background: var(--secondary-color);
     border-radius: 50%;
-    border: 2px solid white;
+    border: 2px solid var(--card);
     box-shadow: 0 0 0 2px var(--secondary-color);
 }
 
@@ -827,7 +827,7 @@
 }
 
 .recommendations {
-    background: white;
+    background: var(--card);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
@@ -945,7 +945,7 @@
 }
 
 .section-block {
-    background: var(--gray-light);
+    background: var(--muted);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     margin-bottom: 1.5rem;
@@ -975,7 +975,7 @@
 .asset-name-input {
     min-width: 0;
     padding: 0.5rem;
-    border: 1px solid var(--gray-medium);
+    border: 1px solid var(--muted-foreground);
     border-radius: var(--border-radius);
 }
 
@@ -984,7 +984,7 @@
 .asset-current-input {
     min-width: 0;
     padding: 0.5rem;
-    border: 1px solid var(--gray-medium);
+    border: 1px solid var(--muted-foreground);
     border-radius: var(--border-radius);
 }
 
@@ -1105,9 +1105,9 @@
 .investor-allocation {
     margin-bottom: 1rem;
     padding: 1rem;
-    background: var(--gray-light);
+    background: var(--muted);
     border-radius: var(--border-radius);
-    border: 1px solid var(--gray-medium);
+    border: 1px solid var(--muted-foreground);
 }
 
 /* Allocation Table */
@@ -1115,14 +1115,14 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 0.9rem;
-    border: 1px solid var(--gray-light);
+    border: 1px solid var(--border);
 }
 
 .allocation-table th,
 .allocation-table td {
     padding: 0.5rem;
     text-align: left;
-    border-bottom: 1px solid var(--gray-light);
+    border-bottom: 1px solid var(--border);
     font-size: 1rem;
 }
 
@@ -1130,7 +1130,7 @@
     background: transparent;
     font-weight: 600;
     color: var(--text-dark);
-    border-bottom: 2px solid var(--gray-medium);
+    border-bottom: 2px solid var(--muted-foreground);
 }
 
 .allocation-table td:last-child,
@@ -1144,7 +1144,7 @@
 }
 
 .allocation-table .total-row td {
-    border-top: 2px solid var(--gray-medium);
+    border-top: 2px solid var(--muted-foreground);
 }
 
 /* Diff Classes for Summary Table */
