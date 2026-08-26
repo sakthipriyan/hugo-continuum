@@ -463,8 +463,10 @@ main {
     transition: color 0.3s ease;
 }
 
+/* The section's own ink, not a fixed blue: a gold section had its card titles
+   turn blue on hover, which belonged to no theme on the page. */
 .content-card:hover .card-title {
-    color: var(--secondary-color);
+    color: var(--accent-ink);
 }
 
 .card-summary {
@@ -3589,10 +3591,6 @@ main article table th {
     transition: var(--transition);
 }
 
-.landing-lead:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
-}
 
 .landing-lead:focus-visible {
     outline: 3px solid var(--focus-ring);
@@ -3600,8 +3598,12 @@ main article table th {
 }
 
 .landing-lead:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.landing-lead:hover .landing-entry-title {
+    color: var(--accent-ink);
 }
 
 .landing-lead:focus-visible {
