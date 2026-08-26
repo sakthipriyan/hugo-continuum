@@ -58,7 +58,7 @@ Renders a content card with image, title, summary, meta, and tags
             {{ end }}
 
             {{ if $cardSummary }}
-            <p class="card-summary" {{ if and (eq .Type "books") .Params.chapter }}style="font-style: italic; opacity: 0.85;"{{ end }}>{{ $cardSummary }}</p>
+            <p class="card-summary" {{ if and (eq .Type "books") .Params.chapter }}style="font-style: italic; opacity: 0.85;"{{ end }}>{{ $cardSummary | plainify | htmlUnescape | chomp }}</p>
             {{ end }}
 
             <!-- Meta information -->
