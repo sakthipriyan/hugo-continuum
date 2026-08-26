@@ -32,7 +32,12 @@
     --accent-to: var(--secondary-color);
     --accent-ink: var(--secondary-color);
     --on-accent: #fff;
-    --header-bg: var(--primary-color);
+    /* Always a gradient, even when it is one flat colour, so it always lands in
+       background-image. The dark scrim under it is a background-color, and a
+       plain colour here would land in the same slot and be overwritten by it --
+       which is exactly what happened to the home page, whose header has no
+       section gradient: it went near-black the moment the scrim arrived. */
+    --header-bg: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color) 100%);
     --focus-ring: var(--primary-color);
 
     /* Superseded names. --gray-light did two jobs, filling panels and drawing
@@ -229,6 +234,18 @@ body,
    bright gold would vanish on all of them, not just the header. */
 :root.dark body {
     --on-accent: #fafafa;
+}
+
+/* Pages with no section of their own -- the home page, 404 -- get the same
+   treatment from --primary-color that a section gets from its accent. */
+:root.dark body {
+    --header-bg: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 20%, transparent) 0%, color-mix(in srgb, var(--primary-color) 16%, transparent) 100%);
+}
+
+@supports (color: oklch(from red l c h)) {
+    :root.dark body {
+        --header-bg: linear-gradient(135deg, oklch(from var(--primary-color) 0.52 c h / 0.55) 0%, oklch(from var(--primary-color) 0.46 c h / 0.55) 100%);
+    }
 }
 
 /* The band is a translucent wash in dark, so the page's own black does the
