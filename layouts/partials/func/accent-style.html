@@ -20,12 +20,18 @@
 {{- with $s -}}
   {{- with .Params.accentFrom -}}
     {{- $ink := $s.Params.accentInk | default . -}}
-    {{- $inkDark := $s.Params.accentInkDark | default (printf "color-mix(in srgb, %s 55%%, #fff)" .) -}}
+    {{- /* Only an explicit override travels inline. The default is derived in
+           CSS from --accent-from, so the home page and a section page cannot
+           drift apart -- which they had, the home page keeping a lighter mix
+           after the section stylesheet moved to setting lightness outright. */ -}}
+    {{- $inkDark := $s.Params.accentInkDark -}}
     {{- if $.full -}}
-      {{- $out = printf "--accent-from:%s;--accent-to:%s;--accent-ink-light:%s;--accent-ink-dark:%s;--on-accent-light:%s;--on-accent-dark:#fafafa;"
-          . ($s.Params.accentTo | default .) $ink $inkDark ($s.Params.onAccent | default "#fff") -}}
+      {{- $out = printf "--accent-from:%s;--accent-to:%s;--accent-ink-light:%s;--on-accent-light:%s;--on-accent-dark:#fafafa;"
+          . ($s.Params.accentTo | default .) $ink ($s.Params.onAccent | default "#fff") -}}
+      {{- with $inkDark }}{{ $out = printf "%s--accent-ink-dark:%s;" $out . }}{{ end -}}
     {{- else -}}
-      {{- $out = printf "--accent-from:%s;--accent-ink-light:%s;--accent-ink-dark:%s;" . $ink $inkDark -}}
+      {{- $out = printf "--accent-from:%s;--accent-ink-light:%s;" . $ink -}}
+      {{- with $inkDark }}{{ $out = printf "%s--accent-ink-dark:%s;" $out . }}{{ end -}}
     {{- end -}}
   {{- end -}}
 {{- end -}}

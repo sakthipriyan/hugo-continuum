@@ -178,6 +178,15 @@ body,
     --on-accent: var(--on-accent-light, #fff);
 }
 
+/* An inline --accent-ink would have outranked the palette too, so the light
+   half is chosen here and the dark half with the other roles above. */
+.section-card,
+.start-item,
+.latest-item,
+.nav-links .section-link-pill {
+    --accent-ink: var(--accent-ink-light, var(--secondary-color));
+}
+
 :root.dark .section-card,
 :root.dark .start-item,
 :root.dark .latest-item,
@@ -193,6 +202,7 @@ body,
     --accent-surface: color-mix(in srgb, var(--accent-from) 60%, transparent);
     --accent-surface-to: color-mix(in srgb, var(--accent-to) 55%, transparent);
     --accent-line: color-mix(in srgb, var(--accent-from) 62%, transparent);
+    --accent-ink: var(--accent-ink-dark, color-mix(in srgb, var(--accent-from) 62%, #fff));
 }
 
 @supports (color: oklch(from red l c h)) {
@@ -204,6 +214,7 @@ body,
         --accent-surface: oklch(from var(--accent-from) 0.56 c h / 0.85);
         --accent-surface-to: oklch(from var(--accent-to) 0.50 c h / 0.85);
         --accent-line: oklch(from var(--accent-from) 0.62 c h / 0.85);
+        --accent-ink: var(--accent-ink-dark, oklch(from var(--accent-from) 0.78 c h));
     }
 }
 
@@ -1501,21 +1512,6 @@ main {
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     gap: 2rem;
     margin-bottom: 4rem;
-}
-
-/* The home page shows every section at once, so each element brings its own
-   pair of inks -- see func/accent-style.html -- and the theme picks between
-   them here, which an inline --accent-ink would not have allowed. */
-.section-card,
-.start-item,
-.latest-item {
-    --accent-ink: var(--accent-ink-light, var(--secondary-color));
-}
-
-:root.dark .section-card,
-:root.dark .start-item,
-:root.dark .latest-item {
-    --accent-ink: var(--accent-ink-dark, var(--secondary-color));
 }
 
 .section-card {
