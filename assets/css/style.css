@@ -1121,7 +1121,7 @@ main {
 .site-footer {
     background: none;
     color: var(--foreground);
-    border-top: 4px solid var(--accent-line);
+    border-top: 2px solid var(--accent-line);
     text-align: center;
     padding: 2rem;
     margin-top: 4rem;
