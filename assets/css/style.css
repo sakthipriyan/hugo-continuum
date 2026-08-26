@@ -1100,12 +1100,32 @@ main {
 }
 
 /* Footer */
+/* The footer was the one band that never moved: the same navy on every page
+   and in both themes, which is what made it read as unrelated to everything
+   above it.
+
+   It takes a rule in the section's colour rather than the colour itself. The
+   header is sticky and carries that signal the whole way down the page; by the
+   time the footer is on screen the reader has known which section they are in
+   for some time, so a full accent band here would buy identity twice and spend
+   it on the least important content on the page.
+
+   Carrying the accent properly here is also not available in both themes with
+   one mechanism. Fading toward the ground darkens gold against black and
+   lightens it against white -- pale and washed rather than dim -- and
+   darkening it in light instead turns it olive. */
 .site-footer {
     background: var(--primary-color);
     color: white;
+    border-top: 3px solid var(--accent-line);
     text-align: center;
     padding: 2rem;
     margin-top: 4rem;
+}
+
+:root.dark .site-footer {
+    background: var(--card);
+    color: var(--foreground);
 }
 
 /* Attribution links: underlined so they read as links on the dark footer
