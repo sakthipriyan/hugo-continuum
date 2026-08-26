@@ -15,9 +15,13 @@
     ink    L 0.78  -- an accent, and legible, but below body text. Left alone,
                       the gold ink measured 15.2:1 against body text's 15.7:1,
                       which is not an accent, it is a second voice.
-    header L 0.42  -- the band is the largest area of colour on the page and
-                      the one that glares. Deep enough to stop shouting, still
-                      unmistakably the section's colour.
+    header L 0.52 at 0.55 alpha -- the band is the largest area of colour on
+                      the page and the one that glares. It is a wash now, laid
+                      over a scrim of the page colour (see .site-header), so
+                      the black underneath does most of the dimming. Setting
+                      the lightness before the alpha is what keeps the sections
+                      level: alpha alone left gold 3.8x brighter than blue,
+                      because a fixed fraction of a bright colour is brighter.
 
   A section can override either with accentInkDark or accentHeaderDark.
 
@@ -39,11 +43,11 @@
         $from $to) -}}
 
     {{- $ink := $s.Params.accentInkDark | default (printf "color-mix(in srgb,%s 62%%,#fff)" $from) -}}
-    {{- $head := $s.Params.accentHeaderDark | default (printf "linear-gradient(135deg,color-mix(in srgb,%s 34%%,#09090b) 0%%,color-mix(in srgb,%s 30%%,#09090b) 100%%)" $from $to) -}}
+    {{- $head := $s.Params.accentHeaderDark | default (printf "linear-gradient(135deg,color-mix(in srgb,%s 20%%,transparent) 0%%,color-mix(in srgb,%s 16%%,transparent) 100%%)" $from $to) -}}
     {{- $dark = $dark | append (printf ":root.dark body.%s{--accent-ink:%s;--header-bg:%s;}" $s.Section $ink $head) -}}
 
     {{- $inkOk := $s.Params.accentInkDark | default (printf "oklch(from %s 0.78 c h)" $from) -}}
-    {{- $headOk := $s.Params.accentHeaderDark | default (printf "linear-gradient(135deg,oklch(from %s 0.42 c h) 0%%,oklch(from %s 0.36 c h) 100%%)" $from $to) -}}
+    {{- $headOk := $s.Params.accentHeaderDark | default (printf "linear-gradient(135deg,oklch(from %s 0.52 c h / 0.55) 0%%,oklch(from %s 0.46 c h / 0.55) 100%%)" $from $to) -}}
     {{- $darkOk = $darkOk | append (printf ":root.dark body.%s{--accent-ink:%s;--header-bg:%s;}" $s.Section $inkOk $headOk) -}}
   {{- end -}}
 {{- end -}}

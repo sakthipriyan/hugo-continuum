@@ -154,6 +154,38 @@ main:focus {
     --on-accent: #fafafa;
 }
 
+/* The band is a translucent wash in dark, so the page's own black does the
+   dimming. Two things have to be true for that to work on a sticky header.
+
+   The scrim, first: the header sits over whatever is scrolling beneath it, and
+   an accent alone is not enough cover. Measured against the things that
+   actually pass under it, unscrimmed white nav text falls to 1.55:1 over the
+   gold search button and 1.06:1 over a white panel -- it disappears. Holding
+   78% of the page colour under the wash bounds the whole range to between
+   7.2:1 and 12.7:1, whatever goes past.
+
+   The blur, second: without it the text underneath stays legible through the
+   glass and collides with the nav. It is what makes this read as a surface
+   rather than as a mistake.
+
+   background-color rather than another layer in --header-bg, because the scrim
+   is the same for every section and only the wash above it changes. */
+:root.dark .site-header {
+    background-color: color-mix(in srgb, var(--background) 78%, transparent);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+}
+
+/* Asked for less transparency, give none: a solid scrim, no blur. The wash
+   keeps the section's colour, composited over an opaque page instead. */
+@media (prefers-reduced-transparency: reduce) {
+    :root.dark .site-header {
+        background-color: var(--background);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+}
+
 /* Header */
 .site-header {
     background: var(--header-bg);
