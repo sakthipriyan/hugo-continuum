@@ -1402,6 +1402,29 @@ main {
     border-radius: var(--border-radius);
 }
 
+/* The hero was the last brand surface dark never touched: 371px of navy
+   running up to #3498db, which measures 0.283 against a page at 0.003 -- by
+   some way the brightest thing on any page here.
+
+   Same treatment as the header band, and for the same reasons. The lightness
+   is set before the alpha, so the two stops come down together instead of the
+   blue end staying bright. The wash is translucent, so the page's own black
+   does the dimming. It needs no scrim, unlike the header: nothing scrolls
+   underneath a hero. */
+:root.dark .hero {
+    background: linear-gradient(135deg,
+        color-mix(in srgb, var(--primary-color) 30%, transparent) 0%,
+        color-mix(in srgb, var(--secondary-color) 24%, transparent) 100%);
+}
+
+@supports (color: oklch(from red l c h)) {
+    :root.dark .hero {
+        background: linear-gradient(135deg,
+            oklch(from var(--primary-color) 0.52 c h / 0.55) 0%,
+            oklch(from var(--secondary-color) 0.46 c h / 0.55) 100%);
+    }
+}
+
 .hero-content {
     display: flex;
     flex-direction: column;
