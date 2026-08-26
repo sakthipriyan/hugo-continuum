@@ -181,9 +181,11 @@
   {{- $slots := int ($cfg.blockCount | default 3) }}
   {{- $picked := slice }}
   {{- $covers := $seenCovers }}
-  {{- /* A curated pick or two, then the newest to fill -- never the same page twice. */ -}}
+  {{- /* Every pick the section names, then the newest to fill what is left --
+         never the same page twice. Naming three fills the block; naming one
+         pins the lead and lets recency choose the rest. */ -}}
   {{- $kindCfg := index $cfg $kind | default dict }}
-  {{- range first (int ($cfg.featuredCount | default 1)) ($kindCfg.featured | default slice) }}
+  {{- range first $slots ($kindCfg.featured | default slice) }}
   {{- with partial "func/resolve-page.html" (dict "ref" .page "site" $sec.Site "where" (printf "landing.%s.featured" $kind)) }}
   {{- $c := .Params.covers | default .RelPermalink }}
   {{- if not (in $seen .RelPermalink) }}{{ $picked = $picked | append . }}{{ $seen = $seen | append .RelPermalink }}{{ $covers = $covers | append $c }}{{ end }}
