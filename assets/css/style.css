@@ -26,6 +26,14 @@
     --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     --transition: all 0.3s ease;
 
+    /* The chain glyph for a heading anchor, as a mask so it takes its colour
+       from the text around it and needs no dark-mode variant. */
+    --anchor-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/%3E%3C/svg%3E");
+
+    /* Enough to clear the sticky .site-header: 1rem of padding either side of a
+       1.3rem logo line. Kept here so headings and the header agree in one place. */
+    --header-height: 5rem;
+
     /* Section accent tokens. Overridden per section by the generated
        section-accents.css, which is built from each section's own front matter. */
     /* A page with no section of its own -- the home page, 404 -- falls back to
@@ -4012,6 +4020,11 @@ main article h2, main article h3, main article h4, main article h5, main article
 }
 
 .anchor-link {
+    /* The mask paints in currentColor, and the comment above says the glyph
+       takes its colour from the text around it -- but an <a> with no colour of
+       its own takes the browser's default link blue, which is #0000EE here and
+       #9e9eff in dark, a colour in no part of the palette. */
+    color: inherit;
     display: inline-block;
     width: 0.8em;
     height: 0.8em;
