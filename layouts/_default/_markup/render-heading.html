@@ -1,0 +1,15 @@
+{{- /* Every heading carries a link to itself.
+
+       The chain icon is drawn in CSS (.anchor-link), not emitted here. Markup
+       written by this hook lands in the rendered content, and Hugo counts that
+       content's words to build .Summary -- a few hundred bytes of SVG path
+       data per heading quietly truncates the summary on every card and in the
+       search index.
+
+       The link is decorative: the heading text next to it is the readable
+       target. Labelling it instead makes it part of the heading's accessible
+       name, so a screen reader announces every title twice. */ -}}
+{{- $anchor := .Anchor | safeURL -}}
+<h{{ .Level }} id="{{ $anchor }}"
+    {{- range $name, $value := .Attributes }}{{ if ne $name "id" }} {{ $name }}="{{ $value }}"{{ end }}{{ end -}}
+><a class="anchor-link" href="#{{ $anchor }}" aria-hidden="true" tabindex="-1"></a>{{ .Text }}</h{{ .Level }}>
