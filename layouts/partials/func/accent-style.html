@@ -29,9 +29,13 @@
       {{- $out = printf "--accent-from:%s;--accent-to:%s;--accent-ink-light:%s;--on-accent-light:%s;--on-accent-dark:#fafafa;"
           . ($s.Params.accentTo | default .) $ink ($s.Params.onAccent | default "#fff") -}}
       {{- with $inkDark }}{{ $out = printf "%s--accent-ink-dark:%s;" $out . }}{{ end -}}
+      {{- with $s.Params.accentSurfaceDark }}{{ $out = printf "%s--accent-surface-dark:%s;" $out . }}{{ end -}}
+      {{- with $s.Params.accentLineDark }}{{ $out = printf "%s--accent-line-dark:%s;" $out . }}{{ end -}}
     {{- else -}}
       {{- $out = printf "--accent-from:%s;--accent-ink-light:%s;" . $ink -}}
       {{- with $inkDark }}{{ $out = printf "%s--accent-ink-dark:%s;" $out . }}{{ end -}}
+      {{- with $s.Params.accentSurfaceDark }}{{ $out = printf "%s--accent-surface-dark:%s;" $out . }}{{ end -}}
+      {{- with $s.Params.accentLineDark }}{{ $out = printf "%s--accent-line-dark:%s;" $out . }}{{ end -}}
     {{- end -}}
   {{- end -}}
 {{- end -}}

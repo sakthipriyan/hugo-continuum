@@ -170,6 +170,10 @@ main:focus {
    a line has to stay bright enough to be seen -- so they are separate roles
    now. Light leaves both as the accent itself, unchanged.
 
+   Each is what a section gets when it names nothing. A section can name any of
+   them outright -- accentInkDark, accentSurfaceDark, accentLineDark,
+   accentHeaderDark -- and the name wins over the derivation.
+
    Derived here rather than in the generated stylesheet, because the home page
    sets --accent-from inline, per card, and CSS can re-derive from that where a
    generator cannot reach. Both blocks are needed: a custom property resolves
@@ -216,9 +220,9 @@ body,
 :root.dark .start-item,
 :root.dark .latest-item,
 :root.dark .nav-links .section-link-pill {
-    --accent-surface: color-mix(in srgb, var(--accent-from) 60%, transparent);
+    --accent-surface: var(--accent-surface-dark, color-mix(in srgb, var(--accent-from) 60%, transparent));
     --accent-surface-to: color-mix(in srgb, var(--accent-to) 55%, transparent);
-    --accent-line: color-mix(in srgb, var(--accent-from) 62%, transparent);
+    --accent-line: var(--accent-line-dark, color-mix(in srgb, var(--accent-from) 62%, transparent));
     --accent-ink: var(--accent-ink-dark, color-mix(in srgb, var(--accent-from) 62%, #fff));
 }
 
@@ -228,9 +232,9 @@ body,
     :root.dark .start-item,
     :root.dark .latest-item,
     :root.dark .nav-links .section-link-pill {
-        --accent-surface: oklch(from var(--accent-from) 0.56 c h / 0.85);
+        --accent-surface: var(--accent-surface-dark, oklch(from var(--accent-from) 0.56 c h / 0.85));
         --accent-surface-to: oklch(from var(--accent-to) 0.50 c h / 0.85);
-        --accent-line: oklch(from var(--accent-from) 0.62 c h / 0.85);
+        --accent-line: var(--accent-line-dark, oklch(from var(--accent-from) 0.62 c h / 0.85));
         --accent-ink: var(--accent-ink-dark, oklch(from var(--accent-from) 0.78 c h));
     }
 }

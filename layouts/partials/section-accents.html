@@ -44,11 +44,17 @@
 
     {{- $ink := $s.Params.accentInkDark | default (printf "color-mix(in srgb,%s 62%%,#fff)" $from) -}}
     {{- $head := $s.Params.accentHeaderDark | default (printf "linear-gradient(135deg,color-mix(in srgb,%s 20%%,transparent) 0%%,color-mix(in srgb,%s 16%%,transparent) 100%%)" $from $to) -}}
-    {{- $dark = $dark | append (printf ":root.dark body.%s{--accent-ink:%s;--header-bg:%s;}" $s.Section $ink $head) -}}
+    {{- /* A section can name any of the dark roles outright. What it does not
+           name is derived below; a site that names nothing still works, which
+           it has to, this being a theme rather than one site's stylesheet. */ -}}
+    {{- $extra := "" -}}
+    {{- with $s.Params.accentSurfaceDark }}{{ $extra = printf "%s--accent-surface:%s;" $extra . }}{{ end -}}
+    {{- with $s.Params.accentLineDark }}{{ $extra = printf "%s--accent-line:%s;" $extra . }}{{ end -}}
+    {{- $dark = $dark | append (printf ":root.dark body.%s{--accent-ink:%s;--header-bg:%s;%s}" $s.Section $ink $head $extra) -}}
 
     {{- $inkOk := $s.Params.accentInkDark | default (printf "oklch(from %s 0.78 c h)" $from) -}}
     {{- $headOk := $s.Params.accentHeaderDark | default (printf "linear-gradient(135deg,oklch(from %s 0.52 c h / 0.55) 0%%,oklch(from %s 0.46 c h / 0.55) 100%%)" $from $to) -}}
-    {{- $darkOk = $darkOk | append (printf ":root.dark body.%s{--accent-ink:%s;--header-bg:%s;}" $s.Section $inkOk $headOk) -}}
+    {{- $darkOk = $darkOk | append (printf ":root.dark body.%s{--accent-ink:%s;--header-bg:%s;%s}" $s.Section $inkOk $headOk $extra) -}}
   {{- end -}}
 {{- end -}}
 {{- with $rules -}}
