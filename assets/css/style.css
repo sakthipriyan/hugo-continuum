@@ -26,14 +26,6 @@
     --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     --transition: all 0.3s ease;
 
-    /* The chain glyph for a heading anchor, as a mask so it takes its colour
-       from the text around it and needs no dark-mode variant. */
-    --anchor-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/%3E%3C/svg%3E");
-
-    /* Enough to clear the sticky .site-header: 1rem of padding either side of a
-       1.3rem logo line. Kept here so headings and the header agree in one place. */
-    --header-height: 5rem;
-
     /* Section accent tokens. Overridden per section by the generated
        section-accents.css, which is built from each section's own front matter. */
     --accent-from: var(--secondary-color);
@@ -3872,9 +3864,6 @@ main article table th {
     cursor: pointer;
 }
 
-
-
-
 /* Heading anchors, from layouts/_default/_markup/render-heading.html. The hook
    emits an empty <a>; the glyph is masked in here so no SVG markup reaches the
    rendered content, where it would be counted into .Summary. */
@@ -3903,8 +3892,142 @@ main article h2, main article h3, main article h4, main article h5, main article
     opacity: 1;
 }
 
+/* ---------------------------------------------------------------------------
+   Print
+
+   An article printed as it stood carried the sticky header, the breadcrumb,
+   the tag list and the site footer onto paper, and on a dark screen it
+   printed the dark palette -- a full page of ink for a background nobody
+   asked for.
+
+   The reader has had a print block since it was written; this is the same
+   idea for everything else.
+   --------------------------------------------------------------------------- */
 @media print {
+    /* Paper is light whatever the screen was. Redefining the tokens is enough:
+       every rule reads them. */
+    :root,
+    :root.dark {
+        --background: #fff;
+        --foreground: #000;
+        --foreground-strong: #000;
+        --card: #fff;
+        --muted: #f2f2f2;
+        --muted-foreground: #444;
+        --border: #bbb;
+        --code-ink: #000;
+        --box-shadow: none;
+    }
+
+    body {
+        background: #fff;
+        color: #000;
+        font-size: 11pt;
+    }
+
+    /* Navigation, controls, and anything that only exists to be clicked. */
+    .site-header,
+    .breadcrumb,
+    .skip-link,
+    .theme-toggle,
+    .hamburger,
+    .nav-overlay,
+    .site-footer,
+    .content-comments,
+    .filter-pills,
+    .search-panel,
+    .landing-entry,
+    .also-as,
+    .chapter-navigation,
+    .view-all-link,
     .anchor-link {
-        display: none;
+        display: none !important;
+    }
+
+    main,
+    .post-content,
+    main article {
+        max-width: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* A card on paper is a box for no reason; keep the tag list, drop its
+       chrome. */
+    .content-card,
+    .card-tags .tag-link {
+        box-shadow: none;
+        border: 1px solid var(--border);
+    }
+
+    /* Where a link went is the one thing paper cannot show. Anchors and mailto
+       say nothing useful and stay bare, and so do the tag pills below the
+       article: those are navigation, and a taxonomy URL after every one of
+       them is four lines of noise for no reference value. */
+    .post-content a[href^="http"]::after,
+    main article a[href^="http"]::after {
+        content: " <" attr(href) ">";
+        font-size: 0.85em;
+        word-break: break-all;
+    }
+
+    .post-content a[href^="/"]::after,
+    main article a[href^="/"]::after {
+        content: " <" var(--print-host, "") attr(href) ">";
+        font-size: 0.85em;
+        word-break: break-all;
+    }
+
+    .content-footer a::after,
+    .card-tags a::after {
+        content: none;
+    }
+
+    /* The URL is what marks a link on paper, so the anchor itself drops the
+       colour and the rule -- a decoration cannot be turned off on a ::after,
+       and four wrapped lines of underlined URL is worse than none. */
+    .post-content a,
+    main article a {
+        color: #000;
+        text-decoration: none;
+    }
+
+    .post-content a::after,
+    main article a::after {
+        color: #444;
+        font-weight: normal;
+    }
+
+    /* Nothing that reads as a unit should be split across a page break, and a
+       heading should never be the last thing on one. */
+    h1, h2, h3, h4 {
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+    pre,
+    blockquote,
+    table,
+    figure,
+    .content-card,
+    li {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    p {
+        orphans: 3;
+        widows: 3;
+    }
+
+    /* Code has to stay inside the page; on screen it scrolls sideways. */
+    pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow: visible;
+    }
+
+    img {
+        max-width: 100% !important;
     }
 }

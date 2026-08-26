@@ -1,0 +1,9 @@
+{{- /* The printed page shows where an internal link goes, and a bare path does
+       not say where. The host comes from baseURL rather than the theme, which
+       has no business knowing what site it is on. One declaration, inline:
+       a fingerprinted request of its own would cost more than it carries. */ -}}
+{{- with urls.Parse .Site.BaseURL -}}
+  {{- with .Host -}}
+<style>{{ printf ":root{--print-host:%q}" . | safeCSS }}</style>
+  {{- end -}}
+{{- end -}}
