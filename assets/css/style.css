@@ -28,9 +28,13 @@
 
     /* Section accent tokens. Overridden per section by the generated
        section-accents.css, which is built from each section's own front matter. */
-    --accent-from: var(--secondary-color);
-    --accent-to: var(--secondary-color);
-    --accent-ink: var(--secondary-color);
+    /* A page with no section of its own -- the home page, 404 -- falls back to
+       the primary colour rather than the secondary, so its header band and its
+       footer rule are the same colour. They were navy and blue respectively,
+       which is what made the footer look unrelated to the page above it. */
+    --accent-from: var(--primary-color);
+    --accent-to: var(--primary-color);
+    --accent-ink: var(--primary-color);
     --on-accent: #fff;
     /* Always a gradient, even when it is one flat colour, so it always lands in
        background-image. The dark scrim under it is a background-color, and a
@@ -1115,21 +1119,16 @@ main {
    lightens it against white -- pale and washed rather than dim -- and
    darkening it in light instead turns it olive. */
 .site-footer {
-    background: var(--primary-color);
-    color: white;
-    border-top: 3px solid var(--accent-line);
+    background: none;
+    color: var(--foreground);
+    border-top: 6px solid var(--accent-line);
     text-align: center;
     padding: 2rem;
     margin-top: 4rem;
 }
 
-:root.dark .site-footer {
-    background: var(--card);
-    color: var(--foreground);
-}
-
-/* Attribution links: underlined so they read as links on the dark footer
-   without relying on colour alone. */
+/* Attribution links: underlined so they read as links without relying on
+   colour alone -- they inherit the body ink here, on the page's own ground. */
 .site-footer a {
     color: inherit;
     text-decoration: underline;
@@ -1140,9 +1139,7 @@ main {
     text-decoration-thickness: 2px;
 }
 
-.site-footer :focus-visible {
-    --focus-ring: #fff;
-}
+
 
 /* Section Overview */
 .section-overview {
