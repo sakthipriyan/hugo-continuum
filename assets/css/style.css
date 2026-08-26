@@ -146,6 +146,14 @@ main:focus {
     --focus-ring: var(--on-accent);
 }
 
+/* The dark header band is deep enough that the section's own on-accent -- a
+   near-black, picked to read on bright gold -- would disappear into it.
+   Redefining the token inside the header carries the logo, the nav, and the
+   toggle icon with it, and leaves every other use of the accent alone. */
+:root.dark .site-header {
+    --on-accent: #fafafa;
+}
+
 /* Header */
 .site-header {
     background: var(--header-bg);

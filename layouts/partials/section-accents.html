@@ -4,30 +4,53 @@
   carries no knowledge of which sections a site has or what colours they use.
   Sections declaring no accentFrom simply inherit the :root defaults.
 
-  Dark needs its own ink. A section picks accentInk to read against white, and
-  the darker that choice is the better it works there and the worse it works
-  against near-black: this site's gold section uses #7a5c12, which is 1.6:1 on
-  a dark page. Sections can name accentInkDark; the fallback lightens accentFrom
-  itself, on the reasoning that the accent is the brand colour and accentInk was
-  only ever a legibility compromise for one background.
+  Dark needs its own answers, and lightness is the whole difficulty. An accent
+  chosen to sit on white lands somewhere arbitrary on near-black: this site's
+  gold reads at 12:1 there and its blue at 2:1, one shouting and the other
+  invisible. Mixing toward white fixes the blue and makes the gold worse.
+
+  So dark sets lightness outright, in oklch, keeping each section's hue and
+  chroma:
+
+    ink    L 0.78  -- an accent, and legible, but below body text. Left alone,
+                      the gold ink measured 15.2:1 against body text's 15.7:1,
+                      which is not an accent, it is a second voice.
+    header L 0.42  -- the band is the largest area of colour on the page and
+                      the one that glares. Deep enough to stop shouting, still
+                      unmistakably the section's colour.
+
+  A section can override either with accentInkDark or accentHeaderDark.
+
+  The plain declaration is a color-mix approximation for browsers without
+  relative colour syntax; the @supports block is the real one.
 */ -}}
 {{- $rules := slice -}}
+{{- $dark := slice -}}
+{{- $darkOk := slice -}}
 {{- range .Site.Sections -}}
   {{- $s := . -}}
   {{- if $s.Params.accentFrom -}}
+    {{- $from := $s.Params.accentFrom -}}
+    {{- $to := $s.Params.accentTo | default $from -}}
     {{- $rules = $rules | append (printf "body.%s{--accent-from:%s;--accent-to:%s;--accent-ink:%s;--on-accent:%s;--header-bg:linear-gradient(135deg,%s 0%%,%s 100%%);}"
-        $s.Section
-        $s.Params.accentFrom
-        ($s.Params.accentTo   | default $s.Params.accentFrom)
-        ($s.Params.accentInk  | default $s.Params.accentFrom)
-        ($s.Params.onAccent   | default "#fff")
-        $s.Params.accentFrom
-        ($s.Params.accentTo   | default $s.Params.accentFrom)) -}}
-    {{- $inkDark := $s.Params.accentInkDark | default (printf "color-mix(in srgb, %s 55%%, #fff)" $s.Params.accentFrom) -}}
-    {{- $rules = $rules | append (printf ":root.dark body.%s{--accent-ink:%s;}" $s.Section $inkDark) -}}
+        $s.Section $from $to
+        ($s.Params.accentInk | default $from)
+        ($s.Params.onAccent | default "#fff")
+        $from $to) -}}
+
+    {{- $ink := $s.Params.accentInkDark | default (printf "color-mix(in srgb,%s 62%%,#fff)" $from) -}}
+    {{- $head := $s.Params.accentHeaderDark | default (printf "linear-gradient(135deg,color-mix(in srgb,%s 34%%,#09090b) 0%%,color-mix(in srgb,%s 30%%,#09090b) 100%%)" $from $to) -}}
+    {{- $dark = $dark | append (printf ":root.dark body.%s{--accent-ink:%s;--header-bg:%s;}" $s.Section $ink $head) -}}
+
+    {{- $inkOk := $s.Params.accentInkDark | default (printf "oklch(from %s 0.78 c h)" $from) -}}
+    {{- $headOk := $s.Params.accentHeaderDark | default (printf "linear-gradient(135deg,oklch(from %s 0.42 c h) 0%%,oklch(from %s 0.36 c h) 100%%)" $from $to) -}}
+    {{- $darkOk = $darkOk | append (printf ":root.dark body.%s{--accent-ink:%s;--header-bg:%s;}" $s.Section $inkOk $headOk) -}}
   {{- end -}}
 {{- end -}}
 {{- with $rules -}}
-  {{- $r := resources.FromString "css/section-accents.css" (delimit . "\n") | minify | fingerprint -}}
+  {{- $css := delimit . "\n" -}}
+  {{- $css = printf "%s\n%s" $css (delimit $dark "\n") -}}
+  {{- $css = printf "%s\n@supports (color: oklch(from red l c h)){\n%s\n}" $css (delimit $darkOk "\n") -}}
+  {{- $r := resources.FromString "css/section-accents.css" $css | minify | fingerprint -}}
   <link rel="stylesheet" href="{{ $r.RelPermalink }}" integrity="{{ $r.Data.Integrity }}">
 {{- end -}}
