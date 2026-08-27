@@ -20,12 +20,15 @@
     --book-toc-border: var(--border);
     --book-border: var(--border);
     --book-link: var(--secondary-color);
-    --book-link-hover: #2980b9;
+    /* Darker than --book-link, not lighter. It used to be, until the secondary
+       colour came down to clear contrast and overtook it. */
+    --book-link-hover: #1b5a82;
     --book-shadow: rgba(0, 0, 0, 0.1);
 }
 
 :root.dark {
-    --book-link: #58a6ff;
+    /* One light blue, not two: the secondary colour already has a dark value
+       that sits where these links want to be. */
     --book-link-hover: #79c0ff;
     --book-shadow: rgba(0, 0, 0, 0.6);
 }
@@ -247,7 +250,7 @@ body.book-reader {
 
 .book-toc-item.active a {
     background: var(--book-link);
-    color: white;
+    color: var(--on-secondary);
     font-weight: 600;
 }
 
