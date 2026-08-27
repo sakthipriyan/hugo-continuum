@@ -53,18 +53,19 @@ function paletteFromPage() {
         N4: token('--border'),
         N5: token('--border'),
         N6: token('--muted'),
-        // The canvas is the page, not a card. --card is the same white as the
-        // page in light, so either looked right there; in dark it is #18181b
-        // against a #09090b page and the diagram sat in a visible grey box.
-        // The tints below are mixed over the same ground, so they composite
-        // against what is actually behind them.
+        // The canvas is the page, so the diagram has no edge of its own -- in
+        // dark, --card put it in a visible grey box that light never had.
         N7: token('--background'),
         B1: token('--accent-ink'),
-        B2: tint('--background', 60),
-        B3: tint('--background', 40),
-        B4: tint('--background', 24),
-        B5: tint('--background', 16),
-        B6: tint('--background', 10)
+        // The shapes are cards on that page, though, so their fills are tinted
+        // over --card rather than over the canvas. Mixed over the canvas they
+        // came out at 1.04:1 against it in dark, which is a fill doing nothing
+        // and a box held up entirely by its stroke.
+        B2: tint('--card', 60),
+        B3: tint('--card', 40),
+        B4: tint('--card', 24),
+        B5: tint('--card', 16),
+        B6: tint('--card', 10)
     });
 
     const wasDark = root.classList.contains('dark');
