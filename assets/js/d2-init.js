@@ -6,12 +6,156 @@ function diagramBlockRoot(codeEl) {
     return codeEl.closest('div.highlight') || codeEl.parentNode;
 }
 
+// D2 ships fixed palettes. This site has its own, one per section, so the
+// diagram is handed the page's colours instead -- through themeOverrides, which
+// takes D2's palette slots by name. Which slot does what, established by
+// rendering with sentinel colours and reading back what landed where:
+//
+//   N7  the canvas behind the diagram      N1/N2  primary / secondary text
+//   B1  every stroke, shapes and edges     B6/B5/B4  node, group, nested fill
+//
+// Both palettes are built up front, because the SVG carries light and dark
+// together and is not re-rendered on a toggle. Reading the dark set means
+// briefly putting the class on the root: it happens inside one task, between
+// two style reads and no paint, so nothing flickers.
+// Theme defaults for a diagram that has not said otherwise.
+const D2_DEFAULTS = {
+    'layout-engine': 'elk',
+    'theme-id': '105',
+    'dark-theme-id': '200'
+};
+
+// A diagram may write its own d2-config -- to pick a different layout engine,
+// say. It used to be all or nothing: any d2-config at all and none of these
+// were applied, so changing the layout engine silently cost the diagram its
+// dark palette and left it bright on a dark page. Only the keys it has not
+// set are filled in now.
+function withConfigDefaults(code) {
+    const open = code.search(/d2-config\s*:\s*\{/);
+    if (open === -1) {
+        const body = Object.entries(D2_DEFAULTS)
+            .map(([k, v]) => '    ' + k + ': ' + v)
+            .join('\n');
+        return 'vars: {\n  d2-config: {\n' + body + '\n  }\n}\n' + code;
+    }
+
+    const brace = code.indexOf('{', open);
+    let depth = 0, close = -1;
+    for (let i = brace; i < code.length; i++) {
+        if (code[i] === '{') depth++;
+        else if (code[i] === '}' && --depth === 0) { close = i; break; }
+    }
+    if (close === -1) return code;
+
+    const declared = code.slice(brace + 1, close);
+    const missing = Object.entries(D2_DEFAULTS)
+        .filter(([k]) => !new RegExp('(^|\\s)' + k + '\\s*:').test(declared))
+        .map(([k, v]) => '\n    ' + k + ': ' + v)
+        .join('');
+
+    return missing ? code.slice(0, close) + missing + '\n  ' + code.slice(close) : code;
+}
+
+function paletteFromPage() {
+    const root = document.documentElement;
+    const probe = document.createElement('span');
+    probe.style.cssText = 'position:absolute;left:-9999px';
+    document.body.appendChild(probe);
+
+    const scratch = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+
+    // Resolve any CSS colour expression -- var(), color-mix(), oklch() -- by
+    // letting the browser do it rather than reimplementing colour maths, then
+    // flatten it to hex through a canvas. That second step is not optional:
+    // anything involving color-mix or oklch serialises as `color(srgb 0.47 ...)`,
+    // and D2 rejects it as an invalid colour format.
+    const resolve = (expr) => {
+        probe.style.color = '';
+        probe.style.color = expr;
+        const computed = getComputedStyle(probe).color || '#000';
+        scratch.clearRect(0, 0, 1, 1);
+        scratch.fillStyle = '#000';
+        scratch.fillStyle = computed;
+        scratch.fillRect(0, 0, 1, 1);
+        const [r, g, b] = scratch.getImageData(0, 0, 1, 1).data;
+        return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+    };
+    const token = (name) => resolve('var(' + name + ')');
+    const tint = (over, pct) => resolve(
+        'color-mix(in srgb, var(--accent-from) ' + pct + '%, var(' + over + '))');
+
+    const read = () => ({
+        N1: token('--foreground-strong'),
+        N2: token('--muted-foreground'),
+        N3: token('--muted-foreground'),
+        N4: token('--border'),
+        N5: token('--border'),
+        N6: token('--muted'),
+        // The canvas is the page, so the diagram has no edge of its own -- in
+        // dark, --card put it in a visible grey box that light never had.
+        N7: token('--background'),
+        B1: token('--accent-ink'),
+        // The shapes are cards on that page, though, so their fills are tinted
+        // over --card rather than over the canvas. Mixed over the canvas they
+        // came out at 1.04:1 against it in dark, which is a fill doing nothing
+        // and a box held up entirely by its stroke.
+        B2: tint('--card', 60),
+        B3: tint('--card', 40),
+        B4: tint('--card', 24),
+        B5: tint('--card', 16),
+        B6: tint('--card', 10)
+    });
+
+    const wasDark = root.classList.contains('dark');
+    root.classList.remove('dark');
+    const light = read();
+    root.classList.add('dark');
+    const dark = read();
+    root.classList.toggle('dark', wasDark);
+
+    probe.remove();
+    return { light, dark };
+}
+
+// Given both a theme-id and a dark-theme-id, D2 emits one SVG carrying both
+// palettes, the dark half behind @media (prefers-color-scheme: dark). That is
+// the right answer for a site with no theme control, and the wrong one here:
+// this site's toggle can hold dark while the OS says light, and the diagram
+// would follow the OS and disagree with the page around it.
+//
+// So the media query is rewritten into the class the rest of the theme uses.
+// The rules inside are flat -- `.d2-1234 .fill-N1{fill:#CDD6F4;}` -- so each
+// gains a :root.dark prefix, which also outranks its light counterpart by one
+// class. Nothing else about the SVG changes.
+function followThemeClass(svg) {
+    const marker = '@media screen and (prefers-color-scheme:dark)';
+    const at = svg.indexOf(marker);
+    if (at === -1) return svg;
+
+    const open = svg.indexOf('{', at);
+    if (open === -1) return svg;
+
+    let depth = 0, close = -1;
+    for (let i = open; i < svg.length; i++) {
+        if (svg[i] === '{') depth++;
+        else if (svg[i] === '}' && --depth === 0) { close = i; break; }
+    }
+    if (close === -1) return svg;
+
+    const scoped = svg.slice(open + 1, close)
+        .replace(/(^|\})\s*([^{}]+)\{/g, (_, before, selector) =>
+            before + '\n\t\t:root.dark ' + selector.trim() + '{');
+
+    return svg.slice(0, at) + scoped + svg.slice(close + 1);
+}
+
 document.addEventListener('DOMContentLoaded', async function () {
     const d2Elements = document.querySelectorAll('pre code.language-d2, pre code.d2');
     if (d2Elements.length === 0) return;
 
     try {
         const d2 = new D2();
+        const palette = paletteFromPage();
 
         // Swap every block for a placeholder up front, then render them in turn.
         const diagramTasks = Array.from(d2Elements).map(codeEl => {
@@ -23,9 +167,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             container.innerHTML = '<span class="spinner">⚙️</span> Rendering diagram...';
             root.parentNode.replaceChild(container, root);
 
-            if (!d2Code.includes('d2-config')) {
-                d2Code = 'vars: {\n  d2-config: {\n    layout-engine: elk\n    theme-id: 105\n  }\n}\n' + d2Code;
-            }
+            d2Code = withConfigDefaults(d2Code);
 
             return { d2Code, container };
         });
@@ -33,10 +175,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         for (const task of diagramTasks) {
             try {
                 const result = await d2.compile(task.d2Code);
-                const svg = await d2.render(result.diagram, result.renderOptions || {});
+                const svg = await d2.render(result.diagram, {
+                    ...(result.renderOptions || {}),
+                    themeOverrides: palette.light,
+                    darkThemeOverrides: palette.dark
+                });
 
                 task.container.className = 'd2-diagram';
-                task.container.innerHTML = svg;
+                task.container.innerHTML = followThemeClass(svg);
 
                 const svgEl = task.container.querySelector('svg');
                 if (svgEl) {
