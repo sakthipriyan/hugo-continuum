@@ -18,6 +18,44 @@ function diagramBlockRoot(codeEl) {
 // together and is not re-rendered on a toggle. Reading the dark set means
 // briefly putting the class on the root: it happens inside one task, between
 // two style reads and no paint, so nothing flickers.
+// Theme defaults for a diagram that has not said otherwise.
+const D2_DEFAULTS = {
+    'layout-engine': 'elk',
+    'theme-id': '105',
+    'dark-theme-id': '200'
+};
+
+// A diagram may write its own d2-config -- to pick a different layout engine,
+// say. It used to be all or nothing: any d2-config at all and none of these
+// were applied, so changing the layout engine silently cost the diagram its
+// dark palette and left it bright on a dark page. Only the keys it has not
+// set are filled in now.
+function withConfigDefaults(code) {
+    const open = code.search(/d2-config\s*:\s*\{/);
+    if (open === -1) {
+        const body = Object.entries(D2_DEFAULTS)
+            .map(([k, v]) => '    ' + k + ': ' + v)
+            .join('\n');
+        return 'vars: {\n  d2-config: {\n' + body + '\n  }\n}\n' + code;
+    }
+
+    const brace = code.indexOf('{', open);
+    let depth = 0, close = -1;
+    for (let i = brace; i < code.length; i++) {
+        if (code[i] === '{') depth++;
+        else if (code[i] === '}' && --depth === 0) { close = i; break; }
+    }
+    if (close === -1) return code;
+
+    const declared = code.slice(brace + 1, close);
+    const missing = Object.entries(D2_DEFAULTS)
+        .filter(([k]) => !new RegExp('(^|\\s)' + k + '\\s*:').test(declared))
+        .map(([k, v]) => '\n    ' + k + ': ' + v)
+        .join('');
+
+    return missing ? code.slice(0, close) + missing + '\n  ' + code.slice(close) : code;
+}
+
 function paletteFromPage() {
     const root = document.documentElement;
     const probe = document.createElement('span');
@@ -129,9 +167,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             container.innerHTML = '<span class="spinner">⚙️</span> Rendering diagram...';
             root.parentNode.replaceChild(container, root);
 
-            if (!d2Code.includes('d2-config')) {
-                d2Code = 'vars: {\n  d2-config: {\n    layout-engine: elk\n    theme-id: 105\n    dark-theme-id: 200\n  }\n}\n' + d2Code;
-            }
+            d2Code = withConfigDefaults(d2Code);
 
             return { d2Code, container };
         });
