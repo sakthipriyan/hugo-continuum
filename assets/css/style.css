@@ -1,13 +1,32 @@
 /* Continuum Theme CSS */
 
 :root {
+    /* Surfaces and ink. These carry role names rather than colour names, so a
+       dark palette can redefine the seven of them and every rule below
+       follows. --card and --background are the same white today; they part
+       company in dark, where a card must lift off the page rather than merge
+       into it. */
+    --background: #fff;
+    --foreground: #333;
+    --foreground-strong: #2c3e50;
+    --card: #fff;
+    --muted: #ecf0f1;
+    --muted-foreground: #95a5a6;
+    --border: #ecf0f1;
+    /* Inline `code` ink. Crimson on a light fill; the GitHub-dark red against
+       a dark one, matching the highlighter's own palette next door. */
+    --code-ink: #c7254e;
+
+    /* Brand */
     --primary-color: #2c3e50;
-    --secondary-color: #3498db;
+    /* Darkened from #3498db, which is a mid-tone: white on it measured 3.15:1
+       against the 4.5:1 AA needs, and it measured the same 3.15:1 the other way
+       round as link ink on white. One value, failing at both ends. This clears
+       both -- 5.30:1 either way. */
+    --secondary-color: #2471a3;
+    --on-secondary: #fff;
     --accent-color: #e74c3c;
-    --text-color: #333;
-    --bg-color: #fff;
-    --gray-light: #ecf0f1;
-    --gray-medium: #95a5a6;
+
     --border-radius: 8px;
     --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     --transition: all 0.3s ease;
@@ -22,12 +41,79 @@
 
     /* Section accent tokens. Overridden per section by the generated
        section-accents.css, which is built from each section's own front matter. */
-    --accent-from: var(--secondary-color);
-    --accent-to: var(--secondary-color);
-    --accent-ink: var(--secondary-color);
+    /* A page with no section of its own -- the home page, 404 -- falls back to
+       the primary colour rather than the secondary, so its header band and its
+       footer rule are the same colour. They were navy and blue respectively,
+       which is what made the footer look unrelated to the page above it. */
+    --accent-from: var(--primary-color);
+    --accent-to: var(--primary-color);
+    --accent-ink: var(--primary-color);
     --on-accent: #fff;
-    --header-bg: var(--primary-color);
+    /* Always a gradient, even when it is one flat colour, so it always lands in
+       background-image. The dark scrim under it is a background-color, and a
+       plain colour here would land in the same slot and be overwritten by it --
+       which is exactly what happened to the home page, whose header has no
+       section gradient: it went near-black the moment the scrim arrived. */
+    --header-bg: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color) 100%);
     --focus-ring: var(--primary-color);
+
+    /* Superseded names. --gray-light did two jobs, filling panels and drawing
+       hairlines, which dark mode needs to pull apart: a border lightens where a
+       fill darkens. Kept as aliases so a site's own CSS keeps working. */
+    --text-color: var(--foreground);
+    --bg-color: var(--background);
+    --gray-light: var(--border);
+    --gray-medium: var(--muted-foreground);
+}
+
+/* Light and dark are both declared, so the browser paints form controls,
+   scrollbars and the canvas behind the page to match rather than flashing a
+   white gutter next to a dark page. */
+:root { color-scheme: light; }
+:root.dark { color-scheme: dark; }
+
+/* Almost everything on the page carries `transition: all 0.3s ease`, so
+   flipping the theme cross-fades every card, pill and border at once -- three
+   hundred milliseconds of the whole page smearing between two palettes. The
+   switch should be instant; the script adds this class for one frame while it
+   changes the palette, and takes it off again. */
+:root.theme-switching *,
+:root.theme-switching *::before,
+:root.theme-switching *::after {
+    transition: none !important;
+}
+
+/* The dark palette. Only these tokens move: every rule in this file reads them
+   rather than a literal, so there is no second copy of the stylesheet to keep
+   in step.
+
+   --card lifts one step off --background rather than matching it, because
+   Continuum separates cards with a shadow and a shadow is invisible against
+   near-black -- the step in lightness is what draws the edge instead.
+
+   --primary-color does not move. It is the navy band behind the footer, the
+   nav drawer and the skip link, and it carries white text in both themes;
+   only its use as ink was split out, into --foreground-strong. */
+:root.dark {
+    --background: #09090b;
+    --foreground: #e4e4e7;
+    --foreground-strong: #fafafa;
+    --card: #18181b;
+    --muted: #27272a;
+    --muted-foreground: #a1a1aa;
+    --border: #27272a;
+    --code-ink: #ff7b72;
+    /* The secondary blue is ink far more often than it is a fill, and ink has
+       to go the other way here: #2471a3 was picked to carry white and to read
+       on white, and on near-black it falls to 3.76:1 in the breadcrumbs. This
+       sits where the accent inks sit, 8.6:1 against the page. */
+    --secondary-color: #6cb0ef;
+    /* Which inverts what can sit on it: white on this is 2.2:1. */
+    --on-secondary: #09090b;
+
+    --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+    /* #2c3e50 is 1.5:1 on this background -- a ring nobody could see. */
+    --focus-ring: #fafafa;
 }
 
 * {
@@ -37,10 +123,10 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--bg-color);
+    color: var(--foreground);
+    background-color: var(--background);
 }
 
 body.book-layout {
@@ -87,6 +173,139 @@ main:focus {
    it on the header itself means every descendant inherits it. */
 .site-header {
     --focus-ring: var(--on-accent);
+}
+
+/* --accent-from was doing two jobs, the way --gray-light and --primary-color
+   were: filling a badge or a button, where it carries --on-accent text, and
+   drawing a line, where it carries nothing. Dark has to treat those
+   differently -- a fill has to recede far enough for light text to sit on it,
+   a line has to stay bright enough to be seen -- so they are separate roles
+   now. Light leaves both as the accent itself, unchanged.
+
+   Each is what a section gets when it names nothing. A section can name any of
+   them outright -- accentInkDark, accentSurfaceDark, accentLineDark,
+   accentHeaderDark -- and the name wins over the derivation.
+
+   Derived here rather than in the generated stylesheet, because the home page
+   sets --accent-from inline, per card, and CSS can re-derive from that where a
+   generator cannot reach. Both blocks are needed: a custom property resolves
+   var() against the element it is declared on, so --accent-surface set on
+   :root would never see a section's own --accent-from. */
+body,
+.section-card,
+.start-item,
+.latest-item,
+.nav-links .section-link-pill {
+    --accent-surface: var(--accent-from);
+    --accent-surface-to: var(--accent-to);
+    --accent-line: var(--accent-from);
+}
+
+/* Elements carrying a section's accent inline bring both on-accents with them,
+   for the same reason they bring both inks: an inline --on-accent would beat
+   the palette. */
+.section-card,
+.start-item,
+.latest-item,
+.nav-links .section-link-pill {
+    --on-accent: var(--on-accent-light, #fff);
+}
+
+/* An inline --accent-ink would have outranked the palette too, so the light
+   half is chosen here and the dark half with the other roles above. */
+.section-card,
+.start-item,
+.latest-item,
+.nav-links .section-link-pill {
+    --accent-ink: var(--accent-ink-light, var(--secondary-color));
+}
+
+:root.dark .section-card,
+:root.dark .start-item,
+:root.dark .latest-item,
+:root.dark .nav-links .section-link-pill {
+    --on-accent: var(--on-accent-dark, #fafafa);
+}
+
+:root.dark body,
+:root.dark .section-card,
+:root.dark .start-item,
+:root.dark .latest-item,
+:root.dark .nav-links .section-link-pill {
+    --accent-surface: var(--accent-surface-dark, color-mix(in srgb, var(--accent-from) 60%, transparent));
+    --accent-surface-to: color-mix(in srgb, var(--accent-to) 55%, transparent);
+    --accent-line: var(--accent-line-dark, color-mix(in srgb, var(--accent-from) 62%, transparent));
+    --accent-ink: var(--accent-ink-dark, color-mix(in srgb, var(--accent-from) 62%, #fff));
+}
+
+@supports (color: oklch(from red l c h)) {
+    :root.dark body,
+    :root.dark .section-card,
+    :root.dark .start-item,
+    :root.dark .latest-item,
+    :root.dark .nav-links .section-link-pill {
+        --accent-surface: var(--accent-surface-dark, oklch(from var(--accent-from) 0.56 c h / 0.85));
+        --accent-surface-to: oklch(from var(--accent-to) 0.50 c h / 0.85);
+        --accent-line: var(--accent-line-dark, oklch(from var(--accent-from) 0.62 c h / 0.85));
+        --accent-ink: var(--accent-ink-dark, oklch(from var(--accent-from) 0.78 c h));
+    }
+}
+
+/* The header band gets away with being a much fainter wash than these -- it is
+   the width of the page and its text is large. A badge is forty pixels with a
+   two-digit number in it, and the same treatment left it at 1.8:1 against the
+   page: a pill you cannot see. These sit at the one setting that clears both
+   bars for both sections at once -- the fill at least 3:1 against the card it
+   sits on, and its text at least 4.5:1 on the fill.
+
+   Every accent fill is dimmed, so the near-black a section picked to read on
+   bright gold would vanish on all of them, not just the header. */
+:root.dark body {
+    --on-accent: #fafafa;
+}
+
+/* Pages with no section of their own -- the home page, 404 -- get the same
+   treatment from --primary-color that a section gets from its accent. */
+:root.dark body {
+    --header-bg: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 20%, transparent) 0%, color-mix(in srgb, var(--primary-color) 16%, transparent) 100%);
+}
+
+@supports (color: oklch(from red l c h)) {
+    :root.dark body {
+        --header-bg: linear-gradient(135deg, oklch(from var(--primary-color) 0.52 c h / 0.55) 0%, oklch(from var(--primary-color) 0.46 c h / 0.55) 100%);
+    }
+}
+
+/* The band is a translucent wash in dark, so the page's own black does the
+   dimming. Two things have to be true for that to work on a sticky header.
+
+   The scrim, first: the header sits over whatever is scrolling beneath it, and
+   an accent alone is not enough cover. Measured against the things that
+   actually pass under it, unscrimmed white nav text falls to 1.55:1 over the
+   gold search button and 1.06:1 over a white panel -- it disappears. Holding
+   78% of the page colour under the wash bounds the whole range to between
+   7.2:1 and 12.7:1, whatever goes past.
+
+   The blur, second: without it the text underneath stays legible through the
+   glass and collides with the nav. It is what makes this read as a surface
+   rather than as a mistake.
+
+   background-color rather than another layer in --header-bg, because the scrim
+   is the same for every section and only the wash above it changes. */
+:root.dark .site-header {
+    background-color: color-mix(in srgb, var(--background) 78%, transparent);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+}
+
+/* Asked for less transparency, give none: a solid scrim, no blur. The wash
+   keeps the section's colour, composited over an opaque page instead. */
+@media (prefers-reduced-transparency: reduce) {
+    :root.dark .site-header {
+        background-color: var(--background);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
 }
 
 /* Header */
@@ -173,12 +392,86 @@ main:focus {
     transform: rotate(-45deg) translate(7px, -7px);
 }
 
+/* Theme toggle. One button, on the site header and the book reader header
+   alike; both sit on a coloured band, so the icon takes --on-accent there and
+   the reader's own header ink inside the reader. */
+.theme-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: var(--border-radius);
+    transition: background 0.3s ease;
+}
+
+.main-nav .nav-links {
+    margin-left: auto;
+}
+
+.main-nav .theme-toggle {
+    margin-left: 0.25rem;
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* The reader's header is a flex row ordered by rule, not by markup: the
+   toggle belongs at the far end, after the title and the author. */
+.book-header .theme-toggle {
+    order: 4;
+}
+
+.book-header .theme-toggle:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+:root.dark .book-header .theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.theme-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--on-accent);
+}
+
+.book-header .theme-icon {
+    color: var(--book-header-text);
+}
+
+/* The button shows where pressing it goes, not where you are: a moon while
+   the page is light, a sun while it is dark. Which one is visible follows the
+   class on <html>, so it is right on the first paint without waiting for
+   script to label it. */
+.theme-icon-light {
+    display: none;
+}
+
+:root.dark .theme-icon-dark {
+    display: none;
+}
+
+:root.dark .theme-icon-light {
+    display: block;
+}
+
 /* Mobile Navigation Styles */
 @media (max-width: 1024px) {
     .hamburger {
         display: flex;
-        order: 2;
+        order: 3;
         flex-shrink: 0;
+    }
+
+    .main-nav .theme-toggle {
+        order: 2;
     }
 
     .main-nav {
@@ -269,12 +562,12 @@ main:focus {
 /* Section-specific navigation link backgrounds for homepage */
 /* Home-page pills: each carries its own accent tokens inline (see header.html). */
 .nav-links .section-link-pill {
-    background: linear-gradient(135deg, var(--accent-from) 0%, var(--accent-to) 100%);
+    background: linear-gradient(135deg, var(--accent-surface) 0%, var(--accent-surface-to) 100%);
     color: var(--on-accent);
 }
 
 .nav-links .section-link-pill:hover {
-    background: linear-gradient(135deg, var(--accent-to) 0%, var(--accent-from) 100%);
+    background: linear-gradient(135deg, var(--accent-surface-to) 0%, var(--accent-surface) 100%);
     color: var(--on-accent);
     transform: translateY(-1px);
 }
@@ -289,7 +582,7 @@ main:focus {
     position: absolute;
     top: 100%;
     left: 0;
-    background: white;
+    background: var(--card);
     min-width: 200px;
     box-shadow: var(--box-shadow);
     border-radius: var(--border-radius);
@@ -306,14 +599,14 @@ main:focus {
 }
 
 .dropdown-menu a {
-    color: var(--text-color);
+    color: var(--foreground);
     padding: 0.75rem 1rem;
     display: block;
     transition: var(--transition);
 }
 
 .dropdown-menu a:hover {
-    background: var(--gray-light);
+    background: var(--muted);
     color: var(--secondary-color);
 }
 
@@ -354,13 +647,13 @@ main {
     gap: 1rem;
     margin-bottom: 1.5rem;
     padding-bottom: 0.75rem;
-    border-bottom: 2px solid var(--gray-light);
+    border-bottom: 2px solid var(--border);
 }
 
 .category-header-full h2 {
     margin: 0;
     font-size: 1.75rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .view-all-section {
@@ -387,12 +680,12 @@ main {
 
 /* Section-specific view-all button colors */
 .view-all-link {
-    background: linear-gradient(135deg, var(--accent-from) 0%, var(--accent-to) 100%);
+    background: linear-gradient(135deg, var(--accent-surface) 0%, var(--accent-surface-to) 100%);
     color: var(--on-accent);
 }
 
 .view-all-link:hover {
-    background: linear-gradient(135deg, var(--accent-to) 0%, var(--accent-from) 100%);
+    background: linear-gradient(135deg, var(--accent-surface-to) 0%, var(--accent-surface) 100%);
     color: var(--on-accent);
 }
 
@@ -403,7 +696,7 @@ main {
 .video-card,
 .tool-card,
 .content-card {
-    background: white;
+    background: var(--card);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     padding: 1.5rem;
@@ -466,7 +759,7 @@ main {
     margin: 0;
     font-size: 1.25rem;
     font-weight: 600;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     line-height: 1.3;
     transition: color 0.3s ease;
 }
@@ -479,7 +772,7 @@ main {
 
 .card-summary {
     margin: 0;
-    color: var(--text-color);
+    color: var(--foreground);
     line-height: 1.6;
     opacity: 0.9;
 }
@@ -490,7 +783,7 @@ main {
     gap: 1rem;
     align-items: center;
     font-size: 0.9rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .meta-item {
@@ -519,8 +812,8 @@ main {
 
 .card-tags .tag-link {
     padding: 0.3rem 0.8rem;
-    background: var(--gray-light);
-    color: var(--text-color);
+    background: var(--muted);
+    color: var(--foreground);
     text-decoration: none;
     border-radius: 20px;
     font-size: 0.85rem;
@@ -586,7 +879,7 @@ main {
 .book-card a,
 .video-card a,
 .tool-card a {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
 }
 
@@ -608,8 +901,8 @@ main {
 }
 
 .tag {
-    background: var(--gray-light);
-    color: var(--text-color);
+    background: var(--muted);
+    color: var(--foreground);
     padding: 0.25rem 0.5rem;
     border-radius: 12px;
     font-size: 0.875rem;
@@ -710,7 +1003,7 @@ main {
 }
 
 .video-title a {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
     font-size: 1.1rem;
     font-weight: 600;
@@ -745,7 +1038,7 @@ main {
 
 .watch-link {
     align-self: flex-start;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
     font-weight: 500;
     padding: 0.5rem 1rem;
@@ -830,21 +1123,36 @@ main {
 }
 
 .status-planning {
-    background: var(--gray-medium);
+    background: var(--muted-foreground);
     color: white;
 }
 
 /* Footer */
+/* The footer was the one band that never moved: the same navy on every page
+   and in both themes, which is what made it read as unrelated to everything
+   above it.
+
+   It takes a rule in the section's colour rather than the colour itself. The
+   header is sticky and carries that signal the whole way down the page; by the
+   time the footer is on screen the reader has known which section they are in
+   for some time, so a full accent band here would buy identity twice and spend
+   it on the least important content on the page.
+
+   Carrying the accent properly here is also not available in both themes with
+   one mechanism. Fading toward the ground darkens gold against black and
+   lightens it against white -- pale and washed rather than dim -- and
+   darkening it in light instead turns it olive. */
 .site-footer {
-    background: var(--primary-color);
-    color: white;
+    background: none;
+    color: var(--foreground);
+    border-top: 2px solid var(--accent-line);
     text-align: center;
     padding: 2rem;
     margin-top: 4rem;
 }
 
-/* Attribution links: underlined so they read as links on the dark footer
-   without relying on colour alone. */
+/* Attribution links: underlined so they read as links without relying on
+   colour alone -- they inherit the body ink here, on the page's own ground. */
 .site-footer a {
     color: inherit;
     text-decoration: underline;
@@ -855,9 +1163,7 @@ main {
     text-decoration-thickness: 2px;
 }
 
-.site-footer :focus-visible {
-    --focus-ring: #fff;
-}
+
 
 /* Section Overview */
 .section-overview {
@@ -871,7 +1177,7 @@ main {
 
 .section-header h1 {
     font-size: 2.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 1rem;
 }
 
@@ -879,7 +1185,7 @@ main {
     max-width: 600px;
     margin: 0 auto;
     font-size: 1.1rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .section-grid {
@@ -890,7 +1196,7 @@ main {
 }
 
 .content-category {
-    background: white;
+    background: var(--card);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     padding: 2rem;
@@ -903,7 +1209,7 @@ main {
 }
 
 .content-category h2 {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 1rem;
     font-size: 1.5rem;
 }
@@ -919,7 +1225,7 @@ main {
 
 .mini-card {
     padding: 1rem 0;
-    border-bottom: 1px solid var(--gray-light);
+    border-bottom: 1px solid var(--border);
 }
 
 .mini-card:last-child {
@@ -932,7 +1238,7 @@ main {
 }
 
 .mini-card h3 a {
-    color: var(--text-color);
+    color: var(--foreground);
     text-decoration: none;
 }
 
@@ -945,7 +1251,7 @@ main {
 .mini-card .event,
 .mini-card .tool-type {
     font-size: 0.875rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .view-all {
@@ -958,7 +1264,7 @@ main {
 }
 
 .view-all:hover {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 /* Breadcrumb */
@@ -967,7 +1273,7 @@ main {
     margin: 1.25rem auto 0.25rem auto;
     padding: 0 2rem;
     font-size: 0.875rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .breadcrumb-list {
@@ -986,11 +1292,11 @@ main {
 .breadcrumb-item:not(:last-child)::after {
     content: ">";
     margin: 0 0.5rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .breadcrumb-item.active span {
-    color: var(--text-color);
+    color: var(--foreground);
 }
 
 .breadcrumb a {
@@ -1005,18 +1311,18 @@ main {
 /* Custom Tool Interface */
 .custom-tool iframe {
     border-radius: var(--border-radius);
-    border: 1px solid var(--gray-light);
+    border: 1px solid var(--border);
 }
 
 /* Related Tools */
 .related-tools {
     margin-top: 3rem;
     padding-top: 2rem;
-    border-top: 2px solid var(--gray-light);
+    border-top: 2px solid var(--border);
 }
 
 .related-tools h3 {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 1rem;
 }
 
@@ -1031,7 +1337,7 @@ main {
 .json-diff-tool textarea {
     width: 100%;
     padding: 1rem;
-    border: 1px solid var(--gray-medium);
+    border: 1px solid var(--muted-foreground);
     border-radius: var(--border-radius);
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     font-size: 0.875rem;
@@ -1053,7 +1359,7 @@ main {
 .allocation-breakdown {
     margin-top: 1.5rem;
     padding: 1rem;
-    background: var(--gray-light);
+    background: var(--muted);
     border-radius: var(--border-radius);
 }
 
@@ -1110,6 +1416,29 @@ main {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
     border-radius: var(--border-radius);
+}
+
+/* The hero was the last brand surface dark never touched: 371px of navy
+   running up to #3498db, which measures 0.283 against a page at 0.003 -- by
+   some way the brightest thing on any page here.
+
+   Same treatment as the header band, and for the same reasons. The lightness
+   is set before the alpha, so the two stops come down together instead of the
+   blue end staying bright. The wash is translucent, so the page's own black
+   does the dimming. It needs no scrim, unlike the header: nothing scrolls
+   underneath a hero. */
+:root.dark .hero {
+    background: linear-gradient(135deg,
+        color-mix(in srgb, var(--primary-color) 30%, transparent) 0%,
+        color-mix(in srgb, var(--secondary-color) 24%, transparent) 100%);
+}
+
+@supports (color: oklch(from red l c h)) {
+    :root.dark .hero {
+        background: linear-gradient(135deg,
+            oklch(from var(--primary-color) 0.52 c h / 0.55) 0%,
+            oklch(from var(--secondary-color) 0.46 c h / 0.55) 100%);
+    }
 }
 
 .hero-content {
@@ -1198,10 +1527,10 @@ main {
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    background: white;
+    background: var(--card);
     border: 1px solid rgba(255, 255, 255, 0.8);
     border-radius: var(--border-radius);
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
     transition: var(--transition);
     font-weight: 500;
@@ -1223,6 +1552,13 @@ main {
 /* Brand colour comes from each link's --social-color (set in config.yaml). */
 .social-link[style*="--social-color"] {
     color: var(--social-color);
+}
+
+/* Brand colours are chosen against white. GitHub's #333 is 1.4:1 on a dark
+   card -- a label you cannot read. Dark drops the tint and keeps the brand for
+   the hover fill, which still carries white text at every one of them. */
+:root.dark .social-link[style*="--social-color"] {
+    color: var(--foreground);
 }
 
 .social-link[style*="--social-color"]:hover {
@@ -1260,12 +1596,12 @@ main {
 }
 
 .section-card {
-    background: white;
+    background: var(--card);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     padding: 2rem;
     transition: var(--transition);
-    border-left: 4px solid var(--accent-from);
+    border-left: 4px solid var(--accent-line);
 }
 
 .section-card:hover {
@@ -1274,13 +1610,13 @@ main {
 }
 
 .section-card h2 {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 1rem;
     font-size: 1.8rem;
 }
 
 .section-card>p {
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     margin-bottom: 1.5rem;
     font-size: 1.1rem;
 }
@@ -1296,8 +1632,8 @@ main {
 }
 
 .stats-grid span {
-    background: var(--gray-light);
-    color: var(--text-color);
+    background: var(--muted);
+    color: var(--foreground);
     padding: 0.25rem 0.75rem;
     border-radius: 15px;
     font-size: 0.875rem;
@@ -1305,7 +1641,7 @@ main {
 }
 
 .stats-grid .stat-link {
-    background: white;
+    background: var(--card);
     color: var(--secondary-color);
     padding: 0.5rem 1rem;
     border-radius: 20px;
@@ -1337,19 +1673,19 @@ main {
 }
 
 .section-link:hover {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: underline;
 }
 
 /* Section-specific button colors */
 .section-card .stat-link {
-    background: white;
+    background: var(--card);
     color: var(--accent-ink);
     border-color: var(--accent-ink);
 }
 
 .section-card .stat-link:hover {
-    background: linear-gradient(135deg, var(--accent-from) 0%, var(--accent-to) 100%);
+    background: linear-gradient(135deg, var(--accent-surface) 0%, var(--accent-surface-to) 100%);
     color: var(--on-accent);
     border-color: transparent;
 }
@@ -1440,13 +1776,13 @@ main {
 
 .content-title {
     font-size: 2rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 1rem;
 }
 
 .content-summary {
     font-size: 1.25rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-style: italic;
     margin: 1rem 0;
     line-height: 1.6;
@@ -1457,7 +1793,7 @@ main {
     flex-wrap: wrap;
     gap: 1.5rem;
     margin: 1rem 0;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.95rem;
 }
 
@@ -1469,7 +1805,7 @@ main {
 
 .content-divider {
     border: none;
-    border-top: 2px solid var(--gray-light);
+    border-top: 2px solid var(--border);
     margin: 1.5rem 0;
 }
 
@@ -1493,12 +1829,12 @@ main {
 
 .video-header h1 {
     font-size: 2rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 1rem;
 }
 
 .video-date {
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.9rem;
 }
 
@@ -1549,7 +1885,7 @@ main {
 }
 
 .video-meta {
-    background: var(--gray-light);
+    background: var(--muted);
     padding: 1rem;
     border-radius: var(--border-radius);
     margin-bottom: 2rem;
@@ -1597,7 +1933,7 @@ main {
 main article {
     font-size: 1.125rem;
     line-height: 1.56;
-    color: var(--text-color);
+    color: var(--foreground);
 }
 
 .post-content p,
@@ -1697,7 +2033,7 @@ main article h2 {
     font-size: 1.75rem;
     margin-top: 2.5rem;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     line-height: 1.3;
 }
 
@@ -1707,7 +2043,7 @@ main article h3 {
     font-size: 1.4rem;
     margin-top: 2rem;
     margin-bottom: 0.75rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     line-height: 1.4;
 }
 
@@ -1716,7 +2052,7 @@ main article h4 {
     font-size: 1.2rem;
     margin-top: 1.5rem;
     margin-bottom: 0.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     line-height: 1.4;
 }
 
@@ -1725,30 +2061,30 @@ main article blockquote {
     border-left: 4px solid var(--secondary-color);
     padding: 1rem 1.5rem;
     margin: 1.5rem 0;
-    background: var(--gray-light);
+    background: var(--muted);
     font-style: italic;
     font-size: 1.5rem;
-    color: #555;
+    color: var(--foreground);
 }
 
 .post-content blockquote,
 main article blockquote {
-    border-left-color: var(--accent-from);
+    border-left-color: var(--accent-line);
 }
 
 .post-content code,
 main article code {
-    background: #f5f5f5;
+    background: var(--muted);
     padding: 0.2rem 0.4rem;
     border-radius: 3px;
     font-size: 0.95em;
     font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
-    color: #c7254e;
+    color: var(--code-ink);
 }
 
 .post-content pre,
 main article pre {
-    background: #f5f5f5;
+    background: var(--muted);
     padding: 0.5rem;
     border-radius: 6px;
     border: 1px solid var(--secondary-color);
@@ -1759,7 +2095,7 @@ main article pre {
 
 .post-content pre,
 main article pre {
-    border-color: var(--accent-from);
+    border-color: var(--accent-line);
 }
 
 .post-content pre code,
@@ -1781,13 +2117,13 @@ main article table {
 main article table th,
 main article table td {
     padding: 0.75rem;
-    border: 1px solid var(--gray-light);
+    border: 1px solid var(--border);
     text-align: left;
 }
 
 .post-content table th,
 main article table th {
-    background: var(--gray-light);
+    background: var(--muted);
     font-weight: 600;
 }
 
@@ -1836,7 +2172,7 @@ main article table th {
 }
 
 .category-card {
-    background: white;
+    background: var(--card);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     padding: 1.5rem;
@@ -1853,11 +2189,11 @@ main article table th {
 .tool-card,
 .tag-card,
 .content-card {
-    border-left: 4px solid var(--accent-from);
+    border-left: 4px solid var(--accent-line);
 }
 
 .card-tags .tag-link:hover {
-    background: var(--accent-from);
+    background: var(--accent-surface);
     color: var(--on-accent);
 }
 
@@ -1875,7 +2211,7 @@ main article table th {
     justify-content: space-between;
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--gray-light);
+    border-bottom: 1px solid var(--border);
 }
 
 .category-header h2 {
@@ -1884,7 +2220,7 @@ main article table th {
 }
 
 .category-header h2 a {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
     transition: var(--transition);
 }
@@ -1895,7 +2231,7 @@ main article table th {
 
 .item-count {
     font-size: 0.9rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-weight: normal;
 }
 
@@ -1958,7 +2294,7 @@ main article table th {
 }
 
 .preview-content h4 a {
-    color: var(--text-color);
+    color: var(--foreground);
     text-decoration: none;
     transition: var(--transition);
 }
@@ -1972,7 +2308,7 @@ main article table th {
     gap: 0.75rem;
     align-items: center;
     font-size: 0.8rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .platform-small {
@@ -1988,8 +2324,8 @@ main article table th {
 }
 
 .tag-small {
-    background: var(--gray-light);
-    color: var(--text-color);
+    background: var(--muted);
+    color: var(--foreground);
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 0.7rem;
@@ -2019,7 +2355,7 @@ main article table th {
 .view-all {
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid var(--gray-light);
+    border-top: 1px solid var(--border);
 }
 
 .view-all a {
@@ -2031,7 +2367,7 @@ main article table th {
 }
 
 .view-all a:hover {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: underline;
 }
 
@@ -2058,10 +2394,10 @@ main article table th {
 
 /* Read Time Styling */
 .read-time {
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.8rem;
     padding: 2px 6px;
-    background: var(--gray-light);
+    background: var(--muted);
     border-radius: 3px;
     font-weight: 500;
 }
@@ -2078,7 +2414,7 @@ main article table th {
 /* Preview Description Styling */
 .preview-description {
     font-size: 0.85rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     line-height: 1.4;
     margin: 0.5rem 0;
     display: -webkit-box;
@@ -2113,7 +2449,7 @@ main article table th {
 }
 
 .tag-card {
-    background: white;
+    background: var(--card);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     padding: 1.2rem 1.5rem;
@@ -2158,7 +2494,7 @@ main article table th {
 
 .tag-card .tag-name {
     margin: 0;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1.25rem;
     font-weight: 600;
     transition: color 0.3s ease;
@@ -2180,8 +2516,8 @@ main article table th {
 }
 
 .tag-count-badge {
-    background: var(--secondary-color);
-    color: white;
+    background: var(--accent-surface);
+    color: var(--on-accent);
     padding: 0.3rem 0.8rem;
     border-radius: 20px;
     font-weight: 700;
@@ -2190,11 +2526,6 @@ main article table th {
     text-align: center;
     transition: all 0.3s ease;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.tag-count-badge {
-    background: var(--accent-from);
-    color: var(--on-accent);
 }
 
 .tag-card:hover .tag-count-badge {
@@ -2264,11 +2595,11 @@ main article table th {
 .tags-stats {
     margin-top: 1rem;
     padding: 1rem;
-    background: var(--gray-light);
+    background: var(--muted);
     border-radius: var(--border-radius);
     text-align: center;
     font-style: italic;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 /* Responsive Design */
@@ -2320,7 +2651,7 @@ main article table th {
 /* Post Summary */
 .post-summary {
     font-size: 1.1rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-style: italic;
     margin: 0 0 1.5rem 0;
     line-height: 1.5;
@@ -2333,7 +2664,7 @@ main article table th {
     align-items: center;
     margin-bottom: 1rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--gray-light);
+    border-bottom: 1px solid var(--border);
     flex-wrap: wrap;
     gap: 1rem;
 }
@@ -2343,7 +2674,7 @@ main article table th {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.9rem;
 }
 
@@ -2366,13 +2697,13 @@ main article table th {
 .post-title {
     margin: 0;
     font-size: 2rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     line-height: 1.2;
 }
 
 .post-subtitle {
     font-size: 1.1rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-style: italic;
     font-weight: normal;
     margin-top: 0.5rem;
@@ -2383,7 +2714,7 @@ main article table th {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.9rem;
     white-space: nowrap;
     flex-shrink: 0;
@@ -2407,7 +2738,7 @@ main article table th {
 
 .tags-label {
     font-weight: 600;
-    color: var(--text-color);
+    color: var(--foreground);
     margin-right: 0.5rem;
 }
 
@@ -2451,8 +2782,8 @@ main article table th {
 .post-tags .tag {
     display: inline-block;
     padding: 0.2rem 0.4rem;
-    background: var(--gray-light);
-    color: var(--text-color);
+    background: var(--muted);
+    color: var(--foreground);
     text-decoration: none;
     font-size: 0.8rem;
     border-radius: 4px;
@@ -2479,7 +2810,7 @@ main article table th {
     gap: 0.8rem;
     align-items: center;
     font-size: 0.9rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .post-meta time,
@@ -2508,12 +2839,12 @@ main article table th {
 .book-chapters {
     margin-top: 3rem;
     padding-top: 2rem;
-    border-top: 2px solid var(--gray-light);
+    border-top: 2px solid var(--border);
 }
 
 .book-chapters h2 {
     margin-bottom: 1.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .chapters-list {
@@ -2529,8 +2860,8 @@ main article table th {
 .chapter-link {
     display: block;
     padding: 1.5rem;
-    background: white;
-    border: 1px solid var(--gray-light);
+    background: var(--card);
+    border: 1px solid var(--border);
     border-radius: var(--border-radius);
     text-decoration: none;
     color: inherit;
@@ -2538,7 +2869,7 @@ main article table th {
 }
 
 .chapter-link:hover {
-    border-color: var(--primary-color);
+    border-color: var(--foreground-strong);
     box-shadow: var(--box-shadow);
     transform: translateX(5px);
 }
@@ -2547,7 +2878,7 @@ main article table th {
     display: block;
     font-size: 1.25rem;
     font-weight: 600;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 0.5rem;
 }
 
@@ -2568,7 +2899,7 @@ main article table th {
     text-align: center;
     margin-bottom: 3rem;
     padding-bottom: 2rem;
-    border-bottom: 2px solid var(--gray-light);
+    border-bottom: 2px solid var(--border);
 }
 
 .book-subtitle {
@@ -2595,7 +2926,7 @@ main article table th {
 .book-content h2 {
     margin-top: 2.5rem;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .book-content h3 {
@@ -2632,7 +2963,7 @@ main article table th {
     width: 280px;
     min-width: 280px;
     background: #f8f9fa;
-    border-right: 1px solid var(--gray-light);
+    border-right: 1px solid var(--border);
     padding: 2rem 1.5rem;
     position: sticky;
     top: 0;
@@ -2647,7 +2978,7 @@ main article table th {
 }
 
 .book-nav-title a {
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
 }
 
@@ -2664,7 +2995,7 @@ main article table th {
 .book-toc-item a {
     display: block;
     padding: 0.5rem 0.75rem;
-    color: var(--text-color);
+    color: var(--foreground);
     text-decoration: none;
     border-radius: 4px;
     transition: var(--transition);
@@ -2672,8 +3003,8 @@ main article table th {
 }
 
 .book-toc-item a:hover {
-    background: white;
-    color: var(--primary-color);
+    background: var(--card);
+    color: var(--foreground-strong);
 }
 
 .book-toc-item.active a {
@@ -2691,7 +3022,7 @@ main article table th {
 .chapter-header {
     margin-bottom: 2rem;
     padding-bottom: 1.5rem;
-    border-bottom: 2px solid var(--gray-light);
+    border-bottom: 2px solid var(--border);
 }
 
 .chapter-header h1 {
@@ -2717,7 +3048,7 @@ main article table th {
 .chapter-content h2 {
     margin-top: 2.5rem;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1.75rem;
 }
 
@@ -2738,7 +3069,7 @@ main article table th {
 }
 
 .chapter-content code {
-    background: #f5f5f5;
+    background: var(--muted);
     padding: 0.2rem 0.4rem;
     border-radius: 3px;
     font-size: 0.9em;
@@ -2746,7 +3077,7 @@ main article table th {
 }
 
 .chapter-content pre {
-    background: #f5f5f5;
+    background: var(--muted);
     padding: 1.5rem;
     border-radius: 6px;
     overflow-x: auto;
@@ -2765,7 +3096,7 @@ main article table th {
     gap: 2rem;
     margin-top: 4rem;
     padding-top: 2rem;
-    border-top: 1px solid var(--gray-light);
+    border-top: 1px solid var(--border);
 }
 
 .book-nav-prev,
@@ -2774,17 +3105,17 @@ main article table th {
     flex-direction: column;
     gap: 0.25rem;
     padding: 1rem;
-    border: 1px solid var(--gray-light);
+    border: 1px solid var(--border);
     border-radius: 6px;
     text-decoration: none;
-    color: var(--text-color);
+    color: var(--foreground);
     transition: var(--transition);
     flex: 1;
 }
 
 .book-nav-prev:hover,
 .book-nav-next:hover {
-    border-color: var(--primary-color);
+    border-color: var(--foreground-strong);
     box-shadow: var(--box-shadow);
 }
 
@@ -2802,7 +3133,7 @@ main article table th {
 
 .book-nav-title {
     font-weight: 600;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 /* Responsive */
@@ -2827,7 +3158,7 @@ main article table th {
         height: auto;
         position: static;
         border-right: none;
-        border-bottom: 1px solid var(--gray-light);
+        border-bottom: 1px solid var(--border);
     }
 
     .book-main {
@@ -2855,9 +3186,9 @@ main article table th {
     padding: 2rem;
     text-align: center;
     font-family: monospace;
-    color: #888;
-    background: #f9f9f9;
-    border: 1px dashed #ccc;
+    color: var(--muted-foreground);
+    background: var(--muted);
+    border: 1px dashed var(--border);
     border-radius: 4px;
 }
 
@@ -2940,7 +3271,7 @@ main article table th {
 .home-start > h2,
 .home-latest > h2 {
     font-size: 1.35rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     margin-bottom: 1rem;
 }
 
@@ -2953,9 +3284,9 @@ main article table th {
 }
 
 .start-item {
-    background: #fff;
-    border: 1px solid var(--gray-light);
-    border-left: 4px solid var(--accent-from);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent-line);
     border-radius: var(--border-radius);
     padding: 1rem 1.25rem;
     transition: var(--transition);
@@ -2985,13 +3316,13 @@ main article table th {
     display: block;
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     line-height: 1.3;
 }
 
 .start-note {
     margin: 0.5rem 0 0;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.95rem;
     line-height: 1.5;
 }
@@ -2999,7 +3330,7 @@ main article table th {
 /* Latest: a compact dated list, not a wall of cards */
 .latest-list {
     list-style: none;
-    border-top: 1px solid var(--gray-light);
+    border-top: 1px solid var(--border);
 }
 
 .latest-item {
@@ -3008,26 +3339,26 @@ main article table th {
     align-items: baseline;
     gap: 0.75rem;
     padding: 0.7rem 0;
-    border-bottom: 1px solid var(--gray-light);
+    border-bottom: 1px solid var(--border);
 }
 
 .latest-item > time {
     flex: 0 0 7.5rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.9rem;
     font-variant-numeric: tabular-nums;
 }
 
 .latest-item > a {
     flex: 1 1 16rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
     font-weight: 500;
 }
 
 .latest-item > a:hover {
     text-decoration: underline;
-    text-decoration-color: var(--accent-from);
+    text-decoration-color: var(--accent-line);
     text-underline-offset: 3px;
 }
 
@@ -3048,7 +3379,7 @@ main article table th {
     gap: 0.5rem;
     margin: 1rem 0 1.25rem;
     padding: 0.75rem 1rem;
-    background: var(--gray-light);
+    background: var(--muted);
     border-radius: var(--border-radius);
 }
 
@@ -3062,7 +3393,7 @@ main article table th {
 
 .section-newest > a {
     flex: 1 1 12rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     text-decoration: none;
     font-weight: 600;
     line-height: 1.35;
@@ -3073,7 +3404,7 @@ main article table th {
 }
 
 .section-newest > time {
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.85rem;
     white-space: nowrap;
 }
@@ -3143,9 +3474,9 @@ main article table th {
     padding: 0.75rem 1rem;
     font-size: 1.05rem;
     font-family: inherit;
-    color: var(--text-color);
-    background: #fff;
-    border: 2px solid var(--gray-light);
+    color: var(--foreground);
+    background: var(--card);
+    border: 2px solid var(--border);
     border-radius: var(--border-radius);
 }
 
@@ -3163,7 +3494,7 @@ main article table th {
 
 .search-status {
     margin: 0.6rem 0 0;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.9rem;
     min-height: 1.2em;
 }
@@ -3196,7 +3527,7 @@ main article table th {
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .filter-pill input {
@@ -3209,18 +3540,18 @@ main article table th {
 .filter-pill span {
     display: inline-block;
     padding: 0.35rem 0.85rem;
-    border: 2px solid var(--gray-light);
+    border: 2px solid var(--border);
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 500;
-    color: var(--text-color);
+    color: var(--foreground);
     cursor: pointer;
     transition: var(--transition);
 }
 
 .filter-pill input:checked + span {
-    background: var(--accent-from);
-    border-color: var(--accent-from);
+    background: var(--accent-surface);
+    border-color: var(--accent-line);
     color: var(--on-accent);
     font-weight: 600;
 }
@@ -3247,7 +3578,7 @@ main article table th {
 
 .collection-count {
     margin: 0 0 1rem;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     font-size: 0.9rem;
 }
 
@@ -3267,7 +3598,7 @@ main article table th {
 
 .card-snippet {
     margin: 0;
-    color: var(--text-color);
+    color: var(--foreground);
     font-size: 0.92rem;
     line-height: 1.55;
 }
@@ -3276,15 +3607,15 @@ main article table th {
 .card-snippet + .card-snippet {
     margin-top: 0.5rem;
     padding-top: 0.5rem;
-    border-top: 1px dashed var(--gray-light);
+    border-top: 1px dashed var(--border);
 }
 
 /* Tinted from the section accent rather than grey, which is already the
    read-time chip's background -- a match should not look like a chip. */
 .card-snippet mark,
 .card-title mark {
-    background: var(--gray-light);
-    background: color-mix(in srgb, var(--accent-from) 26%, #fff);
+    background: var(--muted);
+    background: color-mix(in srgb, var(--accent-from) 26%, var(--card));
     color: inherit;
     font-weight: 600;
     padding: 0 0.1em;
@@ -3306,7 +3637,7 @@ main article table th {
     margin-left: 0.35rem;
     padding: 0.15em 0.7em;
     border-radius: 20px;
-    background: var(--accent-from);
+    background: var(--accent-surface);
     color: var(--on-accent);
     font-size: 0.45em;
     font-weight: 700;
@@ -3342,13 +3673,13 @@ main article table th {
     gap: 0.5rem 1.5rem;
     margin: 0 0 1.25rem;
     padding-bottom: 0.6rem;
-    border-bottom: 2px solid var(--gray-light);
+    border-bottom: 2px solid var(--border);
 }
 
 .block-head h2 {
     margin: 0;
     font-size: 1.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 /* A block heading is two thirds the size of a page title, so the badge needs a
@@ -3410,9 +3741,9 @@ main article table th {
     justify-content: center;
     width: 2.9rem;
     padding: 0;
-    border: 2px solid var(--accent-from);
+    border: 2px solid var(--accent-line);
     border-radius: 0;
-    background: var(--accent-from);
+    background: var(--accent-surface);
     color: var(--on-accent);
     font: inherit;
     font-weight: 600;
@@ -3441,7 +3772,7 @@ main article table th {
     display: inline-block;
     padding: 0.6rem 1.3rem;
     border-radius: 24px;
-    background: var(--accent-from);
+    background: var(--accent-surface);
     color: var(--on-accent);
     font-weight: 600;
     text-decoration: none;
@@ -3492,23 +3823,23 @@ main article table th {
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
 }
 
 .also-as a {
     padding: 0.25rem 0.7rem;
-    border: 2px solid var(--gray-light);
+    border: 2px solid var(--border);
     border-radius: 20px;
     font-size: 0.88rem;
     font-weight: 500;
-    color: var(--text-color);
+    color: var(--foreground);
     text-decoration: none;
     transition: var(--transition);
 }
 
 .also-as a:hover {
-    background: var(--accent-from);
-    border-color: var(--accent-from);
+    background: var(--accent-surface);
+    border-color: var(--accent-line);
     color: var(--on-accent);
 }
 
@@ -3588,9 +3919,9 @@ main article table th {
     display: block;
     margin: 0;
     padding: 1rem 1.25rem;
-    border-left: 4px solid var(--accent-from);
+    border-left: 4px solid var(--accent-line);
     border-radius: var(--border-radius);
-    background: #fff;
+    background: var(--card);
     box-shadow: var(--box-shadow);
     text-decoration: none;
 }
@@ -3633,13 +3964,13 @@ main article table th {
     margin-top: 0.35rem;
     font-size: 1.4rem;
     font-weight: 700;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .landing-entry-note {
     display: block;
     margin-top: 0.45rem;
-    color: var(--text-color);
+    color: var(--foreground);
     max-width: 52rem;
 }
 
@@ -3711,9 +4042,6 @@ main article table th {
     cursor: pointer;
 }
 
-
-
-
 /* Heading anchors, from layouts/_default/_markup/render-heading.html. The hook
    emits an empty <a>; the glyph is masked in here so no SVG markup reaches the
    rendered content, where it would be counted into .Summary. */
@@ -3726,6 +4054,11 @@ main article h2, main article h3, main article h4, main article h5, main article
 }
 
 .anchor-link {
+    /* The mask paints in currentColor, and the comment above says the glyph
+       takes its colour from the text around it -- but an <a> with no colour of
+       its own takes the browser's default link blue, which is #0000EE here and
+       #9e9eff in dark, a colour in no part of the palette. */
+    color: inherit;
     display: inline-block;
     width: 0.8em;
     height: 0.8em;
@@ -3742,8 +4075,142 @@ main article h2, main article h3, main article h4, main article h5, main article
     opacity: 1;
 }
 
+/* ---------------------------------------------------------------------------
+   Print
+
+   An article printed as it stood carried the sticky header, the breadcrumb,
+   the tag list and the site footer onto paper, and on a dark screen it
+   printed the dark palette -- a full page of ink for a background nobody
+   asked for.
+
+   The reader has had a print block since it was written; this is the same
+   idea for everything else.
+   --------------------------------------------------------------------------- */
 @media print {
+    /* Paper is light whatever the screen was. Redefining the tokens is enough:
+       every rule reads them. */
+    :root,
+    :root.dark {
+        --background: #fff;
+        --foreground: #000;
+        --foreground-strong: #000;
+        --card: #fff;
+        --muted: #f2f2f2;
+        --muted-foreground: #444;
+        --border: #bbb;
+        --code-ink: #000;
+        --box-shadow: none;
+    }
+
+    body {
+        background: #fff;
+        color: #000;
+        font-size: 11pt;
+    }
+
+    /* Navigation, controls, and anything that only exists to be clicked. */
+    .site-header,
+    .breadcrumb,
+    .skip-link,
+    .theme-toggle,
+    .hamburger,
+    .nav-overlay,
+    .site-footer,
+    .content-comments,
+    .filter-pills,
+    .search-panel,
+    .landing-entry,
+    .also-as,
+    .chapter-navigation,
+    .view-all-link,
     .anchor-link {
-        display: none;
+        display: none !important;
+    }
+
+    main,
+    .post-content,
+    main article {
+        max-width: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* A card on paper is a box for no reason; keep the tag list, drop its
+       chrome. */
+    .content-card,
+    .card-tags .tag-link {
+        box-shadow: none;
+        border: 1px solid var(--border);
+    }
+
+    /* Where a link went is the one thing paper cannot show. Anchors and mailto
+       say nothing useful and stay bare, and so do the tag pills below the
+       article: those are navigation, and a taxonomy URL after every one of
+       them is four lines of noise for no reference value. */
+    .post-content a[href^="http"]::after,
+    main article a[href^="http"]::after {
+        content: " <" attr(href) ">";
+        font-size: 0.85em;
+        word-break: break-all;
+    }
+
+    .post-content a[href^="/"]::after,
+    main article a[href^="/"]::after {
+        content: " <" var(--print-host, "") attr(href) ">";
+        font-size: 0.85em;
+        word-break: break-all;
+    }
+
+    .content-footer a::after,
+    .card-tags a::after {
+        content: none;
+    }
+
+    /* The URL is what marks a link on paper, so the anchor itself drops the
+       colour and the rule -- a decoration cannot be turned off on a ::after,
+       and four wrapped lines of underlined URL is worse than none. */
+    .post-content a,
+    main article a {
+        color: #000;
+        text-decoration: none;
+    }
+
+    .post-content a::after,
+    main article a::after {
+        color: #444;
+        font-weight: normal;
+    }
+
+    /* Nothing that reads as a unit should be split across a page break, and a
+       heading should never be the last thing on one. */
+    h1, h2, h3, h4 {
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+    pre,
+    blockquote,
+    table,
+    figure,
+    .content-card,
+    li {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    p {
+        orphans: 3;
+        widows: 3;
+    }
+
+    /* Code has to stay inside the page; on screen it scrolls sideways. */
+    pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow: visible;
+    }
+
+    img {
+        max-width: 100% !important;
     }
 }

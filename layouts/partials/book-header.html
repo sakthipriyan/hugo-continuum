@@ -33,9 +33,6 @@
         </div>
 
         {{- /* Theme Toggle */ -}}
-        <button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
-            <span class="theme-icon theme-icon-light" data-theme="light">☀</span>
-            <span class="theme-icon theme-icon-dark" data-theme="dark">☾</span>
-        </button>
+        {{ partial "theme-toggle.html" . }}
     </div>
 </header>

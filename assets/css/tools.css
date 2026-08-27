@@ -1,5 +1,65 @@
 /* Tools CSS - Styles for Financial Calculators and Tools */
 
+/* The calculators speak in status as much as in structure -- a green output
+   panel, an amber warning, a red clear-all, a blue asset badge -- and every
+   one of those was a literal chosen against white. Named here once, in both
+   palettes, so the rules below never mention a colour again.
+
+   The reds collapsed: #e74c3c, #dc3545, #ef4444, #dc2626 and #d32f2f were
+   five near-identical danger colours doing three jobs between them, and the
+   greens and ambers the same. Three roles each -- the colour, the tinted
+   surface it fills, and the ink that reads on that surface -- covers all of
+   it, and gives dark somewhere to put a different answer.
+
+   Dark surfaces are translucent rather than opaque: a fixed tint would only
+   suit whichever card it was mixed against, and these panels sit on both
+   --card and --muted. */
+:root {
+    --success: #27ae60;
+    --success-surface: #e8f5e8;
+    --success-ink: #2c5530;
+
+    --danger: #e74c3c;
+    --danger-strong: #dc3545;
+    --danger-surface: #fef2f2;
+    --danger-ink: #c0392b;
+
+    --warning: #f39c12;
+    --warning-dim: #f7b733;
+    --warning-surface: #fff8e1;
+
+    --info: #1976d2;
+    --info-surface: #e3f2fd;
+    --info-border: #90caf9;
+
+    /* A floating tooltip is dark in both themes; it just cannot be the same
+       dark as the page behind it. */
+    --tooltip: #333;
+    --tooltip-foreground: #fff;
+}
+
+:root.dark {
+    --success: #34d399;
+    --success-surface: rgba(52, 211, 153, 0.13);
+    --success-ink: #6ee7b7;
+
+    --danger: #f87171;
+    --danger-strong: #ef4444;
+    --danger-surface: rgba(248, 113, 113, 0.13);
+    --danger-ink: #fca5a5;
+
+    --warning: #fbbf24;
+    --warning-dim: #f5b942;
+    --warning-surface: rgba(251, 191, 36, 0.13);
+
+    --info: #60a5fa;
+    --info-surface: rgba(96, 165, 250, 0.14);
+    --info-border: rgba(96, 165, 250, 0.4);
+
+    --tooltip: #3f3f46;
+    --tooltip-foreground: #fafafa;
+}
+
 /* Common Tool Input Styles */
 .input-group {
     margin-bottom: 1rem;
@@ -29,7 +89,7 @@
 .input-group-col input {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid var(--gray-medium);
+    border: 1px solid var(--muted-foreground);
     border-radius: var(--border-radius);
     font-size: 1rem;
 }
@@ -47,7 +107,7 @@
 .input-group select {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid var(--gray-medium);
+    border: 1px solid var(--muted-foreground);
     border-radius: var(--border-radius);
     font-size: 1rem;
 }
@@ -74,8 +134,8 @@
     left: 50%;
     top: calc(100% + 8px);
     transform: translateX(-50%);
-    background: #333;
-    color: white;
+    background: var(--tooltip);
+    color: var(--tooltip-foreground);
     padding: 0.75rem 1rem;
     border-radius: 6px;
     font-size: 0.95rem;
@@ -98,7 +158,7 @@
     top: calc(100% + 2px);
     transform: translateX(-50%);
     border: 6px solid transparent;
-    border-bottom-color: #333;
+    border-bottom-color: var(--tooltip);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.15s ease;
@@ -129,7 +189,7 @@
     top: auto;
     bottom: calc(100% + 2px);
     border-bottom-color: transparent;
-    border-top-color: #333;
+    border-top-color: var(--tooltip);
 }
 
 /* Show tooltip above for last row in plan tables */
@@ -142,7 +202,7 @@
     top: auto;
     bottom: calc(100% + 2px);
     border-bottom-color: transparent;
-    border-top-color: #333;
+    border-top-color: var(--tooltip);
 }
 
 /* Show tooltip on the left for last column */
@@ -179,8 +239,8 @@
 
 .unit-buttons button {
     padding: 0.5rem;
-    border: 2px solid var(--gray-medium);
-    background: white;
+    border: 2px solid var(--muted-foreground);
+    background: var(--card);
     border-radius: var(--border-radius);
     cursor: pointer;
     font-size: 0.9rem;
@@ -190,20 +250,20 @@
 
 .unit-buttons button:hover {
     border-color: var(--secondary-color);
-    background: #f8f9fa;
+    background: var(--muted);
 }
 
 .unit-buttons button.active {
     border-color: var(--secondary-color);
     background: var(--secondary-color);
-    color: white;
+    color: var(--on-secondary);
 }
 
 /* Inactive style button for Import/Export/Add */
 .unit-buttons-btn {
     padding: 0.35rem 0.6rem;
-    border: 2px solid var(--gray-medium);
-    background: white;
+    border: 2px solid var(--muted-foreground);
+    background: var(--card);
     border-radius: var(--border-radius);
     cursor: pointer;
     font-size: 0.9rem;
@@ -213,7 +273,7 @@
 
 .unit-buttons-btn:hover:not(:disabled) {
     border-color: var(--secondary-color);
-    background: #f8f9fa;
+    background: var(--muted);
 }
 
 .unit-buttons-btn:disabled {
@@ -231,8 +291,8 @@
 .mode-toggle button {
     flex: 1;
     padding: 0.5rem 0.875rem;
-    border: 2px solid var(--gray-medium);
-    background: white;
+    border: 2px solid var(--muted-foreground);
+    background: var(--card);
     border-radius: var(--border-radius);
     cursor: pointer;
     font-size: 0.9rem;
@@ -242,24 +302,24 @@
 
 .mode-toggle button:hover {
     border-color: var(--secondary-color);
-    background: #f8f9fa;
+    background: var(--muted);
 }
 
 .mode-toggle button.active {
     border-color: var(--secondary-color);
     background: var(--secondary-color);
-    color: white;
+    color: var(--on-secondary);
 }
 
 .mode-toggle button.btn-clear-all {
-    border-color: #e74c3c;
-    color: #c0392b;
-    background: white;
+    border-color: var(--danger);
+    color: var(--danger-ink);
+    background: var(--card);
 }
 
 .mode-toggle button.btn-clear-all:hover {
-    background: #dc3545;
-    border-color: #dc3545;
+    background: var(--danger-strong);
+    border-color: var(--danger-strong);
     color: white;
 }
 
@@ -267,7 +327,7 @@
 .share-button {
     padding: 0.5rem 1rem;
     border: 2px solid var(--secondary-color);
-    background: white;
+    background: var(--card);
     color: var(--secondary-color);
     border-radius: var(--border-radius);
     cursor: pointer;
@@ -281,7 +341,7 @@
 
 .share-button:hover:not(:disabled) {
     background: var(--secondary-color);
-    color: white;
+    color: var(--on-secondary);
 }
 
 .share-button:disabled {
@@ -291,14 +351,14 @@
 
 /* Clear All Variant of Share Button */
 .share-button.btn-clear-all {
-    border-color: #e74c3c;
-    color: #c0392b;
+    border-color: var(--danger);
+    color: var(--danger-ink);
     background: transparent;
 }
 
 .share-button.btn-clear-all:hover:not(:disabled) {
-    background: #dc3545;
-    border-color: #dc3545;
+    background: var(--danger-strong);
+    border-color: var(--danger-strong);
     color: white;
 }
 
@@ -359,16 +419,16 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: bold;
-    color: #333;
+    color: var(--foreground);
 }
 
 .start-month-selector input[type="month"] {
     width: 100%;
     padding: 0.75rem;
-    border: 2px solid #ddd;
+    border: 2px solid var(--border);
     border-radius: 4px;
     font-size: 1rem;
-    background: white;
+    background: var(--card);
     cursor: pointer;
 }
 
@@ -376,7 +436,7 @@
 .view-slides,
 .use-tool {
     background: var(--secondary-color);
-    color: white;
+    color: var(--on-secondary);
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: var(--border-radius);
@@ -395,13 +455,13 @@
 }
 
 .calculate-btn:disabled {
-    background: var(--gray-medium);
+    background: var(--muted-foreground);
     cursor: not-allowed;
 }
 
 /* Results and Summary Styles */
 .results {
-    background: white;
+    background: var(--card);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     margin-top: 1rem;
@@ -410,7 +470,7 @@
 
 .results h4 {
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .summary-table {
@@ -422,13 +482,13 @@
 .summary-table th,
 .summary-table td {
     padding: 0.75rem;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
 }
 
 .summary-table th {
     background: transparent !important;
     font-weight: 700;
-    color: #374151;
+    color: var(--foreground-strong);
 }
 
 .summary-table th:first-child,
@@ -443,7 +503,7 @@
 
 .summary-table td:first-child {
     font-weight: 500;
-    color: var(--text-color);
+    color: var(--foreground);
 }
 
 .summary-table td.highlight {
@@ -454,24 +514,24 @@
 
 .summary-table .total-row {
     font-weight: 600;
-    border-top: 2px solid var(--gray-medium);
+    border-top: 2px solid var(--muted-foreground);
 }
 
 /* Target Fields Background */
 .target-group {
-    background-color: #e3f2fd;
+    background-color: var(--info-surface);
     padding: 10px;
     border-radius: 8px;
-    border: 1px solid #90caf9;
+    border: 1px solid var(--info-border);
     margin-bottom: 20px;
 }
 
 /* Investment Parameters Background */
 .investment-params-group {
-    background-color: #fff3e0;
+    background-color: var(--warning-surface);
     padding: 10px;
     border-radius: 8px;
-    border: 1px solid #ffb74d;
+    border: 1px solid var(--warning);
 }
 
 /* Placeholder Content */
@@ -480,23 +540,23 @@
     align-items: center;
     justify-content: center;
     min-height: 400px;
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    background: var(--muted);
     border-radius: var(--border-radius);
     text-align: center;
 }
 
 .placeholder-content h4 {
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     margin-bottom: 1rem;
 }
 
 .placeholder-content p {
-    color: var(--gray-medium);
+    color: var(--muted-foreground);
     margin-bottom: 1.5rem;
 }
 
 .placeholder-features p {
-    color: #6c757d;
+    color: var(--muted-foreground);
     margin: 0.5rem 0;
     font-size: 0.9rem;
 }
@@ -508,14 +568,14 @@
 
 .investment-plan h4 {
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .plan-table-wrapper {
     max-height: 400px;
     overflow-y: auto;
     overflow-x: hidden;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 4px;
 }
 
@@ -529,12 +589,12 @@
     position: sticky;
     top: -1px;
     background: var(--secondary-color);
-    color: white;
+    color: var(--on-secondary);
     z-index: 10;
 }
 
 .plan-table thead th {
-    border-bottom: 2px solid #ddd;
+    border-bottom: 2px solid var(--border);
     background: inherit;
 }
 
@@ -542,7 +602,7 @@
 .plan-table td {
     padding: 0.35rem 0.5rem;
     vertical-align: middle;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border);
 }
 
 .plan-table th {
@@ -551,7 +611,7 @@
 }
 
 .plan-table tbody tr:hover {
-    background: #f5f5f5;
+    background: var(--muted);
 }
 
 /* First column (Year/Period) - center aligned */
@@ -588,30 +648,30 @@
 }
 
 .sip-inputs {
-    background: white;
+    background: var(--card);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
-    border-left: 4px solid #f7b733;
+    border-left: 4px solid var(--warning-dim);
 }
 
 .sip-inputs h4 {
     margin-bottom: 1.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1.2rem;
 }
 
 .sip-outputs {
-    background: white;
+    background: var(--card);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
-    border-left: 4px solid #27ae60;
+    border-left: 4px solid var(--success);
 }
 
 .sip-outputs h4 {
     margin-bottom: 1.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1.2rem;
 }
 
@@ -624,7 +684,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
 }
 
 .summary-item:last-child {
@@ -633,12 +693,12 @@
 
 .summary-item .label {
     font-weight: 500;
-    color: var(--text-color);
+    color: var(--foreground);
 }
 
 .summary-item .value {
     font-weight: bold;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .summary-item .value.highlight {
@@ -655,45 +715,45 @@
 }
 
 .ef-inputs {
-    background: white;
+    background: var(--card);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
-    border-left: 4px solid #f7b733;
+    border-left: 4px solid var(--warning-dim);
 }
 
 .ef-inputs h4 {
     margin-bottom: 1.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1.2rem;
 }
 
 .ef-outputs {
-    background: white;
+    background: var(--card);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
-    border-left: 4px solid #27ae60;
+    border-left: 4px solid var(--success);
 }
 
 .ef-outputs h4 {
     margin-bottom: 1.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1.2rem;
 }
 
 /* Input Summary Styling */
 .input-summary {
-    background: #e8f5e8;
+    background: var(--success-surface);
     padding: 1rem;
     border-radius: var(--border-radius);
     margin: 1rem 0;
-    border-left: 3px solid #27ae60;
+    border-left: 3px solid var(--success);
 }
 
 .input-summary p {
     margin: 0;
-    color: #2c5530;
+    color: var(--success-ink);
     font-weight: 500;
 }
 
@@ -711,7 +771,7 @@
 .progress-bar {
     width: 100%;
     height: 20px;
-    background-color: #f0f0f0;
+    background-color: var(--muted);
     border-radius: 10px;
     overflow: hidden;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -719,7 +779,7 @@
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #27ae60, #2ecc71);
+    background: var(--success);
     border-radius: 10px;
     transition: width 0.5s ease-in-out;
     animation: progressPulse 2s ease-in-out infinite alternate;
@@ -730,7 +790,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: #333;
+    color: var(--foreground);
     font-weight: bold;
     font-size: 0.875rem;
 }
@@ -752,7 +812,7 @@
 
 .savings-timeline h5 {
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1rem;
 }
 
@@ -775,7 +835,7 @@
     position: relative;
     margin-bottom: 1rem;
     padding: 0.75rem 1rem;
-    background: #f8f9fa;
+    background: var(--muted);
     border-radius: var(--border-radius);
     border-left: 3px solid var(--secondary-color);
     transition: var(--transition);
@@ -791,19 +851,19 @@
     height: 12px;
     background: var(--secondary-color);
     border-radius: 50%;
-    border: 2px solid white;
+    border: 2px solid var(--card);
     box-shadow: 0 0 0 2px var(--secondary-color);
 }
 
 .timeline-item.goal-achieved {
-    background: linear-gradient(135deg, #e8f5e8, #d4edda);
-    border-left-color: #27ae60;
+    background: var(--success-surface);
+    border-left-color: var(--success);
     animation: goalAchieved 0.6s ease-in-out;
 }
 
 .timeline-item.goal-achieved::before {
-    background: #27ae60;
-    box-shadow: 0 0 0 2px #27ae60;
+    background: var(--success);
+    box-shadow: 0 0 0 2px var(--success);
 }
 
 @keyframes goalAchieved {
@@ -827,16 +887,16 @@
 }
 
 .recommendations {
-    background: white;
+    background: var(--card);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
-    border-left: 4px solid #f39c12;
+    border-left: 4px solid var(--warning);
 }
 
 .recommendations h4 {
     margin-bottom: 1.5rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
     font-size: 1.2rem;
 }
 
@@ -847,10 +907,10 @@
 }
 
 .recommendation-card {
-    background: #fff8e1;
+    background: var(--warning-surface);
     padding: 1rem;
     border-radius: var(--border-radius);
-    border-left: 3px solid #f39c12;
+    border-left: 3px solid var(--warning);
     transition: var(--transition);
 }
 
@@ -871,13 +931,13 @@
 
 /* Building Wealth theme color for contribution table header */
 .contribution-grid thead {
-    background: #f39c12 !important;
+    background: var(--warning) !important;
     color: #2c3e50 !important;
 }
 
 /* Investment Plan table header styling */
 .investment-plan .plan-table thead {
-    background: #f39c12 !important;
+    background: var(--warning) !important;
     color: #2c3e50 !important;
 }
 
@@ -931,7 +991,7 @@
 .investors-group h4 {
     margin-top: 0;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .assets-group {
@@ -941,11 +1001,11 @@
 .assets-group h4 {
     margin-top: 0;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 .section-block {
-    background: var(--gray-light);
+    background: var(--muted);
     padding: 1.5rem;
     border-radius: var(--border-radius);
     margin-bottom: 1.5rem;
@@ -954,7 +1014,7 @@
 .section-block h4 {
     margin-top: 0;
     margin-bottom: 1rem;
-    color: var(--primary-color);
+    color: var(--foreground-strong);
 }
 
 /* Investor and Asset Row Styles */
@@ -975,7 +1035,7 @@
 .asset-name-input {
     min-width: 0;
     padding: 0.5rem;
-    border: 1px solid var(--gray-medium);
+    border: 1px solid var(--muted-foreground);
     border-radius: var(--border-radius);
 }
 
@@ -984,7 +1044,7 @@
 .asset-current-input {
     min-width: 0;
     padding: 0.5rem;
-    border: 1px solid var(--gray-medium);
+    border: 1px solid var(--muted-foreground);
     border-radius: var(--border-radius);
 }
 
@@ -1004,7 +1064,7 @@
 }
 
 .btn-remove {
-    background: var(--danger-color, #ef4444);
+    background: var(--danger-strong);
     color: white;
     border: none;
     border-radius: var(--border-radius);
@@ -1015,13 +1075,13 @@
 }
 
 .btn-remove:hover {
-    background: #dc2626;
+    background: var(--danger);
     transform: scale(1.05);
 }
 
 .btn-remove-subtle {
     background: transparent;
-    color: #999;
+    color: var(--muted-foreground);
     border: none;
     padding: 0;
     margin: 0;
@@ -1033,13 +1093,13 @@
 }
 
 .btn-remove-subtle:hover {
-    color: #ef4444;
+    color: var(--danger-strong);
     opacity: 1;
     transform: scale(1.2);
 }
 
 .btn-add {
-    background: var(--success-color, #10b981);
+    background: var(--success);
     color: white;
     border: none;
     border-radius: var(--border-radius);
@@ -1052,21 +1112,21 @@
 }
 
 .btn-add:hover {
-    background: #059669;
+    background: var(--success-ink);
     transform: translateY(-1px);
 }
 
 /* Validation Errors */
 .validation-errors {
-    background: #fef2f2;
-    border: 1px solid #fecaca;
+    background: var(--danger-surface);
+    border: 1px solid var(--danger);
     border-radius: var(--border-radius);
     padding: 1rem;
     margin-bottom: 1rem;
 }
 
 .error-message {
-    color: #dc2626;
+    color: var(--danger-ink);
     margin-bottom: 0.5rem;
     font-size: 0.95rem;
 }
@@ -1086,28 +1146,28 @@
 .asset-table td {
     padding: 0.4rem;
     text-align: left;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border);
     font-size: 1rem;
 }
 
 .asset-table th {
     background: transparent !important;
     font-weight: 700;
-    color: #374151;
+    color: var(--foreground-strong);
     white-space: nowrap;
 }
 
 .asset-table tbody tr:hover {
-    background: #f9fafb;
+    background: var(--muted);
 }
 
 /* Investor Allocation */
 .investor-allocation {
     margin-bottom: 1rem;
     padding: 1rem;
-    background: var(--gray-light);
+    background: var(--muted);
     border-radius: var(--border-radius);
-    border: 1px solid var(--gray-medium);
+    border: 1px solid var(--muted-foreground);
 }
 
 /* Allocation Table */
@@ -1115,14 +1175,14 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 0.9rem;
-    border: 1px solid var(--gray-light);
+    border: 1px solid var(--border);
 }
 
 .allocation-table th,
 .allocation-table td {
     padding: 0.5rem;
     text-align: left;
-    border-bottom: 1px solid var(--gray-light);
+    border-bottom: 1px solid var(--border);
     font-size: 1rem;
 }
 
@@ -1130,7 +1190,7 @@
     background: transparent;
     font-weight: 600;
     color: var(--text-dark);
-    border-bottom: 2px solid var(--gray-medium);
+    border-bottom: 2px solid var(--muted-foreground);
 }
 
 .allocation-table td:last-child,
@@ -1144,21 +1204,21 @@
 }
 
 .allocation-table .total-row td {
-    border-top: 2px solid var(--gray-medium);
+    border-top: 2px solid var(--muted-foreground);
 }
 
 /* Diff Classes for Summary Table */
 .diff-neutral {
-    color: var(--gray-dark, #4b5563);
+    color: var(--foreground);
 }
 
 .diff-positive {
-    color: var(--danger-color, #ef4444);
+    color: var(--danger-strong);
     font-weight: 600;
 }
 
 .diff-negative {
-    color: var(--success-color, #10b981);
+    color: var(--success);
     font-weight: 600;
 }
 
@@ -1214,17 +1274,17 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0.25rem 0.5rem;
-    background-color: #e3f2fd;
-    border: 1px solid #90caf9;
+    background-color: var(--info-surface);
+    border: 1px solid var(--info-border);
     border-radius: 4px;
     font-size: 0.875rem;
-    color: #1976d2;
+    color: var(--info);
 }
 
 .asset-badge-remove {
     border: none;
     background: transparent;
-    color: #1976d2;
+    color: var(--info);
     cursor: pointer;
     padding: 0;
     font-size: 0.875rem;
@@ -1233,5 +1293,5 @@
 }
 
 .asset-badge-remove:hover {
-    color: #d32f2f;
+    color: var(--danger-strong);
 }

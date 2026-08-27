@@ -1,0 +1,80 @@
+{{- /*
+  Theme resolution. Inline and in <head> on purpose: it has to set the class
+  before the first paint, or a reader who chose dark watches the page flash
+  white on every navigation.
+
+  Three states behind one binary control, the way Xfina does it. Nobody has
+  chosen anything to begin with, so the stored preference is "auto" and the
+  system setting decides -- and keeps deciding, live, if the reader changes it
+  in the OS while the page is open. Pressing the toggle stores "light" or
+  "dark" explicitly, and from then on this site keeps its own answer whatever
+  the system says.
+*/ -}}
+<script>
+(function () {
+    var KEY = 'continuum-theme';
+    var root = document.documentElement;
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function read() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+    }
+    function write(v) {
+        try { localStorage.setItem(KEY, v); } catch (e) {}
+    }
+
+    /* The book reader kept its own pair of keys. Fold them into this one so a
+       reader who picked dark last week still opens in dark. */
+    try {
+        var old = localStorage.getItem('book-theme');
+        if (old && !read()) {
+            write(localStorage.getItem('book-theme-manual') ? old : 'auto');
+        }
+        localStorage.removeItem('book-theme');
+        localStorage.removeItem('book-theme-manual');
+    } catch (e) {}
+
+    function preference() {
+        var v = read();
+        return (v === 'light' || v === 'dark') ? v : 'auto';
+    }
+
+    function apply() {
+        var p = preference();
+        var dark = p === 'auto' ? mq.matches : p === 'dark';
+        root.classList.toggle('dark', dark);
+        var buttons = document.querySelectorAll('.theme-toggle');
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].setAttribute('aria-pressed', dark ? 'true' : 'false');
+            buttons[i].setAttribute('title', dark ? 'Switch to light' : 'Switch to dark');
+            buttons[i].setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+        }
+    }
+
+    apply();
+
+    /* Only while the reader has not chosen: "auto" means follow along. */
+    mq.addEventListener('change', function () {
+        if (preference() === 'auto') { apply(); }
+    });
+
+    document.addEventListener('click', function (e) {
+        var button = e.target.closest && e.target.closest('.theme-toggle');
+        if (!button) { return; }
+        write(root.classList.contains('dark') ? 'light' : 'dark');
+        root.classList.add('theme-switching');
+        apply();
+        /* Two frames: one for the palette to land, one for the browser to
+           have painted it before transitions are allowed back. */
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                root.classList.remove('theme-switching');
+            });
+        });
+    });
+
+    /* The buttons do not exist yet at this point in <head>; label them once
+       they do. */
+    document.addEventListener('DOMContentLoaded', apply);
+})();
+</script>

@@ -1,0 +1,42 @@
+{{- /*
+  Inline accent tokens for an element belonging to a section other than the
+  page's own -- the home page, where every section appears at once and the
+  body class cannot speak for all of them.
+
+  Emits both inks rather than one, and both on-accents. An inline value would
+  outrank any rule the dark palette could write, so the choice is left to CSS:
+  the theme picks the -light or -dark half and assigns --accent-ink and
+  --on-accent. A section's own onAccent is chosen to read on the accent at full
+  brightness -- near-black, on this site's gold -- and dark dims every fill, so
+  it needs the other answer there.
+
+  Usage: {{ partial "func/accent-style.html" (dict "section" $s) }}
+         {{ partial "func/accent-style.html" (dict "section" $s "full" true) }}
+  `full` adds --accent-to and --on-accent, for elements that paint the accent
+  as a surface rather than only as ink.
+*/ -}}
+{{- $out := "" -}}
+{{- $s := .section -}}
+{{- with $s -}}
+  {{- with .Params.accentFrom -}}
+    {{- $ink := $s.Params.accentInk | default . -}}
+    {{- /* Only an explicit override travels inline. The default is derived in
+           CSS from --accent-from, so the home page and a section page cannot
+           drift apart -- which they had, the home page keeping a lighter mix
+           after the section stylesheet moved to setting lightness outright. */ -}}
+    {{- $inkDark := $s.Params.accentInkDark -}}
+    {{- if $.full -}}
+      {{- $out = printf "--accent-from:%s;--accent-to:%s;--accent-ink-light:%s;--on-accent-light:%s;--on-accent-dark:#fafafa;"
+          . ($s.Params.accentTo | default .) $ink ($s.Params.onAccent | default "#fff") -}}
+      {{- with $inkDark }}{{ $out = printf "%s--accent-ink-dark:%s;" $out . }}{{ end -}}
+      {{- with $s.Params.accentSurfaceDark }}{{ $out = printf "%s--accent-surface-dark:%s;" $out . }}{{ end -}}
+      {{- with $s.Params.accentLineDark }}{{ $out = printf "%s--accent-line-dark:%s;" $out . }}{{ end -}}
+    {{- else -}}
+      {{- $out = printf "--accent-from:%s;--accent-ink-light:%s;" . $ink -}}
+      {{- with $inkDark }}{{ $out = printf "%s--accent-ink-dark:%s;" $out . }}{{ end -}}
+      {{- with $s.Params.accentSurfaceDark }}{{ $out = printf "%s--accent-surface-dark:%s;" $out . }}{{ end -}}
+      {{- with $s.Params.accentLineDark }}{{ $out = printf "%s--accent-line-dark:%s;" $out . }}{{ end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $out -}}

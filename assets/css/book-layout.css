@@ -5,32 +5,31 @@
     --book-toc-width: 500px;
     --book-content-max-width: 1200px;
     --book-spacing: 2rem;
-    
-    /* Light theme colors */
-    --book-bg: #ffffff;
-    --book-text: #2c3e50;
-    --book-header-bg: #f8f9fa;
-    --book-header-text: #2c3e50;
-    --book-toc-bg: #ffffff;
-    --book-toc-border: #dee2e6;
-    --book-link: #3498db;
-    --book-link-hover: #2980b9;
-    --book-border: #e1e4e8;
+
+    /* The reader used to carry a whole palette of its own, with its own dark
+       set and its own toggle, parallel to the site's and drifting from it.
+       Both are the site's now. These names survive as aliases so the sixty-odd
+       rules below did not all have to be rewritten, and so only the two that
+       are genuinely the reader's own -- its link colour and its shadow --
+       still need a dark value. */
+    --book-bg: var(--background);
+    --book-text: var(--foreground-strong);
+    --book-header-bg: var(--muted);
+    --book-header-text: var(--foreground-strong);
+    --book-toc-bg: var(--card);
+    --book-toc-border: var(--border);
+    --book-border: var(--border);
+    --book-link: var(--secondary-color);
+    /* Darker than --book-link, not lighter. It used to be, until the secondary
+       colour came down to clear contrast and overtook it. */
+    --book-link-hover: #1b5a82;
     --book-shadow: rgba(0, 0, 0, 0.1);
 }
 
-/* Dark theme */
-.theme-dark,
-.theme-dark body {
-    --book-bg: rgb(51, 51, 51);
-    --book-text: #ffffff;
-    --book-header-bg: #1a1a1a;
-    --book-header-text: #ffffff;
-    --book-toc-bg: #2a2a2a;
-    --book-toc-border: #3a3a3a;
-    --book-link: #58a6ff;
+:root.dark {
+    /* One light blue, not two: the secondary colour already has a dark value
+       that sits where these links want to be. */
     --book-link-hover: #79c0ff;
-    --book-border: #2a2a2a;
     --book-shadow: rgba(0, 0, 0, 0.6);
 }
 
@@ -41,14 +40,6 @@ body.book-reader {
     margin: 0;
     padding: 0;
     transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* Ensure text color inheritance for dark theme */
-.theme-dark body.book-reader,
-.theme-dark .chapter-body,
-.theme-dark .chapter-body p,
-.theme-dark .chapter-body li {
-    color: #ffffff !important;
 }
 
 /* Book Header */
@@ -173,44 +164,6 @@ body.book-reader {
 }
 
 /* Theme Toggle */
-.theme-toggle {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.3s ease;
-    flex-shrink: 0;
-    width: 40px;
-    height: 40px;
-    order: 4;
-    border-radius: 4px;
-}
-
-.theme-toggle:hover {
-    background: rgba(0, 0, 0, 0.1);
-}
-
-/* Dark theme hover uses white */
-.theme-dark .theme-toggle:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.theme-icon {
-    font-size: 1.5rem;
-    display: none;
-    line-height: 1;
-    color: var(--book-header-text);
-}
-
-.theme-icon.active {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 /* TOC Sidebar */
 .book-toc-sidebar {
     position: fixed;
@@ -290,14 +243,14 @@ body.book-reader {
     color: var(--book-link);
 }
 
-.theme-dark .book-toc-item a:hover {
+:root.dark .book-toc-item a:hover {
     background: rgba(255, 255, 255, 0.15);
     color: #5dade2;
 }
 
 .book-toc-item.active a {
     background: var(--book-link);
-    color: white;
+    color: var(--on-secondary);
     font-weight: 600;
 }
 
@@ -506,12 +459,12 @@ body.book-reader {
 }
 
 /* Dark theme table overrides */
-.theme-dark .chapter-body table th {
-    background: #1a1a1a;
-    color: #ffffff;
+:root.dark .chapter-body table th {
+    background: var(--muted);
+    color: var(--foreground-strong);
 }
 
-.theme-dark .chapter-body table tr:hover {
+:root.dark .chapter-body table tr:hover {
     background: rgba(255, 255, 255, 0.05);
 }
 

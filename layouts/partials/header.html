@@ -45,6 +45,8 @@
                 <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>
                 {{- end }}
             </ul>
+
+            {{- partial "theme-toggle.html" . }}
         {{- else }}
             {{- /* Site header: one pill per top-level section, each carrying its
                    own accent tokens so the pills stay section-agnostic in CSS. */}}
@@ -59,17 +61,13 @@
             <ul class="nav-links">
                 {{- range .Site.Sections }}
                 {{- $s := . }}
-                {{- $style := "" }}
-                {{- if $s.Params.accentFrom }}
-                    {{- $style = printf "--accent-from:%s;--accent-to:%s;--on-accent:%s;"
-                        $s.Params.accentFrom
-                        ($s.Params.accentTo | default $s.Params.accentFrom)
-                        ($s.Params.onAccent | default "#fff") }}
-                {{- end }}
+                {{- $style := partial "func/accent-style.html" (dict "section" $s "full" true) }}
                 <li><a href="{{ $s.RelPermalink }}" class="section-link-pill"
                     {{- with $style }} style="{{ . | safeCSS }}"{{ end }}>{{ $s.Title }}</a></li>
                 {{- end }}
             </ul>
+
+            {{- partial "theme-toggle.html" . }}
         {{- end }}
     </nav>
 </header>

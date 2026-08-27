@@ -57,7 +57,7 @@
             {{- if $target }}
             {{- $owner := partial "func/owning-section.html" $target }}
             <li class="start-item"
-                {{- with $owner }}{{ with .Params.accentFrom }} style="--accent-from:{{ . }};--accent-ink:{{ $owner.Params.accentInk | default . }};"{{ end }}{{ end }}>
+                {{- with partial "func/accent-style.html" (dict "section" $owner) }} style="{{ . | safeCSS }}"{{ end }}>
                 <a href="{{ $target.RelPermalink }}">
                     {{- $kind := partial "func/page-kind.html" $target }}
                     <span class="start-kind">{{ with $owner }}<span aria-hidden="true">{{ .Params.emoji }}</span> {{ end }}{{ $kind | humanize | singularize }}</span>
@@ -87,7 +87,7 @@
             {{- range . }}
             {{- $owner := partial "func/owning-section.html" . }}
             <li class="latest-item"
-                {{- with $owner }}{{ with .Params.accentFrom }} style="--accent-from:{{ . }};--accent-ink:{{ $owner.Params.accentInk | default . }};"{{ end }}{{ end }}>
+                {{- with partial "func/accent-style.html" (dict "section" $owner) }} style="{{ . | safeCSS }}"{{ end }}>
                 <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
                 <a href="{{ .RelPermalink }}">{{ .Title }}</a>
                 {{- with $owner }}
@@ -103,11 +103,7 @@
         {{ range .Site.Sections }}
         {{ $section := . }}
         {{ if $section }}
-        {{ $style := "" }}
-        {{ with $section.Params.accentFrom }}
-        {{ $style = printf "--accent-from:%s;--accent-to:%s;--accent-ink:%s;--on-accent:%s;"
-            . ($section.Params.accentTo | default .) ($section.Params.accentInk | default .) ($section.Params.onAccent | default "#fff") }}
-        {{ end }}
+        {{ $style := partial "func/accent-style.html" (dict "section" $section "full" true) }}
         <div class="section-card"{{ with $style }} style="{{ . | safeCSS }}"{{ end }}>
             <h2>
                 {{ $emoji := "📊" }}

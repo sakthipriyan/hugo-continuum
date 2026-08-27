@@ -3,22 +3,64 @@
   Every value comes from the section's own _index.md front matter, so the theme
   carries no knowledge of which sections a site has or what colours they use.
   Sections declaring no accentFrom simply inherit the :root defaults.
+
+  Dark needs its own answers, and lightness is the whole difficulty. An accent
+  chosen to sit on white lands somewhere arbitrary on near-black: this site's
+  gold reads at 12:1 there and its blue at 2:1, one shouting and the other
+  invisible. Mixing toward white fixes the blue and makes the gold worse.
+
+  So dark sets lightness outright, in oklch, keeping each section's hue and
+  chroma:
+
+    ink    L 0.78  -- an accent, and legible, but below body text. Left alone,
+                      the gold ink measured 15.2:1 against body text's 15.7:1,
+                      which is not an accent, it is a second voice.
+    header L 0.52 at 0.55 alpha -- the band is the largest area of colour on
+                      the page and the one that glares. It is a wash now, laid
+                      over a scrim of the page colour (see .site-header), so
+                      the black underneath does most of the dimming. Setting
+                      the lightness before the alpha is what keeps the sections
+                      level: alpha alone left gold 3.8x brighter than blue,
+                      because a fixed fraction of a bright colour is brighter.
+
+  A section can override either with accentInkDark or accentHeaderDark.
+
+  The plain declaration is a color-mix approximation for browsers without
+  relative colour syntax; the @supports block is the real one.
 */ -}}
 {{- $rules := slice -}}
+{{- $dark := slice -}}
+{{- $darkOk := slice -}}
 {{- range .Site.Sections -}}
   {{- $s := . -}}
   {{- if $s.Params.accentFrom -}}
+    {{- $from := $s.Params.accentFrom -}}
+    {{- $to := $s.Params.accentTo | default $from -}}
     {{- $rules = $rules | append (printf "body.%s{--accent-from:%s;--accent-to:%s;--accent-ink:%s;--on-accent:%s;--header-bg:linear-gradient(135deg,%s 0%%,%s 100%%);}"
-        $s.Section
-        $s.Params.accentFrom
-        ($s.Params.accentTo   | default $s.Params.accentFrom)
-        ($s.Params.accentInk  | default $s.Params.accentFrom)
-        ($s.Params.onAccent   | default "#fff")
-        $s.Params.accentFrom
-        ($s.Params.accentTo   | default $s.Params.accentFrom)) -}}
+        $s.Section $from $to
+        ($s.Params.accentInk | default $from)
+        ($s.Params.onAccent | default "#fff")
+        $from $to) -}}
+
+    {{- $ink := $s.Params.accentInkDark | default (printf "color-mix(in srgb,%s 62%%,#fff)" $from) -}}
+    {{- $head := $s.Params.accentHeaderDark | default (printf "linear-gradient(135deg,color-mix(in srgb,%s 20%%,transparent) 0%%,color-mix(in srgb,%s 16%%,transparent) 100%%)" $from $to) -}}
+    {{- /* A section can name any of the dark roles outright. What it does not
+           name is derived below; a site that names nothing still works, which
+           it has to, this being a theme rather than one site's stylesheet. */ -}}
+    {{- $extra := "" -}}
+    {{- with $s.Params.accentSurfaceDark }}{{ $extra = printf "%s--accent-surface:%s;" $extra . }}{{ end -}}
+    {{- with $s.Params.accentLineDark }}{{ $extra = printf "%s--accent-line:%s;" $extra . }}{{ end -}}
+    {{- $dark = $dark | append (printf ":root.dark body.%s{--accent-ink:%s;--header-bg:%s;%s}" $s.Section $ink $head $extra) -}}
+
+    {{- $inkOk := $s.Params.accentInkDark | default (printf "oklch(from %s 0.78 c h)" $from) -}}
+    {{- $headOk := $s.Params.accentHeaderDark | default (printf "linear-gradient(135deg,oklch(from %s 0.52 c h / 0.55) 0%%,oklch(from %s 0.46 c h / 0.55) 100%%)" $from $to) -}}
+    {{- $darkOk = $darkOk | append (printf ":root.dark body.%s{--accent-ink:%s;--header-bg:%s;%s}" $s.Section $inkOk $headOk $extra) -}}
   {{- end -}}
 {{- end -}}
 {{- with $rules -}}
-  {{- $r := resources.FromString "css/section-accents.css" (delimit . "\n") | minify | fingerprint -}}
+  {{- $css := delimit . "\n" -}}
+  {{- $css = printf "%s\n%s" $css (delimit $dark "\n") -}}
+  {{- $css = printf "%s\n@supports (color: oklch(from red l c h)){\n%s\n}" $css (delimit $darkOk "\n") -}}
+  {{- $r := resources.FromString "css/section-accents.css" $css | minify | fingerprint -}}
   <link rel="stylesheet" href="{{ $r.RelPermalink }}" integrity="{{ $r.Data.Integrity }}">
 {{- end -}}
