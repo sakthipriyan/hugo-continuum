@@ -14,18 +14,27 @@
 {{- $p := .page -}}
 {{- $lead := .lead | default .page -}}
 {{- $group := partial "func/covers-group.html" $lead -}}
+{{- if .is_subjects_list -}}
+  {{- $group = sort $group "Type" "asc" -}}
+{{- end -}}
 <li class="latest-item">
   <time datetime="{{ $p.Date.Format "2006-01-02" }}">{{ $p.Date.Format "Jan 2, 2006" }}</time>
-  <a href="{{ $lead.RelPermalink }}">{{ $lead.Title }}</a>
+  <a href="{{ $lead.RelPermalink }}">
+    {{- if and (eq $lead.Type "books") (isset $lead.Params "chapter") -}}
+      Chapter {{ $lead.Params.chapter }}: {{ $lead.Title }}
+    {{- else -}}
+      {{ $lead.Title }}
+    {{- end -}}
+  </a>
   <span class="latest-section">
     {{- if $group -}}
       {{- range $i, $m := $group }}{{ if $i }} · {{ end }}
       {{- $k := partial "func/page-kind.html" $m -}}
-      <a href="{{ $m.RelPermalink }}"><span aria-hidden="true">{{ partial "func/kind-icon.html" $k }}</span> {{ $k | humanize | singularize }}</a>
+      <a href="{{ $m.RelPermalink }}" {{- if $.is_subjects_list }} style="text-transform: capitalize;"{{ end -}}><span aria-hidden="true">{{ partial "func/kind-icon.html" $k }}</span> {{ $k | humanize | singularize }}</a>
       {{- end -}}
     {{- else -}}
       {{- $k := partial "func/page-kind.html" $lead -}}
-      <span aria-hidden="true">{{ partial "func/kind-icon.html" $k }}</span> {{ $k | humanize | singularize }}
+      <span aria-hidden="true">{{ partial "func/kind-icon.html" $k }}</span> <span {{- if $.is_subjects_list }} style="text-transform: capitalize;"{{ end -}}>{{ $k | humanize | singularize }}</span>
     {{- end -}}
   </span>
 </li>
