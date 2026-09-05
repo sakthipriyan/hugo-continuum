@@ -71,34 +71,6 @@
     </section>
     {{- end }}
 
-    {{- /* Most recent published items across every section. */ -}}
-    {{- /* Any published page carrying a real date. Filtering by Type is not
-           reliable here: Hugo resolves Type differently depending on whether a
-           section declares one, so a date is the honest signal. */ -}}
-    {{- $dated := slice }}
-    {{- range .Site.RegularPages }}
-    {{- if not .Date.IsZero }}{{ $dated = $dated | append . }}{{ end }}
-    {{- end }}
-    {{- $latest := first (.Params.latestCount | default 5) (sort $dated "Date" "desc") }}
-    {{- with $latest }}
-    <section class="home-latest" aria-labelledby="latest">
-        <h2 id="latest">Latest</h2>
-        <ul class="latest-list">
-            {{- range . }}
-            {{- $owner := partial "func/owning-section.html" . }}
-            <li class="latest-item"
-                {{- with partial "func/accent-style.html" (dict "section" $owner) }} style="{{ . | safeCSS }}"{{ end }}>
-                <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
-                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-                {{- with $owner }}
-                <span class="latest-section">{{ .Title }}</span>
-                {{- end }}
-            </li>
-            {{- end }}
-        </ul>
-    </section>
-    {{- end }}
-
     <div class="main-sections">
         {{ range .Site.Sections }}
         {{ $section := . }}
@@ -112,20 +84,6 @@
             </h2>
             <p>{{ $section.Params.description | default $section.Summary | default "Explore this section" }}</p>
 
-            {{- /* Lead with the section's newest item: a reason to click, rather
-                   than an inventory count. */ -}}
-            {{- $sectionDated := slice }}
-            {{- range $section.RegularPagesRecursive }}
-            {{- if not .Date.IsZero }}{{ $sectionDated = $sectionDated | append . }}{{ end }}
-            {{- end }}
-            {{- $newest := first 1 (sort $sectionDated "Date" "desc") }}
-            {{- range $newest }}
-            <div class="section-newest">
-                <span class="section-newest-label">Latest</span>
-                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-                <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
-            </div>
-            {{- end }}
 
             <div class="section-stats">
                 <div class="stats-grid">
@@ -168,5 +126,37 @@
         {{ end }}
         {{ end }}
     </div>
+    {{- /* Most recent published items across every section. */ -}}
+    {{- /* Any published page carrying a real date. Filtering by Type is not
+           reliable here: Hugo resolves Type differently depending on whether a
+           section declares one, so a date is the honest signal. */ -}}
+    {{- $dated := slice }}
+    {{- range .Site.RegularPages }}
+    {{- if not .Date.IsZero }}{{ $dated = $dated | append . }}{{ end }}
+    {{- end }}
+    {{- $latest := first (.Params.latestCount | default 5) (sort $dated "Date" "desc") }}
+    {{- with $latest }}
+    <section class="home-latest" aria-labelledby="latest">
+        <h2 id="latest">Latest</h2>
+        <ul class="latest-list">
+            {{- range . }}
+            {{- $owner := partial "func/owning-section.html" . }}
+            <li class="latest-item"
+                {{- with partial "func/accent-style.html" (dict "section" $owner) }} style="{{ . | safeCSS }}"{{ end }}>
+                <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+                <span class="latest-kind">
+                    {{- $kind := partial "func/page-kind.html" . -}}
+                    <span aria-hidden="true" class="latest-kind-icon">{{ partial "func/kind-icon.html" $kind }}</span> {{ $kind | humanize | singularize }}
+                </span>
+                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                {{- with $owner }}
+                <span class="latest-section">{{ .Title }}</span>
+                {{- end }}
+            </li>
+            {{- end }}
+        </ul>
+    </section>
+    {{- end }}
+
 </section>
 {{ end }}
