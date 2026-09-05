@@ -3371,6 +3371,16 @@ main article table th {
     white-space: nowrap;
 }
 
+.latest-kind {
+    flex: 0 0 6rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    white-space: nowrap;
+}
+
 /* Newest item promoted inside each section card */
 .section-newest {
     display: flex;
