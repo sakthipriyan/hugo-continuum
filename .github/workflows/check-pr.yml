@@ -1,0 +1,96 @@
+name: Check PR
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # The theme on its own terms: does exampleSite still build, and does it build
+  # on the version theme.yaml claims as min_version as well as on current Hugo?
+  # Both run in one job so there is a single check to require, and because the
+  # build itself takes milliseconds -- installing Hugo is the whole cost.
+  theme:
+    name: Theme
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # theme.yaml declares min_version: "0.164.0". Nothing tested that claim
+      # before this job existed.
+      - name: Setup Hugo (minimum supported)
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.164.0'
+          extended: true
+
+      - name: Build exampleSite on the minimum
+        run: hugo --source exampleSite --themesDir ../.. --minify --panicOnWarning
+
+      - name: Setup Hugo (latest)
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: latest
+          extended: true
+
+      - name: Build exampleSite on latest
+        run: hugo --source exampleSite --themesDir ../.. --minify --panicOnWarning
+
+  # exampleSite has two sections. sakthipriyan.com has books, slides, videos,
+  # tools and curated lists, which is where the layouts actually get exercised
+  # -- and it deploys straight from main, so a theme change that breaks it
+  # reaches production with nothing in between. Build the real site against
+  # this pull request's theme.
+  consumer:
+    name: Consumer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the theme
+        uses: actions/checkout@v7
+        with:
+          path: hugo-continuum
+
+      - name: Checkout the site
+        uses: actions/checkout@v7
+        with:
+          repository: sakthipriyan/sakthipriyan.github.io
+          path: site
+          fetch-depth: 0        # required for .GitInfo / lastmod
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.164.0'
+          extended: true
+
+      - name: Setup Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: 'stable'
+          cache-dependency-path: site/go.sum
+
+      # A Hugo workspace replaces the pinned module with this checkout, so the
+      # site builds against the branch rather than the last released tag.
+      # HUGO_MODULE_WORKSPACE is what activates it: the file alone does nothing.
+      - name: Point the site at this checkout of the theme
+        working-directory: site
+        run: |
+          cat > hugo.work <<'WORK'
+          go 1.26.5
+
+          use .
+          use ../hugo-continuum
+          WORK
+          cat hugo.work
+
+      - name: Build the site against this theme
+        working-directory: site
+        env:
+          HUGO_MODULE_WORKSPACE: hugo.work
+        run: hugo --minify --panicOnWarning
