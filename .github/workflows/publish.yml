@@ -41,10 +41,10 @@ jobs:
       - uses: actions/checkout@v7
 
       # Keep a Changelog puts a version's entries between its heading and the
-      # next one. A tag with no section falls back to generated notes rather
-      # than publishing an empty release.
+      # next one. Blank lines around them are formatting, not content: the ones
+      # before the first entry and after the last are dropped, the ones between
+      # entries are kept.
       - name: Take the notes from CHANGELOG.md
-        id: notes
         env:
           TAG: ${{ github.ref_name }}
         run: |
@@ -52,24 +52,27 @@ jobs:
           awk -v want="## [$VERSION]" '
             index($0, want) == 1 { found = 1; next }
             found && /^## \[/    { exit }
-            found                { print }
+            found {
+              if (NF == 0) { blanks++; next }
+              if (started) { for (i = 0; i < blanks; i++) print "" }
+              blanks = 0
+              started = 1
+              print
+            }
           ' CHANGELOG.md > notes.md
 
-          if [ -s notes.md ]; then
-            echo "found=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "No CHANGELOG section for $VERSION; generating notes instead."
-            echo "found=false" >> "$GITHUB_OUTPUT"
+          # Loudly, not quietly. Generating notes from commit subjects instead
+          # would publish a release nobody wrote and hide the omission.
+          if [ ! -s notes.md ]; then
+            echo "::error::CHANGELOG.md has no '## [$VERSION]' section. Open one before tagging $TAG."
+            exit 1
           fi
+
+          echo "Notes for $TAG:"
+          cat notes.md
 
       - name: Create the release
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
-          FOUND: ${{ steps.notes.outputs.found }}
-        run: |
-          if [ "$FOUND" = "true" ]; then
-            gh release create "$TAG" --title "$TAG" --notes-file notes.md
-          else
-            gh release create "$TAG" --title "$TAG" --generate-notes
-          fi
+        run: gh release create "$TAG" --title "$TAG" --notes-file notes.md
