@@ -1,0 +1,151 @@
+name: Publish
+
+# Tagging already publishes the theme: proxy.golang.org serves it the moment a
+# tag exists, and `hugo mod get` finds it without anything here running. What is
+# missing is the human half — release notes for whoever is deciding whether to
+# bump, and the bump itself on the site that pins this theme by version.
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: read
+
+jobs:
+  verify_tag:
+    name: Verify the tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check the tag is on main
+        env:
+          SHA: ${{ github.sha }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          git fetch origin main
+          if ! git branch -r --contains "$SHA" | grep -E -q '(^|\s)origin/main$'; then
+            echo "Error: tag $TAG is not on the main branch."
+            exit 1
+          fi
+
+  release:
+    name: Release
+    needs: [verify_tag]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      # Keep a Changelog puts a version's entries between its heading and the
+      # next one. A tag with no section falls back to generated notes rather
+      # than publishing an empty release.
+      - name: Take the notes from CHANGELOG.md
+        id: notes
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="${TAG#v}"
+          awk -v want="## [$VERSION]" '
+            index($0, want) == 1 { found = 1; next }
+            found && /^## \[/    { exit }
+            found                { print }
+          ' CHANGELOG.md > notes.md
+
+          if [ -s notes.md ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No CHANGELOG section for $VERSION; generating notes instead."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          FOUND: ${{ steps.notes.outputs.found }}
+        run: |
+          if [ "$FOUND" = "true" ]; then
+            gh release create "$TAG" --title "$TAG" --notes-file notes.md
+          else
+            gh release create "$TAG" --title "$TAG" --generate-notes
+          fi
+
+  bump_site:
+    name: Bump the site's pin
+    needs: [release]
+    runs-on: ubuntu-latest
+    steps:
+      # A cross-repo push needs a token GITHUB_TOKEN cannot provide. Until one
+      # exists this job succeeds and does nothing, rather than failing every
+      # release.
+      - name: Look for the cross-repo token
+        id: token
+        env:
+          TOKEN: ${{ secrets.SITE_PIN_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "SITE_PIN_TOKEN is not set; skipping the pin bump."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout the site
+        if: steps.token.outputs.present == 'true'
+        uses: actions/checkout@v7
+        with:
+          repository: sakthipriyan/sakthipriyan.github.io
+          token: ${{ secrets.SITE_PIN_TOKEN }}
+
+      - name: Setup Hugo
+        if: steps.token.outputs.present == 'true'
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.164.0'
+          extended: true
+
+      - name: Setup Go
+        if: steps.token.outputs.present == 'true'
+        uses: actions/setup-go@v7
+        with:
+          go-version: 'stable'
+          cache-dependency-path: go.sum
+
+      # `hugo mod get` rather than `go get`: a Hugo module has no Go imports, so
+      # the Go tooling would not keep the requirement. GOPRIVATE skips the proxy
+      # and checksum database for this path, so the bump does not wait for
+      # proxy.golang.org to notice a tag pushed seconds ago.
+      - name: Bump the pin and open a pull request
+        if: steps.token.outputs.present == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SITE_PIN_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          GOPRIVATE: github.com/sakthipriyan/*
+        run: |
+          hugo mod get "github.com/sakthipriyan/hugo-continuum@$TAG"
+
+          if git diff --quiet; then
+            echo "The site already pins $TAG; nothing to open."
+            exit 0
+          fi
+
+          BRANCH="chore/hugo-continuum-$TAG"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$BRANCH"
+          git commit -am "chore(deps): bump hugo-continuum to $TAG"
+          git push -u origin "$BRANCH"
+
+          cat > body.md <<BODY
+          Opened by hugo-continuum's Publish workflow when \`$TAG\` was tagged.
+
+          Release notes: https://github.com/sakthipriyan/hugo-continuum/releases/tag/$TAG
+
+          The site's own Check PR builds against this pin before it can merge.
+          BODY
+
+          gh pr create --title "chore(deps): bump hugo-continuum to $TAG" --body-file body.md
