@@ -13,3 +13,11 @@ Entries begin at the next release. For `v0.17.0` and earlier the commit history
 is the record.
 
 ## [Unreleased]
+
+## [0.17.1] - 2026-09-06
+
+### Added
+
+- This changelog. Sites pin the theme by version, so there is now a record to
+  read before bumping one; `v0.17.0` and earlier stay documented by commit
+  history alone.
