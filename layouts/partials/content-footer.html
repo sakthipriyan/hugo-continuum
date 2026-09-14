@@ -1,9 +1,16 @@
 {{/*
 Content Footer Partial
 Usage: {{ partial "content-footer.html" . }}
-Displays tags and Disqus comments
+Displays tags, the section's newsletter sign-up and Disqus comments
 */}}
 <footer class="content-footer">
+    {{- /* First, before the rule: the reader has just finished the piece, which
+           is when a sign-up is an offer rather than an interruption, and above
+           the tags it is still part of the piece rather than of the page's
+           furniture below it. Renders nothing unless the owning section
+           configures one. */ -}}
+    {{ partial "subscribe.html" (dict "page" . "id" "subscribe-footer" "heading" true "slot" true) }}
+
     <hr class="content-divider">
 
     {{- /* Tags come from the taxonomy the owning section declares. */ -}}

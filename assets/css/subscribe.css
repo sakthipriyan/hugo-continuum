@@ -1,0 +1,524 @@
+/* Newsletter sign-up: the card from partials/subscribe.html, driven by
+   subscribe.js, and the welcome from partials/subscribe-welcome.html. Loaded
+   only on sections that configure a sign-up.
+
+   Themed by the tokens the rest of the theme uses and none of its own: the
+   role tokens (--card, --foreground, --border, ...) for surfaces and ink, and
+   the section accent (--accent-line, --accent-surface, --accent-ink,
+   --on-accent) for its edge, chip and buttons. A section's accentFrom,
+   accentTo and dark accent keys in its front matter therefore theme the card
+   too, and the dark palette follows with no rules here.
+
+   One card, the same everywhere. In the section landing's entry row it is the
+   third track; under an article and in a page it sits in .subscribe-slot, a
+   copy of that row's grid, so it is exactly one track wide there too. */
+
+.subscribe-slot {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+/* The entry row's own breakpoints, so the card changes width where its twin
+   on the landing does. */
+@media (max-width: 1080px) {
+    .subscribe-slot {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .subscribe-slot {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* The heading's own bottom margin is the gap above the card. */
+.subscribe-heading + .subscribe-slot {
+    margin-top: 0;
+}
+
+/* The entry row's card shape, stated here so the card is the same object
+   outside that row. */
+.subscribe {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 1rem 1.25rem;
+    border-left: 4px solid var(--accent-line);
+    border-radius: var(--border-radius);
+    background: var(--card);
+    box-shadow: var(--box-shadow);
+}
+
+.subscribe [hidden] {
+    display: none !important;
+}
+
+/* Every state is drawn in one grid cell and only the current one is visible.
+   The cell is as tall as the tallest state, so moving between them never
+   changes the card's height -- nor, in the entry row, the height of the cards
+   beside it. `visibility` rather than `display` is what keeps the hidden
+   states measuring, and it also takes them out of the tab order and the
+   accessibility tree. The column is minmax(0, 1fr), not the implicit auto
+   column: an auto column grows to its content's min-content, and a line that
+   never wraps would widen it past the card instead of giving way inside it. */
+.subscribe-panels {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.subscribe-panel {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    margin: 0;
+    visibility: hidden;
+}
+
+/* Which state shows. Before subscribe.js has run, the `is-subscribe-*` class
+   subscribe-init.html puts on <html> decides, so a subscriber never sees the
+   form first; from then on the card's own data-view does. */
+.subscribe:not([data-view]) .subscribe-panel-form,
+:root.is-subscribe-pending .subscribe:not([data-view]) .subscribe-panel-pending,
+:root.is-subscribe-confirmed .subscribe:not([data-view]) .subscribe-panel-confirmed,
+.subscribe[data-view="form"] .subscribe-panel-form,
+.subscribe[data-view="pending"] .subscribe-panel-pending,
+.subscribe[data-view="confirmed"] .subscribe-panel-confirmed {
+    visibility: visible;
+}
+
+:root.is-subscribe-pending .subscribe:not([data-view]) .subscribe-panel-form,
+:root.is-subscribe-confirmed .subscribe:not([data-view]) .subscribe-panel-form {
+    visibility: hidden;
+}
+
+/* The heading line: the same heading in every state -- the entry row's title
+   size, and in the form the field's label -- and from the second state on, a
+   chip at its end saying which state this is. The chip is shorter than the
+   heading's line and never wraps; past the space it has it is cut short, so it
+   cannot add a line to the card. */
+.subscribe-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.subscribe-title {
+    flex: none;
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--foreground-strong);
+}
+
+label.subscribe-title {
+    cursor: pointer;
+}
+
+.subscribe-status {
+    flex: 0 1 auto;
+    min-width: 0;
+    margin: 0;
+    padding: 0.1rem 0.6rem;
+    overflow: hidden;
+    border: 1px solid var(--accent-line);
+    border-radius: 999px;
+    color: var(--accent-ink);
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.subscribe-status svg {
+    vertical-align: -0.05em;
+}
+
+/* Where focus is sent when the state changes: a ring only for a reader on the
+   keyboard, since a pointer reader would see a box appear from nowhere. */
+.subscribe-status:focus {
+    outline: none;
+}
+
+.subscribe-status:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* The line under the heading, and the error that takes its place: both in one
+   cell, so a refusal does not add a line to the card. minmax(0, 1fr) for the
+   same reason as .subscribe-panels: the pending line never wraps, and must be
+   held to the card's width for its address to be fitted to it. */
+.subscribe-message {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 0.35rem;
+}
+
+.subscribe-message > *,
+.subscribe-text > p {
+    margin: 0;
+}
+
+.subscribe-message > * {
+    grid-area: 1 / 1;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--foreground);
+}
+
+/* A refusal is said in words and weight, never by colour alone. Two lines at
+   most, to stay inside the card; the whole of it is announced regardless. */
+.subscribe-error {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-weight: 600;
+    color: var(--foreground-strong);
+    visibility: hidden;
+}
+
+.subscribe-panel[data-error] .subscribe-text {
+    visibility: hidden;
+}
+
+.subscribe-panel[data-error] .subscribe-error {
+    visibility: visible;
+}
+
+/* The address, in the pending line and the confirmed line alike: it takes what
+   the words around it leave of its line, and subscribe.js shortens it to
+   exactly that. The ellipsis is only the last resort, for a domain too long to
+   shorten; the whole address is in its title and in what is announced. */
+.subscribe-email {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--foreground-strong);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Pending: where the link went, and what to do if it has not come, each on a
+   line of its own that never wraps -- two lines, as every state's text is. The
+   words around the address keep their width, and their spaces, which a flex
+   item would otherwise trim. */
+.subscribe-sent,
+.subscribe-hint {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.subscribe-sent {
+    display: flex;
+    align-items: baseline;
+}
+
+.subscribe-sent > span {
+    flex: none;
+    white-space: pre;
+}
+
+/* The field and its button, and the actions that stand in for them in the
+   other states: all pinned to the foot, so they sit at the same height
+   whichever state is showing. */
+.subscribe-row,
+.subscribe-actions {
+    display: flex;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 0.7rem;
+}
+
+.subscribe-actions {
+    gap: 1rem;
+    min-height: calc(2.9rem + 0.7rem);
+}
+
+/* Pending: "use another email" at the start of the row, where the confirmed
+   state keeps it, and the resend at the far end. */
+.subscribe-panel-pending .subscribe-actions {
+    justify-content: space-between;
+}
+
+/* Confirmed: which address and since when, on one line over the way to use
+   another, both in the height every state gives its bottom row. Two classes,
+   not one: the row rule above would otherwise keep its gap and centring. */
+.subscribe-actions.subscribe-actions-stacked {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.15rem;
+}
+
+/* As wide as the card, not as its content: a width that followed the address
+   would give it nothing to be fitted against. */
+.subscribe-who {
+    display: flex;
+    align-items: baseline;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--foreground);
+    white-space: nowrap;
+}
+
+.subscribe-who .subscribe-sep,
+.subscribe-who .subscribe-when {
+    flex: none;
+}
+
+/* A flex item's edge spaces are trimmed, so the separator's spacing is
+   padding. */
+.subscribe-who .subscribe-sep {
+    padding: 0 0.35em;
+}
+
+.subscribe-row .search-input {
+    flex: 1 1 auto;
+    align-self: stretch;
+    min-width: 0;
+    max-width: none;
+    border-right: 0;
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+}
+
+.subscribe-row .search-input[readonly] {
+    color: var(--muted-foreground);
+}
+
+.subscribe-submit,
+.subscribe-action {
+    display: inline-grid;
+    flex: 0 0 auto;
+    place-items: center;
+    padding: 0 1rem;
+    border: 2px solid var(--accent-line);
+    background: var(--accent-surface);
+    color: var(--on-accent);
+    font: inherit;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    /* Named, not the theme's `all`: `visibility` animates too, and a button in
+       the state being left would stay drawn over the state arriving for the
+       length of the transition. */
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease,
+        filter 0.3s ease, opacity 0.3s ease;
+}
+
+.subscribe-submit {
+    align-self: stretch;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
+.subscribe-action {
+    min-height: 2.9rem;
+    border-radius: var(--border-radius);
+}
+
+/* A button's labels -- ready, sending, sent -- share one cell, so the button
+   is as wide as its longest and never jumps as the words change. */
+.subscribe-submit > *,
+.subscribe-action > * {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.subscribe-label-busy,
+.subscribe-label-done,
+[aria-busy="true"] > .subscribe-label,
+[data-done] > .subscribe-label {
+    visibility: hidden;
+}
+
+[aria-busy="true"] > .subscribe-label-busy,
+[data-done] > .subscribe-label-done {
+    visibility: visible;
+}
+
+.subscribe-submit:not(:disabled):hover,
+.subscribe-action:not(:disabled):hover {
+    filter: brightness(0.92);
+}
+
+.subscribe-submit:disabled,
+.subscribe-action:disabled {
+    cursor: not-allowed;
+}
+
+/* Waiting for an address worth sending. */
+.subscribe-submit:disabled:not([aria-busy="true"]) {
+    opacity: 0.55;
+}
+
+.subscribe-submit[aria-busy="true"],
+.subscribe-action[aria-busy="true"] {
+    cursor: progress;
+}
+
+/* The field and the button are one rectangle, so focusing either lights the
+   whole edge, as on the landing search. */
+.subscribe-panel-form:focus-within .search-input,
+.subscribe-panel-form:focus-within .subscribe-submit {
+    border-color: var(--accent-ink);
+}
+
+.subscribe-row .search-input:focus,
+.subscribe-submit:focus-visible {
+    outline: 2px solid var(--accent-ink);
+    outline-offset: -2px;
+}
+
+.subscribe-action:focus-visible,
+.subscribe-link:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* A link in look, a button in behaviour: it changes the card, it goes
+   nowhere. */
+.subscribe-link {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 0.9rem;
+    color: var(--accent-ink);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+    cursor: pointer;
+}
+
+.subscribe-spinner {
+    width: 0.9em;
+    height: 0.9em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: subscribe-spin 0.7s linear infinite;
+}
+
+@keyframes subscribe-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Heard, not seen: what the card changed to, for a screen reader. */
+.subscribe-live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Back from the confirmation link: the card that now says "Subscribed" draws
+   the eye once. */
+:root.is-subscribe-welcome .subscribe {
+    animation: subscribe-arrive 1.6s ease-out 0.3s 1 both;
+}
+
+@keyframes subscribe-arrive {
+    from {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-line) 75%, transparent), var(--box-shadow);
+    }
+    to {
+        box-shadow: 0 0 0 14px color-mix(in srgb, var(--accent-line) 0%, transparent), var(--box-shadow);
+    }
+}
+
+/* The only other time the page speaks up: the welcome on landing back from the
+   confirmation link. Shown by a class on <html> from the first frame, so it
+   never pushes the page down after load. */
+.subscribe-welcome-note {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 1rem 0;
+    padding: 0.75rem 0.75rem 0.75rem 1.25rem;
+    border-left: 4px solid var(--accent-line);
+    border-radius: var(--border-radius);
+    background: var(--card);
+    box-shadow: var(--box-shadow);
+    color: var(--foreground);
+}
+
+:root.is-subscribe-welcome .subscribe-welcome-note {
+    display: flex;
+}
+
+.subscribe-welcome-note p {
+    margin: 0;
+}
+
+.subscribe-welcome-note strong {
+    color: var(--foreground-strong);
+}
+
+.subscribe-dismiss {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 0;
+    border-radius: var(--border-radius);
+    background: none;
+    color: var(--foreground);
+    cursor: pointer;
+}
+
+.subscribe-dismiss:hover {
+    background: var(--muted);
+}
+
+.subscribe-dismiss:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    /* Progress still has to show; slower is enough. */
+    .subscribe-spinner {
+        animation-duration: 2.4s;
+    }
+
+    :root.is-subscribe-welcome .subscribe {
+        animation: none;
+    }
+}
+
+@media print {
+    .subscribe-heading,
+    .subscribe-slot,
+    .subscribe,
+    .subscribe-welcome-note {
+        display: none !important;
+    }
+}

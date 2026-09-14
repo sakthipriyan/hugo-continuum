@@ -1,0 +1,24 @@
+{{- /*
+  The note a new subscriber lands on. The provider's confirmation redirect adds
+  `subscribed=1`; subscribe-init.html sees it before first paint and raises this
+  with a class on <html>, so it is in place from the first frame rather than
+  pushing the page down, and subscribe.js dismisses it. Rendered only where the
+  owning section configures a sign-up, which is where that redirect points.
+
+  Usage: {{ partial "subscribe-welcome.html" . }}
+*/ -}}
+{{- with partial "func/owning-section.html" . -}}
+{{- with .Params.subscribe -}}
+{{- if .action }}
+<div class="subscribe-welcome-note" role="status">
+  <p>{{ .welcome | default "**You're in.** Thanks for confirming your subscription." | markdownify }}</p>
+  <button type="button" class="subscribe-dismiss" aria-label="Dismiss" title="Dismiss">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false">
+      <path d="M18 6 6 18M6 6l12 12"></path>
+    </svg>
+  </button>
+</div>
+{{- end -}}
+{{- end -}}
+{{- end -}}

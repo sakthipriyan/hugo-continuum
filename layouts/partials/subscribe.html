@@ -1,0 +1,140 @@
+{{- /*
+  Newsletter sign-up card for the section that owns the page.
+
+  A section opts in with a `subscribe` block in its _index.md front matter
+  (YAML or TOML alike); a section without one renders nothing, so the theme
+  names no provider and no section. `action` is the provider's form endpoint --
+  for Kit, the `action` of the form's HTML embed -- and the field is
+  `email_address`, the name Kit reads. Every other key is optional, and the
+  words of each state sit under that state's key:
+
+    subscribe:
+      action, heading, title, another, sending, networkError, welcome
+      form:      text, placeholder, button
+      pending:   status, text, hint, resend, resent
+      confirmed: status, detail, text
+
+  One card, the same everywhere, holding every state it can be in: the form,
+  the next step once an address is accepted, and "subscribed" once the reader
+  has confirmed. All three are drawn in one cell and subscribe.js shows one, so
+  the card never changes size between them. The heading is the same in all
+  three, as the cards beside it never change theirs; what state the card is in
+  is said by a chip at the end of the heading's line. Without JavaScript it is
+  the form alone, a plain POST that lands on the provider's own page.
+
+  Usage: {{ partial "subscribe.html" (dict "page" . "id" "subscribe-footer" "heading" true "slot" true) }}
+    "heading" true  puts the section's `heading` above it, as under an article.
+    "slot" true     sizes it as one track of the section landing's entry row,
+                    wherever it is not already in that row.
+  A page opts out with `subscribe: false` in its front matter.
+*/ -}}
+{{- $page := .page -}}
+{{- $id := .id | default "subscribe" -}}
+{{- $cfg := dict -}}
+{{- with partial "func/owning-section.html" $page -}}
+  {{- with .Params.subscribe }}{{ $cfg = . }}{{ end -}}
+{{- end -}}
+{{- if and $cfg.action (ne $page.Params.subscribe false) -}}
+{{- $form := $cfg.form | default dict -}}
+{{- $pending := $cfg.pending | default dict -}}
+{{- $confirmed := $cfg.confirmed | default dict -}}
+{{- $title := $cfg.title | default "Subscribe" -}}
+{{- $another := $cfg.another | default "Use another email" -}}
+{{- $sending := $cfg.sending | default "Sending…" -}}
+{{- /* The pending line around the address, split at {email} so the address
+       can take the whole of what the words leave of that line. */ -}}
+{{- $sent := split ($pending.text | default "Link sent to {email}.") "{email}" -}}
+{{- if .heading }}
+{{- /* The same markup _markup/render-heading.html gives the piece's own
+       headings, chain link and all, so `#subscribe` can be linked to. */}}
+<h2 class="subscribe-heading" id="subscribe"><a class="anchor-link" href="#subscribe" aria-hidden="true" tabindex="-1"></a>{{ $cfg.heading | default "Newsletter" }}</h2>
+{{- end }}
+{{- if .slot }}
+<div class="subscribe-slot">
+{{- end }}
+<aside class="subscribe" aria-labelledby="{{ $id }}-title"
+       data-error-network="{{ $cfg.networkError | default "Couldn't reach the newsletter service. Check your connection and try again." }}">
+  <p class="subscribe-live" role="status" aria-live="polite"></p>
+  <div class="subscribe-panels">
+    <form class="subscribe-panel subscribe-panel-form" action="{{ $cfg.action }}" method="post">
+      <div class="subscribe-head">
+        <label class="subscribe-title" id="{{ $id }}-title" for="{{ $id }}-email">{{ $title }}</label>
+      </div>
+      <div class="subscribe-message">
+        <p class="subscribe-text">{{ $form.text | default "Get new posts by email." | markdownify }}</p>
+        <p class="subscribe-error" id="{{ $id }}-error"></p>
+      </div>
+      <div class="subscribe-row">
+        <input type="email" id="{{ $id }}-email" name="email_address" class="search-input"
+               placeholder="{{ $form.placeholder | default "you@example.com" }}"
+               autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false"
+               required aria-describedby="{{ $id }}-error">
+        <button type="submit" class="subscribe-submit">
+          <span class="subscribe-label">{{ $form.button | default "Subscribe" }}</span>
+          <span class="subscribe-label-busy" aria-hidden="true"><span class="subscribe-spinner"></span>{{ $sending }}</span>
+        </button>
+      </div>
+    </form>
+
+    <div class="subscribe-panel subscribe-panel-pending">
+      <div class="subscribe-head">
+        <p class="subscribe-title">{{ $title }}</p>
+        {{- /* Where focus goes when the card arrives here: the chip says what
+               changed, the unchanging heading would not. */}}
+        <p class="subscribe-status" tabindex="-1">{{ $pending.status | default "Check your inbox" }}</p>
+      </div>
+      <div class="subscribe-message">
+        {{- /* Two lines, each its own: where the link went, and what to do if it
+               has not arrived. The address slot is left empty for subscribe.js
+               to fit to what its line leaves. */}}
+        <div class="subscribe-text">
+          <p class="subscribe-sent"><span>{{ index $sent 0 }}</span>
+            {{- if gt (len $sent) 1 }}<strong class="subscribe-email"></strong><span>{{ index $sent 1 }}</span>{{ end -}}
+          </p>
+          <p class="subscribe-hint">{{ $pending.hint | default "Not there? Check your spam folder." }}</p>
+        </div>
+        <p class="subscribe-error"></p>
+      </div>
+      <div class="subscribe-actions">
+        {{- /* The way back to the form first, at the start of the row where the
+               confirmed state has it too, under the same words; the resend at
+               the far end. First in the markup as well, so the tab order is the
+               order seen. */}}
+        <button type="button" class="subscribe-link subscribe-change">{{ $another }}</button>
+        <button type="button" class="subscribe-action subscribe-resend">
+          <span class="subscribe-label">{{ $pending.resend | default "Resend link" }}</span>
+          <span class="subscribe-label-busy" aria-hidden="true"><span class="subscribe-spinner"></span>{{ $sending }}</span>
+          <span class="subscribe-label-done" aria-hidden="true">{{ $pending.resent | default "Sent" }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="subscribe-panel subscribe-panel-confirmed">
+      <div class="subscribe-head">
+        <p class="subscribe-title">{{ $title }}</p>
+        <p class="subscribe-status" tabindex="-1">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M20 6 9 17l-5-5"></path>
+          </svg>
+          {{ $confirmed.status | default "Subscribed" }}
+        </p>
+      </div>
+      <div class="subscribe-message">
+        <p class="subscribe-text">{{ $confirmed.text | default "Thanks for subscribing." | markdownify }}</p>
+      </div>
+      <div class="subscribe-actions subscribe-actions-stacked">
+        {{- /* Which address, when this browser knows it, and since when: one
+               line over the way to use another, together in the height the
+               other states give their field or buttons. `{date}` in data-detail
+               is the site's date format; subscribe.js writes the line in. */}}
+        <p class="subscribe-who" data-detail="{{ $confirmed.detail | default "since {date}" }}"><strong class="subscribe-email"></strong><span class="subscribe-sep" aria-hidden="true"> · </span><span class="subscribe-when"></span></p>
+        <button type="button" class="subscribe-link subscribe-another">{{ $another }}</button>
+      </div>
+    </div>
+  </div>
+</aside>
+{{- if .slot }}
+</div>
+{{- end }}
+{{- end -}}

@@ -3989,12 +3989,11 @@ main article table th {
     margin: 1.25rem 0 2rem;
 }
 
-/* The two ways into a section on one row -- search for the reader who knows
-   what they want, the guided page for the one who does not. They wrap to
-   separate rows below roughly 44rem, where neither would have room to read. */
-/* Three columns, the third deliberately empty and reserved. A grid rather than
-   a flex row so the empty track holds its width: flex would let the two cards
-   spread across it and there would be nothing to fill later. */
+/* The ways into a section on one row: the guided page for the reader who does
+   not know where to begin, search for the one who does, and the section's
+   newsletter sign-up. Three columns, as a grid rather than a flex row, so that
+   a section with no sign-up keeps the third track empty at its width -- flex
+   would let the two cards spread across it. */
 .landing-entry {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -4031,8 +4030,9 @@ main article table th {
     margin-top: 0;
 }
 
-/* The field and its button, pinned to the foot of the card so it lines up
-   with the bottom of the text beside it however the blurb wraps. */
+/* The field and its button, directly under the blurb. Pinned to the foot of
+   the card, they drifted away from it whenever a taller card beside this one
+   stretched the row; the spare height now falls below the field instead. */
 .landing-search {
     display: flex;
     flex-direction: column;
@@ -4040,7 +4040,6 @@ main article table th {
 
 .landing-search-row {
     display: flex;
-    margin-top: auto;
     padding-top: 0.7rem;
 }
 

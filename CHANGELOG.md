@@ -14,6 +14,14 @@ is the record.
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-09-14
+
+### Added
+
+- Newsletter sign-up card (Kit), enabled per section with a `subscribe` block
+  in `_index.md`. It appears on the section landing, under posts and via
+  `{{< subscribe >}}`; see the README.
+
 ## [0.17.1] - 2026-09-06
 
 ### Added
