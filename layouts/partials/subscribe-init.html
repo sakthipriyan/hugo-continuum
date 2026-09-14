@@ -1,0 +1,68 @@
+{{- /*
+  Newsletter state, resolved inline in <head> like theme-init.html, for the same
+  reason -- a subscriber's card should say "subscribed" from the first frame,
+  not show the form and then change its mind -- and for one more: the URL has
+  to be clean before analytics reads it.
+
+  The provider's confirmation email sends a new subscriber to a page carrying
+  `subscribed=1` (the redirect is set in the provider, not here). That marks
+  this browser confirmed, dated, and raises the welcome; the parameter is then
+  dropped so a refresh or a shared link welcomes nobody else. The address the
+  sign-up was pending on carries over, for the confirmed card to show; it
+  never leaves this browser. Kit can also decorate links with
+  `ck_subscriber_id`, which identifies a person; it goes too, before the
+  analytics tag at the foot of the page can record it. On every page, since a
+  newsletter links to all of them.
+
+  State lives in localStorage under `continuum-subscribe` as
+  {"state": "pending" | "confirmed", "at": ISO timestamp, "email"?}: "pending"
+  once the form has accepted an address (subscribe.js), "confirmed" after the
+  redirect. A pending one older than seven days counts for nothing, as in
+  subscribe.js. The cards read it from `is-subscribe-*` classes on <html>. The
+  `is-` prefix is load-bearing: a root class sharing a name with an element rule
+  once hid the whole page.
+*/ -}}
+<script>
+(function () {
+    var KEY = 'continuum-subscribe';
+    var PENDING_DAYS = 7;
+    var root = document.documentElement;
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+    if (!saved || !saved.at || (saved.state !== 'pending' && saved.state !== 'confirmed')) {
+        saved = null;
+    } else if (saved.state === 'pending' && Date.now() - new Date(saved.at).getTime() > PENDING_DAYS * 864e5) {
+        saved = null;
+    }
+
+    try {
+        var url = new URL(window.location.href);
+        if (url.searchParams.get('subscribed') === '1') {
+            /* A second trip through the redirect keeps the first date. */
+            if (!saved || saved.state !== 'confirmed') {
+                saved = {
+                    state: 'confirmed',
+                    at: new Date().toISOString(),
+                    email: saved && saved.email ? saved.email : undefined
+                };
+                try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+            }
+            root.classList.add('is-subscribe-welcome');
+        }
+        var changed = false;
+        ['subscribed', 'ck_subscriber_id'].forEach(function (name) {
+            if (url.searchParams.has(name)) {
+                url.searchParams.delete(name);
+                changed = true;
+            }
+        });
+        if (changed) {
+            history.replaceState(history.state, '', url.pathname + url.search + url.hash);
+        }
+    } catch (e) {}
+
+    if (saved) {
+        root.classList.add('is-subscribe-' + saved.state);
+    }
+})();
+</script>

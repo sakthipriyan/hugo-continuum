@@ -5,6 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {{- partial "head-meta.html" . }}
+    {{- /* No theme or sign-up here, but a newsletter links to slides too, and
+           the subscriber id has to leave the URL before analytics reads it. */ -}}
+    {{- partial "subscribe-init.html" . }}
 
     <!-- Reveal.js CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">

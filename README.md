@@ -71,6 +71,92 @@ The theme emits these as CSS custom properties (`--accent-from`, `--accent-to`,
 `--accent-ink`, `--on-accent`, `--header-bg`) in a generated, fingerprinted
 stylesheet, with `:root` fallbacks for pages that belong to no section.
 
+### Newsletter sign-up
+
+A section offers a sign-up card by naming its provider's form endpoint in its
+`_index.md` front matter. Only `action` is required; every other key has a
+default, and the words for each state sit under that state:
+
+```yaml
+subscribe:
+  action: "https://app.kit.com/forms/<form-id>/subscriptions"   # required
+  heading: "Newsletter"            # section heading above the card under posts
+  title: "Subscribe"               # the card's heading, the same in every state
+  another: "Use another email"     # back to the form, from pending and confirmed
+  sending: "Sending…"              # a button while its request is out
+  networkError: "Couldn't reach the newsletter service. Check your connection and try again."
+  welcome: "**You're in.** Thanks for confirming your subscription."   # Markdown
+  form:
+    text: "Get new posts by email."          # Markdown
+    placeholder: "you@example.com"
+    button: "Subscribe"
+  pending:
+    status: "Check your inbox"               # the chip beside the heading
+    text: "Link sent to {email}."            # the address is fitted to this line
+    hint: "Not there? Check your spam folder."
+    resend: "Resend link"
+    resent: "Sent"
+  confirmed:
+    status: "Subscribed"
+    detail: "since {date}"                   # after the address; the site's date format
+    text: "Thanks for subscribing."          # Markdown
+```
+
+The same in TOML:
+
+```toml
+[subscribe]
+action = "https://app.kit.com/forms/<form-id>/subscriptions"
+heading = "Newsletter"
+
+[subscribe.form]
+text = "Get new posts by email."
+button = "Subscribe"
+
+[subscribe.pending]
+hint = "Not there? Check your spam folder."
+
+[subscribe.confirmed]
+text = "Thanks for subscribing."
+```
+
+The card is the third track of the section landing's entry row, beside Start
+Here and Search. Under every post in the section (after `heading`) and wherever
+`{{< subscribe >}}` is placed it is the same card at the same width, one track
+of that row. A page opts out with `subscribe: false`. Keep each `text` to two
+lines on the narrowest card: every state shares one height, so a longer one
+makes all of them taller.
+
+The card holds every state in one cell, so it never changes size. The heading
+is the same in all of them; a chip at the end of its line says which state the
+card is in:
+
+1. **Form.** The button waits for a valid address.
+2. **Sending.** The field locks and the button shows progress; a refusal from
+   the provider takes the place of the line under the heading.
+3. **Pending.** Where the link went, what to do if it has not arrived, a
+   resend (resting thirty seconds after each) and a way back to the form. A
+   pending sign-up older than seven days is let go.
+4. **Confirmed.** Set the provider's post-confirmation redirect to the section
+   landing with `?subscribed=1` added. The page opens with the `welcome` note,
+   and in that browser the card says so from then on, with the address and the
+   date on a line of their own.
+
+Every card on the page, and in the reader's other tabs, moves together. The
+state lives in the reader's own browser (localStorage) and is never sent
+anywhere. The parameter is removed from the URL on arrival, and so is Kit's
+`ck_subscriber_id` on any page, before analytics can record either.
+
+It posts `email_address` with the same fields and headers as Kit's own embed
+script; the `action` is the one in a Kit form's HTML embed. Without JavaScript
+the card is the form alone, a plain POST that lands on the provider's own page.
+
+**Theming.** The card has no colours of its own. Its styles, in
+`subscribe.css` and loaded only on sections that configure a sign-up, draw on
+the theme's role tokens and the section accent (`accentFrom`, `accentTo`,
+`accentInk` and their dark counterparts above), so it follows the section's
+colours and the dark palette with nothing further to set.
+
 ## Site configuration
 
 ```yaml

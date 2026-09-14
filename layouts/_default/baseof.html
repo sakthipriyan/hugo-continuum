@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {{- partial "head-meta.html" . }}
     {{- partial "theme-init.html" . }}
+    {{- partial "subscribe-init.html" . }}
     {{- partial "print-host.html" . }}
 
     {{- /* Stylesheets: base, plus whatever this page type needs. */ -}}
@@ -12,6 +13,10 @@
     {{- if and (eq .Type "tools") (eq .Kind "page") }}
         {{- $styles = $styles | append "tools" }}
     {{- end }}
+    {{- /* The sign-up card's styles, on sections that configure one. */ -}}
+    {{- with partial "func/owning-section.html" . }}{{ with .Params.subscribe }}
+        {{- $styles = $styles | append "subscribe" }}
+    {{- end }}{{ end }}
     {{- /* Chroma highlights at build time; ship its stylesheet only to pages that
            actually contain a highlighted block. */ -}}
     {{- if and .Content (strings.Contains .Content "class=\"highlight\"") }}
@@ -35,6 +40,7 @@
     {{- partial "header.html" . }}
     {{- partial "breadcrumb.html" . }}
     <main id="main-content" tabindex="-1">
+        {{- partial "subscribe-welcome.html" . }}
         {{- block "main" . }}{{- end }}
     </main>
     {{- partial "footer.html" . }}
@@ -66,6 +72,9 @@
     {{- end }}
 
     {{- block "scripts" . }}{{- end }}
+    {{- /* Sign-up forms answer in place; only a section that configures one
+           ships the script. */ -}}
+    {{- with partial "func/owning-section.html" . }}{{ with .Params.subscribe }}{{ partial "js.html" (slice "subscribe") }}{{ end }}{{ end }}
     {{- partial "js.html" (slice "nav") }}
     {{- partial "ga-tracking.html" . }}
 </body>

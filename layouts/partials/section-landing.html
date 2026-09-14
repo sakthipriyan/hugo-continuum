@@ -40,11 +40,12 @@
   <div class="section-content">{{ . }}</div>
   {{- end }}
 
-  {{- /* The two ways in, side by side. The guided page leads, being what a
+  {{- /* The ways in, side by side. The guided page leads, being what a
          newcomer needs; search is for the reader who already knows what they
-         are after. Swapped in the markup rather than with CSS order, so the
+         are after; the section's newsletter sign-up, when it has one, is
+         third. In that order in the markup rather than by CSS order, so the
          mobile stack and a screen reader follow the same sequence. They wrap
-         to separate rows when there is not width for both. */ -}}
+         to fewer columns when there is not width for three. */ -}}
   <div class="landing-entry">
   {{- /* A single wide card above the curated six. Being first in a grid is not
          prominence -- on a phone everything stacks, so first means nothing --
@@ -69,10 +70,14 @@
   {{- with $sec.GetPage "search" }}
   <form class="landing-search" role="search" action="{{ .RelPermalink }}" method="get">
     {{- /* The label is the card's heading rather than hidden text, so this side
-           of the row carries the same weight as the card beside it. What is
-           searched is said by the placeholder rather than on a line of its
-           own -- two sentences for one control was one too many. */ -}}
+           of the row carries the same weight as the cards beside it. Under it,
+           the search page's own summary when it has one, as the lead card
+           carries its page's: without a line there this was the one card in
+           the row with nothing to read, a title over an empty band. */ -}}
     <label class="landing-entry-title" for="landing-q">Search</label>
+    {{- with (.Params.summary | default .Description) }}
+    <span class="landing-entry-note">{{ . }}</span>
+    {{- end }}
     <span class="landing-search-row">
       <input type="search" id="landing-q" name="q" class="search-input"
              placeholder="Title or topic in any format…" autocomplete="off" spellcheck="false">
@@ -87,6 +92,11 @@
     </span>
   </form>
   {{- end }}
+  {{- /* The third track, held empty until now: the section's newsletter, for
+         the reader who would rather be told when there is more. It renders
+         nothing for a section with no `subscribe` block, so that section keeps
+         the track reserved as before. */ -}}
+  {{ partial "subscribe.html" (dict "page" $sec "id" "landing-subscribe") }}
   </div>
 
   {{- /* One curated block rather than two. Splitting "where to begin" from

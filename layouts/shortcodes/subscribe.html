@@ -1,0 +1,8 @@
+{{- /*
+  The owning section's newsletter sign-up card, placed in the body of a page,
+  one track of the section landing's entry row wide. Renders nothing on a
+  section with no `subscribe` block. See partials/subscribe.html.
+
+  Usage: {{< subscribe >}}
+*/ -}}
+{{- partial "subscribe.html" (dict "page" .Page "id" (printf "subscribe-%d" .Ordinal) "slot" true) -}}
