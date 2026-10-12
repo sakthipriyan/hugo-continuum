@@ -14,6 +14,13 @@ is the record.
 
 ## [Unreleased]
 
+### Added
+
+- The newsletter sign-up card on book pages: under each chapter and the book's
+  chapter list, with the confirmation welcome, for sections that configure a
+  `subscribe` block. The book layouts render their own document, so they had
+  missed the card, its styles and its script.
+
 ## [0.18.0] - 2026-09-14
 
 ### Added

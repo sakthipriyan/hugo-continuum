@@ -7,7 +7,12 @@
     {{- partial "theme-init.html" . }}
     {{- partial "subscribe-init.html" . }}
     {{- partial "print-host.html" . }}
-    {{- partial "css.html" (slice "style" "book-layout") }}
+    {{- /* The sign-up card's styles, on sections that configure one. */ -}}
+    {{- $styles := slice "style" "book-layout" }}
+    {{- with partial "func/owning-section.html" . }}{{ with .Params.subscribe }}
+        {{- $styles = $styles | append "subscribe" }}
+    {{- end }}{{ end }}
+    {{- partial "css.html" $styles }}
     {{- partial "section-accents.html" . }}
 </head>
 
@@ -21,7 +26,8 @@
     {{- /* This is the books list page - use default layout */ -}}
     {{ partial "header.html" . }}
     {{ partial "breadcrumb.html" . }}
-    <main>
+    <main id="main-content" tabindex="-1">
+        {{- partial "subscribe-welcome.html" . }}
         <section class="books-list">
             {{ partial "page-title.html" (dict "title" .Title "count" (len .Pages)) }}
             {{- if .Content }}
@@ -38,6 +44,7 @@
         </section>
     </main>
     {{ partial "footer.html" . }}
+    {{- with partial "func/owning-section.html" . }}{{ with .Params.subscribe }}{{ partial "js.html" (slice "subscribe") }}{{ end }}{{ end }}
     {{ partial "ga-tracking.html" . }}
     {{- else -}}
     {{- /* This is a specific book - use book reader layout */ -}}
@@ -63,6 +70,7 @@
     {{- /* Main Content */ -}}
     <main class="book-main-content" id="main-content" tabindex="-1">
         <div class="book-content-wrapper">
+            {{- partial "subscribe-welcome.html" . }}
             <article class="book-chapter">
                 <header class="chapter-header">
                     <h1 class="chapter-title">{{ .Title }}</h1>
@@ -95,6 +103,8 @@
                     </ol>
                 </nav>
                 {{- end }}
+
+                {{ partial "subscribe.html" (dict "page" . "id" "subscribe-footer" "heading" true "slot" true) }}
             </article>
         </div>
     </main>
@@ -104,6 +114,7 @@
 
     {{- /* Scripts */ -}}
     {{ partial "book-scripts.html" . }}
+    {{- with partial "func/owning-section.html" . }}{{ with .Params.subscribe }}{{ partial "js.html" (slice "subscribe") }}{{ end }}{{ end }}
     {{ partial "ga-tracking.html" . }}
     {{- end -}}
     {{- end -}}
