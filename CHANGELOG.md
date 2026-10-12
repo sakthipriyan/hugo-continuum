@@ -14,6 +14,8 @@ is the record.
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-10-12
+
 ### Added
 
 - The newsletter sign-up card on book pages: under each chapter and the book's
