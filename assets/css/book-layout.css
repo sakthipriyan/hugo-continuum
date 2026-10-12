@@ -731,3 +731,16 @@ body.book-reader {
     background: var(--book-link);
     border-color: var(--book-link);
 }
+
+/* The newsletter card and its welcome take the reader's blue, not the owning
+   section's accent: inside a book the section colour appears nowhere else, so
+   a gold card would be the one thing on the page in another palette. The card
+   is themed only through these tokens (see subscribe.css), and the secondary
+   colour already has a dark value and an on-colour that clear contrast. */
+.book-reader .subscribe,
+.book-reader .subscribe-welcome-note {
+    --accent-line: var(--book-link);
+    --accent-surface: var(--book-link);
+    --accent-ink: var(--book-link);
+    --on-accent: var(--on-secondary);
+}

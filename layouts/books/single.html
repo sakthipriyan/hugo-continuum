@@ -8,7 +8,12 @@
     {{- partial "theme-init.html" . }}
     {{- partial "subscribe-init.html" . }}
     {{- partial "print-host.html" . }}
-    {{- partial "css.html" (slice "style" "book-layout") }}
+    {{- /* The sign-up card's styles, on sections that configure one. */ -}}
+    {{- $styles := slice "style" "book-layout" }}
+    {{- with partial "func/owning-section.html" . }}{{ with .Params.subscribe }}
+        {{- $styles = $styles | append "subscribe" }}
+    {{- end }}{{ end }}
+    {{- partial "css.html" $styles }}
     {{- partial "section-accents.html" . }}
     <!-- Book Reader Layout Active -->
 </head>
@@ -44,6 +49,7 @@
     {{- /* Main Content */ -}}
     <main class="book-main-content" id="main-content" tabindex="-1">
         <div class="book-content-wrapper">
+            {{- partial "subscribe-welcome.html" . }}
             <article class="book-chapter">
                 <header class="chapter-header">
                     {{- if .Params.chapter }}
@@ -74,6 +80,11 @@
                 <div class="chapter-body">
                     {{ .Content }}
                 </div>
+
+                {{- /* As under a post: the reader has just finished the chapter.
+                       Renders nothing unless the owning section configures a
+                       sign-up. */ -}}
+                {{ partial "subscribe.html" (dict "page" . "id" "subscribe-footer" "heading" true "slot" true) }}
 
                 {{- /* Chapter Tags */ -}}
                 {{ $tags := slice }}
@@ -155,6 +166,7 @@
 
     {{- /* Scripts */ -}}
     {{ partial "book-scripts.html" . }}
+    {{- with partial "func/owning-section.html" . }}{{ with .Params.subscribe }}{{ partial "js.html" (slice "subscribe") }}{{ end }}{{ end }}
     {{ partial "ga-tracking.html" . }}
     {{- end -}}
 </body>
