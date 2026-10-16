@@ -14,6 +14,16 @@ is the record.
 
 ## [Unreleased]
 
+## [0.19.1] - 2026-10-16
+
+### Fixed
+
+- The mobile navigation menu in dark mode. The header's frosted-glass blur made
+  it the containing block for the fixed nav drawer, so the closed drawer doubled
+  the page's width on phones — sideways scroll, a zoomed-out page, and taps on
+  the hamburger landing on the invisible drawer instead. The blur and scrim now
+  sit on a layer behind the header, looking the same.
+
 ## [0.19.0] - 2026-10-12
 
 ### Added
