@@ -14,6 +14,17 @@ is the record.
 
 ## [Unreleased]
 
+### Added
+
+- Slide pages can use [Slidetake](https://slidetake.com) instead of reveal.js: set
+  `engine: slidetake` in a deck's frontmatter. The deck (reveal.js `---` / `--`
+  markdown and plain heading decks both work) becomes a spatial deck with tree,
+  radial, path and focus layouts, a camera and OBS recording, following the
+  site's light/dark choice, with a link back to its section. Decks without the
+  key keep reveal.js. Slidetake 0.1.0 is vendored at
+  `static/slidetake/slidetake.js`; update it by copying `dist/slidetake.js`
+  from a Slidetake release.
+
 ## [0.19.1] - 2026-10-16
 
 ### Fixed
