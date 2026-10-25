@@ -1,12 +1,13 @@
 {{- /*
   Two engines for a slide page. `engine: slidetake` in a deck's frontmatter renders it with Slidetake
   (https://slidetake.com): a spatial deck with layouts, camera and recording, from the vendored
-  static/slidetake/slidetake.js. Every other deck keeps reveal.js, below.
+  assets/slidetake/slidetake.js. Every other deck keeps reveal.js, below.
 */ -}}
 {{- if eq (lower (.Params.engine | default "")) "slidetake" -}}
-{{- $back := .Parent -}}
-{{- $backLabel := $back.Title -}}
-{{- with .FirstSection }}{{ if ne .RelPermalink $back.RelPermalink }}{{ $backLabel = printf "%s · %s" .Title $back.Title }}{{ end }}{{ end -}}
+{{- /* the header's trail: the site, the deck's section, and the slides list it belongs to */ -}}
+{{- $trail := slice (dict "label" .Site.Title "url" ("/" | relURL)) -}}
+{{- with .FirstSection }}{{ $trail = $trail | append (dict "label" .Title "url" .RelPermalink) }}{{ end -}}
+{{- with .Parent }}{{ if ne .RelPermalink $.FirstSection.RelPermalink }}{{ $trail = $trail | append (dict "label" .Title "url" .RelPermalink) }}{{ end }}{{ end -}}
 <!DOCTYPE html>
 <html lang="{{ .Site.Language.Locale | default "en" }}">
 
@@ -27,11 +28,14 @@
             markdown: {{ .RawContent }},
             settings: {{ .Params }},
             base: {{ .Permalink }},
-            back: {url: {{ $back.RelPermalink }}, label: {{ $backLabel }}},
+            trail: {{ $trail }},
             themeKey: "continuum-theme"
         };
     </script>
-    <script src="{{ "slidetake/slidetake.js" | relURL }}"></script>
+    {{- /* fingerprinted, so a theme update never leaves readers on a cached older Slidetake */}}
+    {{- with resources.Get "slidetake/slidetake.js" | fingerprint }}
+    <script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}"></script>
+    {{- end }}
     {{ partial "ga-tracking.html" . }}
 </body>
 
