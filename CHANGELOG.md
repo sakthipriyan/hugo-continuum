@@ -14,6 +14,20 @@ is the record.
 
 ## [Unreleased]
 
+## [0.20.1] - 2026-10-27
+
+### Fixed
+
+- The vendored Slidetake is now the npm release `slidetake@0.1.1` byte for byte.
+  v0.20.0 shipped a local build of the same code whose banner still read 0.1.0.
+
+### Changed
+
+- `assets/slidetake/slidetake.js` is updated with `scripts/slidetake.sh update
+  <version>`, which copies that release from npm, rather than by copying a
+  build. The file's first line names its release, and the theme's checks fail
+  if the file is not that release.
+
 ## [0.20.0] - 2026-10-26
 
 ### Added

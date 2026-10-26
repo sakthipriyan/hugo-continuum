@@ -22,6 +22,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # Slidetake ships inside the theme, so it has to be what npm published: the
+      # release its first line names, byte for byte, not someone's local build.
+      - name: Check the vendored Slidetake is its npm release
+        run: scripts/slidetake.sh check
+
       # theme.yaml declares min_version: "0.164.0". Nothing tested that claim
       # before this job existed.
       - name: Setup Hugo (minimum supported)
