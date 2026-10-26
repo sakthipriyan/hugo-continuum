@@ -1034,7 +1034,7 @@ Recorded `+new Date(e.date).toLocaleString()+(e.outputPath?" \xB7 "+e.outputPath
   .node .body .gallery.carousel > li{grid-area:1/1;}
   .node .body .gallery.carousel figure.media img{max-height:58vh;}
   .node .body .gallery.carousel figure.media figcaption{font-size:.82em;}
-  .node .body .gallery.carousel figcaption[data-count]::before{content:attr(data-count) "   ";color:var(--accent);font-family:var(--mono);white-space:pre;}
+  .node .body .gallery.carousel figcaption[data-count]::before{content:attr(data-count) " ";color:var(--accent);font-weight:600;white-space:pre;}
   .node .body .gallery.carousel:has(> li.visible) > li:not(.fragment){opacity:0;visibility:hidden;transition:opacity .45s ease, visibility 0s .45s;}
   .node .body .gallery.carousel > li:not(.fragment){transition:opacity .45s ease;}
   /* image cards: an image or carousel alone, laid out by the image's shape (see sizeCard) */
