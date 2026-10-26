@@ -8,6 +8,26 @@
 {{- $trail := slice (dict "label" .Site.Title "url" ("/" | relURL)) -}}
 {{- with .FirstSection }}{{ $trail = $trail | append (dict "label" .Title "url" .RelPermalink) }}{{ end -}}
 {{- with .Parent }}{{ if ne .RelPermalink $.FirstSection.RelPermalink }}{{ $trail = $trail | append (dict "label" .Title "url" .RelPermalink) }}{{ end }}{{ end -}}
+{{- /* the section's colours, so the deck wears them as the section's pages do: the accent band behind the
+       header and the accent ink in light mode, and the dimmed wash and brighter ink in dark. The dark
+       defaults are section-accents.html's, for a section that names no dark values of its own. A section
+       without accentFrom passes nothing and the deck keeps Slidetake's own colours. */ -}}
+{{- $colors := dict -}}
+{{- with .FirstSection }}{{ with .Params.accentFrom -}}
+  {{- $p := $.FirstSection.Params -}}
+  {{- $from := . -}}
+  {{- $to := $p.accentTo | default $from -}}
+  {{- $ink := $p.accentInk | default $from -}}
+  {{- $inkDark := $p.accentInkDark | default (printf "oklch(from %s 0.78 c h)" $from) -}}
+  {{- $colors = dict
+      "light" (dict "accent" $ink "accentSoft" $ink "line" $from "ring" $to
+                    "header" (printf "linear-gradient(135deg,%s 0%%,%s 100%%)" $from $to)
+                    "headerText" ($p.onAccent | default "#fff"))
+      "dark" (dict "accent" $inkDark "accentSoft" $from "ring" $inkDark
+                   "line" ($p.accentLineDark | default (printf "oklch(from %s 0.52 c h)" $from))
+                   "header" ($p.accentHeaderDark | default (printf "linear-gradient(135deg,oklch(from %s 0.52 c h / 0.55) 0%%,oklch(from %s 0.46 c h / 0.55) 100%%)" $from $to))
+                   "headerText" "#fafafa") -}}
+{{- end }}{{ end -}}
 <!DOCTYPE html>
 <html lang="{{ .Site.Language.Locale | default "en" }}">
 
@@ -29,6 +49,7 @@
             settings: {{ .Params }},
             base: {{ .Permalink }},
             trail: {{ $trail }},
+            colors: {{ $colors }},
             themeKey: "continuum-theme"
         };
     </script>

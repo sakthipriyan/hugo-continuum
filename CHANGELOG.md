@@ -14,6 +14,21 @@ is the record.
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-10-27
+
+### Added
+
+- Slidetake decks wear their section's colours: the accent band behind the
+  header and the accent ink in light mode, the dimmed wash and brighter ink in
+  dark, from the section's `accentFrom`, `accentTo`, `accentInk`, `onAccent`
+  and dark-mode keys, as its other pages do. A section without `accentFrom`
+  leaves the deck in Slidetake's own colours, and a deck's own `accent:` still
+  wins.
+
+### Changed
+
+- Slidetake 0.2.0, whose own colour is now terminal green rather than gold.
+
 ## [0.20.1] - 2026-10-27
 
 ### Fixed
