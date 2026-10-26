@@ -1,3 +1,46 @@
+{{- /*
+  Two engines for a slide page. `engine: slidetake` in a deck's frontmatter renders it with Slidetake
+  (https://slidetake.com): a spatial deck with layouts, camera and recording, from the vendored
+  assets/slidetake/slidetake.js. Every other deck keeps reveal.js, below.
+*/ -}}
+{{- if eq (lower (.Params.engine | default "")) "slidetake" -}}
+{{- /* the header's trail: the site, the deck's section, and the slides list it belongs to */ -}}
+{{- $trail := slice (dict "label" .Site.Title "url" ("/" | relURL)) -}}
+{{- with .FirstSection }}{{ $trail = $trail | append (dict "label" .Title "url" .RelPermalink) }}{{ end -}}
+{{- with .Parent }}{{ if ne .RelPermalink $.FirstSection.RelPermalink }}{{ $trail = $trail | append (dict "label" .Title "url" .RelPermalink) }}{{ end }}{{ end -}}
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Locale | default "en" }}">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{- partial "head-meta.html" . }}
+    {{- partial "subscribe-init.html" . }}
+    {{- /* sets html.dark from the reader's choice; Slidetake follows the same continuum-theme key */ -}}
+    {{- partial "theme-init.html" . }}
+</head>
+
+<body>
+    {{- /* The deck for slidetake.js: its markdown, its frontmatter as data, where its images live, and the
+           way back to the site. Hugo writes the values as JSON inside this script. */}}
+    <script>
+        window.SLIDETAKE = {
+            markdown: {{ .RawContent }},
+            settings: {{ .Params }},
+            base: {{ .Permalink }},
+            trail: {{ $trail }},
+            themeKey: "continuum-theme"
+        };
+    </script>
+    {{- /* fingerprinted, so a theme update never leaves readers on a cached older Slidetake */}}
+    {{- with resources.Get "slidetake/slidetake.js" | fingerprint }}
+    <script src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}"></script>
+    {{- end }}
+    {{ partial "ga-tracking.html" . }}
+</body>
+
+</html>
+{{- else -}}
 <!DOCTYPE html>
 <html lang="{{ .Site.Language.Locale | default "en" }}">
 
@@ -65,3 +108,4 @@
 </body>
 
 </html>
+{{- end }}
