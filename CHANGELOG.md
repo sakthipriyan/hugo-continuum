@@ -14,6 +14,21 @@ is the record.
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-10-28
+
+### Changed
+
+- Slidetake 0.3.2: `<!-- steps -->` reveals everything after it on the card
+  until a `<!-- steps: off -->`; diagrams and charts get carousels like images;
+  the header trail and active layout button stay readable on a header in the
+  section's own colour.
+
+### Fixed
+
+- Slidetake decks: in dark mode, sub-headings use a lightened shade of the
+  section accent instead of the raw accent, which sank into the card for a
+  dark accent such as navy. A section can set `accentSoftDark` to choose it.
+
 ## [0.22.0] - 2026-10-28
 
 ### Changed
