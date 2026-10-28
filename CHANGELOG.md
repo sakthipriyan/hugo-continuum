@@ -14,6 +14,13 @@ is the record.
 
 ## [Unreleased]
 
+### Changed
+
+- Slidetake 0.3.0: its own colour is seafoam; full-screen cards are a 16:9
+  frame placed like other slides; layouts are offered alphabetically with path
+  as the default; live editing fixed. Sections that set `accentFrom` keep
+  their own colours.
+
 ## [0.21.0] - 2026-10-27
 
 ### Added
