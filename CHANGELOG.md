@@ -14,6 +14,13 @@ is the record.
 
 ## [Unreleased]
 
+## [0.24.1] - 2026-10-28
+
+### Fixed
+
+- Slidetake 0.3.4: in light mode, the Slidetake credit in a deck's header is
+  visible on the section's coloured band (it was the band's own colour).
+
 ## [0.24.0] - 2026-10-28
 
 ### Changed
