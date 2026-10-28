@@ -14,6 +14,8 @@ is the record.
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-10-28
+
 ### Changed
 
 - Slidetake 0.3.1: its own colour is seafoam; full-screen cards are a 16:9
