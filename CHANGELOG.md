@@ -14,6 +14,14 @@ is the record.
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-10-28
+
+### Changed
+
+- Slidetake 0.3.3: ` ```svg ` drawings in a deck are drawn inline, so they can
+  use the deck's colours (`currentColor`, `var(--text)`, `var(--accent)`) and
+  switch with dark and light. Scripts, styles and links inside them are removed.
+
 ## [0.23.0] - 2026-10-28
 
 ### Changed
