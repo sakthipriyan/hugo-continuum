@@ -19,11 +19,14 @@
   {{- $to := $p.accentTo | default $from -}}
   {{- $ink := $p.accentInk | default $from -}}
   {{- $inkDark := $p.accentInkDark | default (printf "oklch(from %s 0.78 c h)" $from) -}}
+  {{- /* the deck's sub-headings: as Slidetake shades its own accent, a step lighter than the ink. The raw
+         accent would do for a light one (gold) but sinks into the card for a dark one (navy). */ -}}
+  {{- $softDark := $p.accentSoftDark | default (printf "oklch(from %s 0.85 c h)" $from) -}}
   {{- $colors = dict
       "light" (dict "accent" $ink "accentSoft" $ink "line" $from "ring" $to
                     "header" (printf "linear-gradient(135deg,%s 0%%,%s 100%%)" $from $to)
                     "headerText" ($p.onAccent | default "#fff"))
-      "dark" (dict "accent" $inkDark "accentSoft" $from "ring" $inkDark
+      "dark" (dict "accent" $inkDark "accentSoft" $softDark "ring" $inkDark
                    "line" ($p.accentLineDark | default (printf "oklch(from %s 0.52 c h)" $from))
                    "header" ($p.accentHeaderDark | default (printf "linear-gradient(135deg,oklch(from %s 0.52 c h / 0.55) 0%%,oklch(from %s 0.46 c h / 0.55) 100%%)" $from $to))
                    "headerText" "#fafafa") -}}

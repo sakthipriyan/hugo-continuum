@@ -14,6 +14,12 @@ is the record.
 
 ## [Unreleased]
 
+### Fixed
+
+- Slidetake decks: in dark mode, sub-headings use a lightened shade of the
+  section accent instead of the raw accent, which sank into the card for a
+  dark accent such as navy. A section can set `accentSoftDark` to choose it.
+
 ## [0.22.0] - 2026-10-28
 
 ### Changed
