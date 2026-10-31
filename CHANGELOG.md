@@ -19,9 +19,14 @@ is the record.
 ### Added
 
 - Slidetake decks record again under `hugo server`: the author's local preview
-  gets ● Studio, Camera and the bottom bar (Slidetake 0.4.1's
+  gets ● Studio, Camera and the bottom bar (Slidetake 0.4.2, with its
   `recording: true`), to record in the browser or with OBS where the deck is
   written. A built site stays a viewer for readers.
+
+### Fixed
+
+- Slidetake decks keep the section's colours even when a deck sets its own
+  `accent:` (which now only applies on slidetake.com and `npx slidetake`).
 
 ## [0.25.0] - 2026-10-31
 
