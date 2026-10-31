@@ -1,7 +1,7 @@
 {{- /*
   Two engines for a slide page. `engine: slidetake` in a deck's frontmatter renders it with Slidetake
-  (https://slidetake.com) as a viewer: a spatial deck with layouts and light/dark, from the vendored
-  assets/slidetake/slidetake.js. Recording is Slidetake's own (slidetake.com or `npx slidetake`). Every other deck keeps reveal.js, below.
+  (https://slidetake.com): a spatial deck with layouts and light/dark, from the vendored
+  assets/slidetake/slidetake.js; a viewer on the built site, and recording under `hugo server`. Every other deck keeps reveal.js, below.
 */ -}}
 {{- if eq (lower (.Params.engine | default "")) "slidetake" -}}
 {{- /* the header's trail: the site, the deck's section, and the slides list it belongs to */ -}}
@@ -45,7 +45,9 @@
 
 <body>
     {{- /* The deck for slidetake.js: its markdown, its frontmatter as data, where its images live, and the
-           way back to the site. Hugo writes the values as JSON inside this script. */}}
+           way back to the site. Hugo writes the values as JSON inside this script. Under `hugo server`
+           (the author's own preview) the deck records too: ● Studio, Camera and the bottom bar; a built
+           site is a viewer for readers. */}}
     <script>
         window.SLIDETAKE = {
             markdown: {{ .RawContent }},
@@ -53,7 +55,8 @@
             base: {{ .Permalink }},
             trail: {{ $trail }},
             colors: {{ $colors }},
-            themeKey: "continuum-theme"
+            themeKey: "continuum-theme",
+            recording: {{ hugo.IsServer }}
         };
     </script>
     {{- /* fingerprinted, so a theme update never leaves readers on a cached older Slidetake */}}
