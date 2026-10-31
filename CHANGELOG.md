@@ -14,6 +14,15 @@ is the record.
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-10-31
+
+### Added
+
+- Slidetake decks record again under `hugo server`: the author's local preview
+  gets ● Studio, Camera and the bottom bar (Slidetake 0.4.1's
+  `recording: true`), to record in the browser or with OBS where the deck is
+  written. A built site stays a viewer for readers.
+
 ## [0.25.0] - 2026-10-31
 
 ### Changed
