@@ -1,7 +1,7 @@
 {{- /*
   Two engines for a slide page. `engine: slidetake` in a deck's frontmatter renders it with Slidetake
-  (https://slidetake.com): a spatial deck with layouts, camera and recording, from the vendored
-  assets/slidetake/slidetake.js. Every other deck keeps reveal.js, below.
+  (https://slidetake.com) as a viewer: a spatial deck with layouts and light/dark, from the vendored
+  assets/slidetake/slidetake.js. Recording is Slidetake's own (slidetake.com or `npx slidetake`). Every other deck keeps reveal.js, below.
 */ -}}
 {{- if eq (lower (.Params.engine | default "")) "slidetake" -}}
 {{- /* the header's trail: the site, the deck's section, and the slides list it belongs to */ -}}

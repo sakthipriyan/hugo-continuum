@@ -14,6 +14,22 @@ is the record.
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-10-31
+
+### Changed
+
+- Slidetake 0.4.0. A Slidetake deck on the site is a viewer only: `?obs` no
+  longer brings back the camera and recording controls. Record the deck's
+  markdown on slidetake.com or with `npx slidetake`, where Slidetake Studio
+  records in the browser or with OBS. Also: Graphviz diagrams in the section's
+  colours for dark and light, code blocks that widen their card instead of
+  scrolling, and image cards with consistent text.
+
+### Fixed
+
+- Slidetake decks: an image with text beside it is a split card again, and a
+  square or tall image's caption stays inside its card.
+
 ## [0.24.1] - 2026-10-28
 
 ### Fixed
