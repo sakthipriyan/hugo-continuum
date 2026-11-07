@@ -14,6 +14,19 @@ is the record.
 
 ## [Unreleased]
 
+## [0.27.0] - 2026-11-07
+
+### Changed
+
+- Slidetake 0.5.3. For readers: Keys and Fullscreen are icons beside
+  light/dark, so the header stays on one line on narrow screens, and the Keys
+  card no longer lists the editor (E), which decks on a site don't have. The
+  first slide's title fades up instead of scrambling.
+- Under `hugo server` (recording): the camera can sit behind the slide's words
+  (`<!-- camera: behind -->`, `left`, `right`, `top`, `bottom`, `solid`,
+  `clear`), a deck can be portrait (`format: portrait`, 9:16 for Shorts and
+  Reels), and takes join without freezes.
+
 ## [0.26.0] - 2026-10-31
 
 ### Added
