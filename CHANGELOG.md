@@ -14,6 +14,14 @@ is the record.
 
 ## [Unreleased]
 
+## [0.27.1] - 2026-11-07
+
+### Fixed
+
+- Slidetake 0.5.4: a bar or line chart's value labels read cleanly in dark mode
+  (the text colour, no outline), and a chart on a `<!-- view: full -->` card
+  fills the card. In a portrait deck a full card is 9:16 and fills the column.
+
 ## [0.27.0] - 2026-11-07
 
 ### Changed
