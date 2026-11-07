@@ -14,6 +14,15 @@ is the record.
 
 ## [Unreleased]
 
+## [0.27.2] - 2026-11-07
+
+### Fixed
+
+- Slidetake 0.5.5: a chart grows in when its slide is reached going forward and
+  shows already drawn going back, so a recording that steps back stays clean;
+  moving between a split slide and a plain card cross-fades in place instead of
+  flying across the map; a line chart's lines and points are their full size.
+
 ## [0.27.1] - 2026-11-07
 
 ### Fixed
