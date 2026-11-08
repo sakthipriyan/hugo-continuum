@@ -14,6 +14,14 @@ is the record.
 
 ## [Unreleased]
 
+## [0.27.5] - 2026-11-08
+
+### Changed
+
+- Slidetake 0.5.8: on a published page (no recording), a slide with the camera
+  behind it shows as its card instead of words beside an empty camera frame.
+  `hugo server` previews keep the frame, since recording works there.
+
 ## [0.27.4] - 2026-11-08
 
 ### Changed
