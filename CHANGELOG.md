@@ -14,6 +14,15 @@ is the record.
 
 ## [Unreleased]
 
+## [0.27.3] - 2026-11-08
+
+### Fixed
+
+- Slidetake 0.5.6: a take no longer loses about a quarter of a second as the
+  camera's box starts to move (a split screen, the words swapping sides); a
+  downloaded video keeps each frame's own time, so it no longer stutters where
+  the recording was smooth; retaking a deck's first slide starts on that slide.
+
 ## [0.27.2] - 2026-11-07
 
 ### Fixed
