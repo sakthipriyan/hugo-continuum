@@ -14,6 +14,13 @@ is the record.
 
 ## [Unreleased]
 
+## [0.27.6] - 2026-11-08
+
+### Changed
+
+- Slidetake 0.5.9: a chart that a step reveals (after `<!-- steps -->`) grows in
+  as it appears, as a chart does when its slide opens.
+
 ## [0.27.5] - 2026-11-08
 
 ### Changed
