@@ -14,6 +14,14 @@ is the record.
 
 ## [Unreleased]
 
+## [0.27.4] - 2026-11-08
+
+### Changed
+
+- Slidetake 0.5.7: a picture beside the camera (`behind left` or `right`) fills
+  its half at its own shape, so a phone screenshot runs most of the frame's
+  height; a carousel's pictures keep one size, long captions included.
+
 ## [0.27.3] - 2026-11-08
 
 ### Fixed
