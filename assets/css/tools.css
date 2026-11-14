@@ -486,20 +486,15 @@
 }
 
 .summary-table th {
-    background: transparent;
+    background: transparent !important;
     font-weight: 700;
     color: var(--foreground-strong);
 }
 
-.summary-table thead {
-    background: var(--accent-surface, var(--secondary-color));
-    color: var(--on-accent, var(--on-secondary));
-}
-
 .summary-table thead th {
-    background: var(--accent-surface, var(--secondary-color)) !important;
-    color: var(--on-accent, var(--on-secondary)) !important;
-    border-bottom: 2px solid var(--accent-line, var(--border));
+    background: transparent !important;
+    color: var(--foreground-strong) !important;
+    border-bottom: 2px solid var(--border);
 }
 
 .summary-table th:first-child,
@@ -1165,21 +1160,16 @@
 }
 
 .asset-table th {
-    background: transparent;
+    background: transparent !important;
     font-weight: 700;
     color: var(--foreground-strong);
     white-space: nowrap;
 }
 
-.asset-table thead {
-    background: var(--accent-surface, var(--secondary-color));
-    color: var(--on-accent, var(--on-secondary));
-}
-
 .asset-table thead th {
-    background: var(--accent-surface, var(--secondary-color)) !important;
-    color: var(--on-accent, var(--on-secondary)) !important;
-    border-bottom: 2px solid var(--accent-line, var(--border));
+    background: transparent !important;
+    color: var(--foreground-strong) !important;
+    border-bottom: 2px solid var(--border);
 }
 
 .asset-table tbody tr:hover {
@@ -1212,35 +1202,23 @@
 }
 
 .allocation-table th {
-    background: transparent;
+    background: transparent !important;
     font-weight: 600;
     color: var(--foreground-strong);
-    border-bottom: 1px solid var(--border);
-}
-
-.allocation-table thead {
-    background: var(--accent-surface, var(--secondary-color));
-    color: var(--on-accent, var(--on-secondary));
+    border-bottom: 2px solid var(--border);
 }
 
 .allocation-table thead th {
-    background: var(--accent-surface, var(--secondary-color)) !important;
-    color: var(--on-accent, var(--on-secondary)) !important;
-    border-bottom: 2px solid var(--accent-line, var(--border));
+    background: transparent !important;
+    color: var(--foreground-strong) !important;
+    border-bottom: 2px solid var(--border);
 }
 
-/* Generic table headers across tools */
-.table thead,
-.table-responsive table thead {
-    background: var(--accent-surface, var(--secondary-color));
-    color: var(--on-accent, var(--on-secondary));
-}
-
-.table thead th,
-.table-responsive table thead th {
-    background: var(--accent-surface, var(--secondary-color)) !important;
-    color: var(--on-accent, var(--on-secondary)) !important;
-    border-bottom: 2px solid var(--accent-line, var(--border));
+/* Input side tables: clean unhighlighted header row */
+.sip-inputs table thead,
+.sip-inputs table thead th {
+    background: transparent !important;
+    color: var(--foreground-strong) !important;
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
