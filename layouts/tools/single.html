@@ -50,19 +50,19 @@
 {{ end }}
 {{- /* Load tool-specific JavaScript */ -}}
 {{ if .Params.tool_script }}
-<script src="{{ .Params.tool_script | absURL }}"></script>
+<script src="{{ .Params.tool_script | relURL }}"></script>
 {{ else if eq .Params.tool_type "emergencyFund" }}
-<script src="{{ "js/emergency-fund.js" | absURL }}"></script>
+<script src="{{ "js/emergency-fund.js" | relURL }}"></script>
 {{ else if eq .Params.tool_type "sipCalculator" }}
-<script src="{{ "js/realvalue-sip-engine.js" | absURL }}"></script>
+<script src="{{ "js/realvalue-sip-engine.js" | relURL }}"></script>
 {{ else if eq .Params.tool_type "emiCalculator" }}
-<script src="{{ "js/realvalue-emi-engine.js" | absURL }}"></script>
+<script src="{{ "js/realvalue-emi-engine.js" | relURL }}"></script>
 {{ else if eq .Params.tool_type "multiAssetAllocator" }}
-<script src="{{ "js/realvalue-family-sip-allocator.js" | absURL }}"></script>
+<script src="{{ "js/realvalue-family-sip-allocator.js" | relURL }}"></script>
 {{ else if eq .Params.tool_type "fxTracker" }}
-<script src="{{ "js/realvalue-fx-engine.js" | absURL }}"></script>
+<script src="{{ "js/realvalue-fx-engine.js" | relURL }}"></script>
 {{ else if eq .Params.tool_type "portfolioTracker" }}
-<script src="{{ "js/realvalue-portfolio.js" | absURL }}"></script>
+<script src="{{ "js/realvalue-portfolio.js" | relURL }}"></script>
 {{ end }}
 <script>
     // Initialize tool based on type
