@@ -18,7 +18,8 @@ jobs:
   # build itself takes milliseconds -- installing Hugo is the whole cost.
   theme:
     name: Theme
-    runs-on: ubuntu-latest
+    # ubuntu-24.04-arm: free for public repos; bump to ubuntu-26.04-arm when 24.04 is retired.
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v7
 
@@ -54,7 +55,8 @@ jobs:
   # this pull request's theme.
   consumer:
     name: Consumer
-    runs-on: ubuntu-latest
+    # ubuntu-24.04-arm: free for public repos; bump to ubuntu-26.04-arm when 24.04 is retired.
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout the theme
         uses: actions/checkout@v7
