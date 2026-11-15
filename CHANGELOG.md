@@ -14,6 +14,19 @@ is the record.
 
 ## [Unreleased]
 
+## [0.27.7] - 2026-11-15
+
+### Changed
+
+- Tools follow the section accent: unit and mode toggles, share and calculate
+  buttons, result and input/output card borders, the timeline, and the plan and
+  contribution table headers use `--accent-line`, `--accent-surface`,
+  `--on-accent` and `--accent-ink` (each falling back to `--secondary-color`)
+  instead of fixed blue, orange and green. Summary and asset table headers lose
+  their highlight.
+- Tool scripts load with `relURL` instead of `absURL`, so a tool works when the
+  dev server is opened from another device.
+
 ## [0.27.6] - 2026-11-08
 
 ### Changed
