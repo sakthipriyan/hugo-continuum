@@ -14,7 +14,8 @@ permissions:
 jobs:
   verify_tag:
     name: Verify the tag
-    runs-on: ubuntu-latest
+    # ubuntu-24.04-arm: free for public repos; bump to ubuntu-26.04-arm when 24.04 is retired.
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v7
         with:
@@ -34,7 +35,8 @@ jobs:
   release:
     name: Release
     needs: [verify_tag]
-    runs-on: ubuntu-latest
+    # ubuntu-24.04-arm: free for public repos; bump to ubuntu-26.04-arm when 24.04 is retired.
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: write
     steps:
