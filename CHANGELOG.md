@@ -14,6 +14,12 @@ is the record.
 
 ## [Unreleased]
 
+### Added
+
+- Book chapters show their published date under the subtitle, and a
+  "Updated" date when `.Lastmod` is later than `.Date` (from Git with
+  `enableGitInfo`, else front matter).
+
 ## [0.27.7] - 2026-11-15
 
 ### Changed

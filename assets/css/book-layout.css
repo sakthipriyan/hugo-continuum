@@ -708,6 +708,23 @@ body.book-reader {
     }
 }
 
+/* Published and last-updated dates under the chapter subtitle. */
+.chapter-dates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+    margin: 0.75rem 0 0;
+    font-size: 0.95rem;
+    color: var(--book-text);
+    opacity: 0.7;
+}
+
+.chapter-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
 /* "Also as" inside a chapter. The site's own colours are fixed to a light
    background; the reader flips to dark, where they left the text invisible
    against its own pill. These follow the reader's tokens instead. */

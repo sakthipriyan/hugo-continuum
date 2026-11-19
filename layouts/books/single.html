@@ -60,6 +60,24 @@
                     <p class="chapter-subtitle">{{ .Params.subtitle }}</p>
                     {{- end }}
 
+                    {{- /* Published and, when a later commit changed the chapter,
+                           last updated. Lastmod comes from Git when the site
+                           sets enableGitInfo, else from front matter. */ -}}
+                    {{- if not .Date.IsZero }}
+                    <p class="chapter-dates">
+                        <span class="chapter-date" title="Published">
+                            <span aria-hidden="true">📅</span>
+                            <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+                        </span>
+                        {{- if and (not .Lastmod.IsZero) (gt (.Lastmod.Format "2006-01-02") (.Date.Format "2006-01-02")) }}
+                        <span class="chapter-date" title="Last updated">
+                            <span aria-hidden="true">🔄</span>
+                            Updated <time datetime="{{ .Lastmod.Format "2006-01-02" }}">{{ .Lastmod.Format "Jan 2, 2006" }}</time>
+                        </span>
+                        {{- end }}
+                    </p>
+                    {{- end }}
+
                     {{- /* A chapter covered elsewhere as a talk or a post. The
                            book header is fixed chrome, so this belongs with the
                            chapter rather than up there. */ -}}
